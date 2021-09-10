@@ -169,6 +169,11 @@
     <Image Include="Agate.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AgateEngine\AgateEngine.vcxproj">
+      <Project>{681c46c6-e20b-43ed-8cb4-10dec7deb3a5}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
