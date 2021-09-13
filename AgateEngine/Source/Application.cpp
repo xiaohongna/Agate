@@ -1,9 +1,8 @@
 #include "pch.h"
-#include "Application.h"
+#include "../Include/Application.h"
 
 namespace Agate
 {
-
     bool Application::Initialize()
     {
         return false;

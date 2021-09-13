@@ -5,6 +5,7 @@
 #include "framework.h"
 #include "Agate.h"
 #include "ThreadPool.h"
+#include <iostream>
 
 #define MAX_LOADSTRING 100
 
@@ -18,7 +19,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
+Agate::ThreadPool   threadPool();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -124,6 +125,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 发送退出消息并返回
 //
 //
+
+std::vector<std::future<int>> s_futures;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -145,10 +149,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_MBUTTONDOWN:
+    case WM_LBUTTONDOWN:
         {
-
+        OutputDebugString(L"开始async");
+        auto fut = (std::async(std::launch::async, [] {
+            OutputDebugString(L"线程中进入了");
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::cout << L"线程中吗" << std::endl;
+            return 5;
+            }));
+        s_futures.emplace_back(std::move(fut));
+        
+        //auto  i = fut.get();
+        //std::cout << i << L"出结果了" << std::endl;
         }
+        OutputDebugString(L"结束async");
         break;
     case WM_PAINT:
         {
