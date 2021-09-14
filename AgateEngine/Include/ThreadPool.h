@@ -50,6 +50,28 @@ namespace Agate
             condition.notify_one();
             return res;
         }
+
+        template<typename F>
+        void AddTask(F(*task)(), void(*then)(F))
+        {
+            using return_type = decltype(task());
+            auto pTask = std::make_shared<std::packaged_task<return_type()>>(std::move(task));
+            {
+                std::lock_guard<std::mutex> lock(queue_mutex);
+                assert(stop == false);
+                tasks.emplace([pTask, then] {
+                    (*pTask)();
+                    then(pTask->get_future().get());
+                    });
+            }
+            condition.notify_one();
+        }
+
+        template<typename F>
+        void AddTask1(F&& task, void(*then)(decltype(task())))
+        {
+
+        }
         
         ~ThreadPool()
         {
