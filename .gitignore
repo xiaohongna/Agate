@@ -1,2 +1,17 @@
 
 *.ipch
+Debug/Agate.exe
+*.obj
+*.tlog
+*.log
+Agate/Debug/vc142.idb
+Agate/Debug/Agate.pch
+*.db
+*.recipe
+*.lib
+*.idb
+*.pch
+.vs/Agate/v16/.suo
+*.ilk
+*.pdb
+*.user
