@@ -19,7 +19,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-Agate::ThreadPool   threadPool();
+Agate::ThreadPool   threadPool(2);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -128,6 +128,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 std::vector<std::future<int>> s_futures;
 
+void test(std::string&& s)
+{
+    auto str = std::make_shared<std::wstring>(L"这是字符串");
+    auto fun = [s1 = std::move(s), str] {
+        std::cout << s1 << std::endl;
+    std::wcout << str << std::endl;
+    };
+    fun();
+};
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -150,19 +160,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_LBUTTONDOWN:
-        {
-        OutputDebugString(L"开始async");
-        auto fut = (std::async(std::launch::async, [] {
-            OutputDebugString(L"线程中进入了");
+    {
+        test("2424");
+        int z = 5;
+        threadPool.AddTask([]{
             std::this_thread::sleep_for(std::chrono::seconds(5));
-            std::cout << L"线程中吗" << std::endl;
             return 5;
-            }));
-        s_futures.emplace_back(std::move(fut));
-        
-        //auto  i = fut.get();
-        //std::cout << i << L"出结果了" << std::endl;
-        }
+            },[hWnd](int i) {
+                OutputDebugString(L"延迟调用");
+                SetWindowText(hWnd, L"接受到了");
+            });
+    }
         OutputDebugString(L"结束async");
         break;
     case WM_PAINT:

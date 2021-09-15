@@ -15,3 +15,6 @@ Agate/Debug/Agate.pch
 *.ilk
 *.pdb
 *.user
+*.db-shm
+*.db-wal
+*.opendb

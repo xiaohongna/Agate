@@ -4,12 +4,13 @@
 #include <queue>
 #include <atomic>
 #include <assert.h>
-
+#include "MainTaskQueue.h"
 namespace Agate
 {
-    class ThreadPool {
+    class ThreadPool
+    {
     public:
-        ThreadPool(size_t threads = 1):stop(false)
+        ThreadPool(size_t threads = 1) :stop(false)
         {
             for (size_t i = 0; i < threads; ++i)
                 workers.emplace_back(
@@ -35,44 +36,32 @@ namespace Agate
         }
 
         template<typename F>
-        auto AddTask(F&& task)->std::future<decltype(task())>
+        void AddTask(F&& task)
         {
-            using return_type = decltype(task());
-            auto pTask = std::make_shared<std::packaged_task<return_type()>>(std::move(task));
-            std::future<return_type> res = pTask->get_future();
             {
                 std::lock_guard<std::mutex> lock(queue_mutex);
                 assert(stop == false);
-                tasks.emplace([pTask] {
-                    (*pTask)();
-                    });
-            }
-            condition.notify_one();
-            return res;
-        }
-
-        template<typename F>
-        void AddTask(F(*task)(), void(*then)(F))
-        {
-            using return_type = decltype(task());
-            auto pTask = std::make_shared<std::packaged_task<return_type()>>(std::move(task));
-            {
-                std::lock_guard<std::mutex> lock(queue_mutex);
-                assert(stop == false);
-                tasks.emplace([pTask, then] {
-                    (*pTask)();
-                    then(pTask->get_future().get());
-                    });
+                tasks.emplace(std::move(task));
             }
             condition.notify_one();
         }
 
         template<typename F>
-        void AddTask1(F&& task, void(*then)(decltype(task())))
+        void AddTask(F&& task, std::function<void(decltype(task()))>&& then)
         {
-
+            {
+                std::lock_guard<std::mutex> lock(queue_mutex);
+                assert(stop == false);
+                tasks.emplace([tk = std::move(task), tn = std::move(then), this]{
+                    auto result = tk();
+                    main_Queue.Async([result, t = std::move(tn)]{
+                        t(result);
+                        });
+                    });
+            }
+            condition.notify_one();
         }
-        
+
         ~ThreadPool()
         {
             {
@@ -90,6 +79,8 @@ namespace Agate
         std::mutex queue_mutex;
         std::condition_variable condition;
         bool stop;
+
+        MainTaskQueue    main_Queue;
     };
 }
 
