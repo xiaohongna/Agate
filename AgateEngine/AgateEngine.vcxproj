@@ -151,9 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
     <ClInclude Include="Include\Application.h" />
     <ClInclude Include="Include\MainTaskQueue.h" />
+    <ClInclude Include="Include\TaskQueue.h" />
     <ClInclude Include="Include\ThreadPool.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -165,6 +165,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\TaskQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -8,8 +8,7 @@
 
 namespace Agate
 {
-const UINT  WM_ASYNC = WM_USER + 1021;
-const UINT  WM_SYNC = WM_USER + 1022;
+
 
 	class MainTaskQueue
 	{

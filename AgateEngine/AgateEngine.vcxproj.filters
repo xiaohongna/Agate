@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -30,12 +27,18 @@
     <ClInclude Include="Include\MainTaskQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Include\TaskQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MainTaskQueue.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TaskQueue.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

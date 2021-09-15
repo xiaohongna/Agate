@@ -5,6 +5,7 @@
 #include "framework.h"
 #include "Agate.h"
 #include "ThreadPool.h"
+#include "TaskQueue.h"
 #include <iostream>
 
 #define MAX_LOADSTRING 100
@@ -163,13 +164,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         test("2424");
         int z = 5;
-        threadPool.AddTask([]{
+     
+        Agate::TaskQueue::Async([]{
             std::this_thread::sleep_for(std::chrono::seconds(5));
             return 5;
             },[hWnd](int i) {
                 OutputDebugString(L"延迟调用");
                 SetWindowText(hWnd, L"接受到了");
             });
+            
     }
         OutputDebugString(L"结束async");
         break;
