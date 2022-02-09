@@ -4,9 +4,10 @@
 #include "pch.h"
 #include "framework.h"
 #include "Agate.h"
-#include "ThreadPool.h"
-#include "TaskQueue.h"
 #include <iostream>
+#include <vector>
+#include <future>
+#include "TaskQueue.h"
 
 #define MAX_LOADSTRING 100
 
@@ -20,7 +21,6 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-Agate::ThreadPool   threadPool(2);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,

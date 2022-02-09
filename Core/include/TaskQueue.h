@@ -9,6 +9,9 @@
 
 namespace Agate
 {
+	const UINT  WM_ASYNC = WM_USER + 1021;
+	const UINT  WM_SYNC = WM_USER + 1022;
+
 	using Task = std::function<void()>;
 
 	class TaskQueue final
@@ -23,6 +26,7 @@ namespace Agate
 			condition.notify_all();
 			for (std::thread& worker : workers)
 				worker.join();
+			DestroyWindow(message_window_handle);
 		}
 		
 		/// <summary>
@@ -64,8 +68,26 @@ namespace Agate
 		/// 在主线程上面异步执行任务
 		/// </summary>
 		/// <param name="task"></param>
-		static inline void AsyncOnMain(Task&& task);
-
+		static inline void AsyncOnMain(Task&& task)
+		{
+			auto pTask = new std::function<void()>(std::move(task));
+			::PostMessage(message_window_handle, WM_ASYNC, 0, (LPARAM)pTask);
+		}
+		/// <summary>
+		/// 在主线程上执行任务，并返回结果
+		/// </summary>
+		/// <typeparam name="F">任务类型</typeparam>
+		/// <param name="task"></param>
+		/// <returns></returns>
+		template<typename F>
+		static auto SyncOnMain(F&& task)-> decltype(task())
+		{
+			using task_return_t = decltype(task());
+			auto packTask = std::packaged_task<task_return_t()>(std::move(task));
+			::SendMessage(message_window_handle, WM_SYNC, 0, (LPARAM)&packTask);
+			return packTask.get();
+		}
+		
 	private:
 		TaskQueue();
 	private:

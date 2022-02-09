@@ -18,3 +18,8 @@ Agate/Debug/Agate.pch
 *.db-shm
 *.db-wal
 *.opendb
+x64/Debug/Agate.exe
+Core/Core.vcxproj.filters
+AgateEngine/AgateEngine.vcxproj.filters
+AgateEngine/AgateEngine.vcxproj.filters
+AgateEngine/AgateEngine.vcxproj.filters
