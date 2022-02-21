@@ -94,6 +94,8 @@ namespace Agate
 	void D2DRenderEngine::Render(RectangeVisual* root)
 	{
 		m_pDeviceContext->BeginDraw();
+		D2D1_COLOR_F clearColor{ 1.0f, 1.0f,1.0f, 1.0f};
+		m_pDeviceContext->Clear(clearColor);
 		root->Render(this);
 		m_pDeviceContext->EndDraw();
 		m_SwapChain->Present(0, 0);
@@ -141,7 +143,7 @@ namespace Agate
 			assert(true);
 			return;
 		}
-		DXGI_RGBA argb = { 1.0f, 1.0f, 0.0f, 1.0f };
+		DXGI_RGBA argb = { 1.0f, 1.0f, 1.0f, 1.0f };
 		m_SwapChain->SetBackgroundColor(&argb);
 	}
 
