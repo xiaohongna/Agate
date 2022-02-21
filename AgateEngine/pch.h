@@ -7,6 +7,9 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include <atlbase.h>
+#include <atlcom.h>
+#include <atlctl.h>
 // 添加要在此处预编译的标头
 
 #endif //PCH_H

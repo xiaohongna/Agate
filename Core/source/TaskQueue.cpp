@@ -57,6 +57,7 @@ namespace Agate
 	TaskQueue::TaskQueue()
 	{
         unsigned int threads = std::thread::hardware_concurrency() - 2;
+        threads = 2;
         for (unsigned int i = 0; i < threads; ++i)
             workers.emplace_back(
                 [this]
