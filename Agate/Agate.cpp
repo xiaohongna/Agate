@@ -7,8 +7,6 @@
 #include <iostream>
 #include <vector>
 #include <future>
-#include "TaskQueue.h"
-#include "Application.h"
 
 #define MAX_LOADSTRING 100
 
@@ -99,7 +97,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        在此函数中，我们在全局变量中保存实例句柄并
 //        创建和显示主程序窗口。
 //
-Agate::Application agateApp;
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
@@ -112,7 +109,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   agateApp.Initialize(hWnd, false);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -129,18 +125,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 发送退出消息并返回
 //
 //
-
-std::vector<std::future<int>> s_futures;
-
-void test(std::string&& s)
-{
-    auto str = std::make_shared<std::wstring>(L"这是字符串");
-    auto fun = [s1 = std::move(s), str] {
-        std::cout << s1 << std::endl;
-    std::wcout << str << std::endl;
-    };
-    fun();
-};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -184,7 +168,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            agateApp.Render();
             // TODO: 在此处添加使用 hdc 的任何绘图代码...
             EndPaint(hWnd, &ps);
         }
