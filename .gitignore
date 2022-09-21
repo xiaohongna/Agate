@@ -28,3 +28,5 @@ AgateEngine/AgateEngine.vcxproj.filters
 x64
 *.vsidx
 *.lock
+Debug
+.vs/Agate/v17
