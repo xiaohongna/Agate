@@ -33,6 +33,13 @@ enum class BlendMode
 
 };
 
+enum class VertexType
+{
+	XYColor,
+	XYUV,
+	XYUVColor,
+};
+
 struct VertexXYColor
 {
 	Vector2 pos;

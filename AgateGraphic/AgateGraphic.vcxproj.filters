@@ -30,9 +30,6 @@
     <ClInclude Include="include\Geometry.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicDrawer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Brush.h">
       <Filter>头文件</Filter>
     </ClInclude>

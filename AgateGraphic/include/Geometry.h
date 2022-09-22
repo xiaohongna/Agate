@@ -10,7 +10,6 @@
 /// ÃèÊöÏß¶Î×éºÏ
 /// </summary>
 /// 
-class FigureData;
 
 class Figure
 {
@@ -38,15 +37,49 @@ public:
 	void Reset();
 
 	void Close();
+
 	friend class Geometry;
 private:
 	std::unique_ptr<FigureData> _Data;
 };
 
+struct SimpleBuffer
+{
+	void* buffer;
+	int	count;
+	SimpleBuffer() :buffer{}, count{}
+	{
+	}
+	
+	template<typename T>
+	T* Alloc(int count)
+	{
+		Free();
+		this->count = count;
+		buffer = malloc(count * sizeof(T));
+		return (T*)buffer;
+	}
+
+	void Free()
+	{
+		if (buffer)
+		{
+			delete buffer;
+			buffer = nullptr;
+			count = 0;
+		}
+	}
+
+	~SimpleBuffer() 
+	{
+		Free();
+	}
+};
+
 class Geometry
 {
 public:
-	Geometry() :_Frozen{ false }, _StrokeWidth{1.0f}
+	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }, _RasterizeData{}
 	{
 
 	}
@@ -65,30 +98,31 @@ public:
 		
 	Vector4 GetBounds();
 	
-	void Freeze()
-	{
-		_Frozen = true;
-	}
+	void Freeze();
 
 	int Rasterize();
 
-	const RasterizeData& getRasterizeData(int index);
+	const RasterizeData& GetRasterizeData(uint32_t index);
 private:
 	void Flatten();
+
 	void FlattenBezier(Vector2* pPoints);
+
+	void RasterizeStroke(uint32_t color);
+
 private:
 	std::vector<std::unique_ptr<FigureData>> _Figures;
 	std::vector<Vector2> _FlattenLines;
 	
 	RasterizeData  _RasterizeData[2];
 
-	std::vector<byte>  _StrokeVertexBuffer;
-	std::vector<DrawIndex> _StrokeDrawIndex;
+	SimpleBuffer  _StrokeVertexBuffer;
+	SimpleBuffer  _StrokeDrawIndex;
 
-	std::vector<byte>  _FillVertexBuffer;
-	std::vector<DrawIndex> _FillDrawIndex;
+	SimpleBuffer  _FillVertexBuffer;
+	SimpleBuffer  _FillDrawIndex;
 
-	bool		_Frozen;
+	uint32_t	_Flags;
 	float		_StrokeWidth;
 
 };

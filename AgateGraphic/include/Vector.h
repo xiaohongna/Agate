@@ -33,3 +33,7 @@ struct Vector4
 
     constexpr Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
 };
+
+static inline Vector2 operator*(const Vector2& lhs, const float rhs) { return Vector2(lhs.x * rhs, lhs.y * rhs); }
+static inline Vector2 operator+(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x + rhs.x, lhs.y + rhs.y); }
+static inline Vector2 operator-(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x - rhs.x, lhs.y - rhs.y); }
