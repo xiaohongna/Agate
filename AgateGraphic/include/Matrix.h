@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <math.h> 
+#include <cmath>
 #include "Vector.h"
 
 constexpr float PI = 3.14159265358979323846f;
@@ -163,7 +163,7 @@ public:
     /// <returns></returns>
     bool IsRotation() const
     {
-        return abs(_11 + _21 - _12 - _22) > 0.00001;
+        return abs(_11 + _21 - _12 - _22) > 0.00001f;
     }
 private:
     void SetProduct(const Matrix3X2& a, const Matrix3X2& b)

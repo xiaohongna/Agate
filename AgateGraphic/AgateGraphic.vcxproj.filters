@@ -15,16 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\GraphicDrawer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="source\GraphicMath.h">
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Matrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Verext.h">
+    <ClInclude Include="include\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Vector.h">
@@ -33,12 +30,30 @@
     <ClInclude Include="include\Geometry.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphicDrawer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Brush.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bezier.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DrawingContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\GraphicDrawer.cpp">
+    <ClCompile Include="source\Geometry.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Geometry.cpp">
+    <ClCompile Include="source\Brush.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\bezier.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawingContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

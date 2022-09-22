@@ -156,6 +156,7 @@ private:
     std::vector<PathCmd> _PathCmd;
 };
 
+/*
 enum class BrushType
 {
     SolidColor,    //´¿É«
@@ -184,6 +185,7 @@ private:
     uint32_t _Color;
     void* _Texture;
 };
+*/
 
 class DrawerList
 {

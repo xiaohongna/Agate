@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="D3D11">
-      <UniqueIdentifier>{8f5ecdd0-39ab-47cb-904a-e8b07f600d39}</UniqueIdentifier>
+      <UniqueIdentifier>{b52edc85-2d67-4cf4-92f0-491c13b222b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,8 +60,5 @@
     <Image Include="Agate.ico">
       <Filter>资源文件</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

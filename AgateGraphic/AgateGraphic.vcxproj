@@ -19,16 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Brush.h" />
+    <ClInclude Include="include\DrawingContext.h" />
     <ClInclude Include="include\Geometry.h" />
     <ClInclude Include="include\GraphicDrawer.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\Vector.h" />
-    <ClInclude Include="include\Verext.h" />
+    <ClInclude Include="include\Vertex.h" />
+    <ClInclude Include="source\bezier.h" />
     <ClInclude Include="source\GraphicMath.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\bezier.cpp" />
+    <ClCompile Include="source\Brush.cpp" />
+    <ClCompile Include="source\DrawingContext.cpp" />
     <ClCompile Include="source\Geometry.cpp" />
-    <ClCompile Include="source\GraphicDrawer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
