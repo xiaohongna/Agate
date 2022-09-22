@@ -64,8 +64,6 @@ public:
 	void SetStrokeBrush(Brush& brush);
 		
 	Vector4 GetBounds();
-
-	const std::vector<Vector2>& Flatten();
 	
 	void Freeze()
 	{
@@ -75,7 +73,9 @@ public:
 	int Rasterize();
 
 	const RasterizeData& getRasterizeData(int index);
-	
+private:
+	void Flatten();
+	void FlattenBezier(Vector2* pPoints);
 private:
 	std::vector<std::unique_ptr<FigureData>> _Figures;
 	std::vector<Vector2> _FlattenLines;

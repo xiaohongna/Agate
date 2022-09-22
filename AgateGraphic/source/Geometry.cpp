@@ -61,6 +61,7 @@ public:
 		_Types.resize(size + count);
 		return _Types.data() + size;
 	}
+	friend class Geometry;
 private:
 	std::vector<Vector2> _Points;
 	std::vector<PointType> _Types;
@@ -195,13 +196,53 @@ Vector4 Geometry::GetBounds()
 	return Vector4();
 }
 
-const std::vector<Vector2>& Geometry::Flatten()
+void Geometry::Flatten()
 {
-	return _FlattenLines;
+	for (size_t i = 0; i < _Figures.size(); i++)
+	{
+		FigureData* figure = _Figures[i].get();
+		auto ppt = figure->_Points.data();
+		for (auto ptt : figure->_Types)
+		{
+			if (ptt == PointType::Line)
+			{
+				_FlattenLines.push_back(*ppt);
+				ppt++;
+				_FlattenLines.push_back(*ppt);
+			}
+			else
+			{
+				FlattenBezier(ppt);
+				ppt += 3;
+			}
+		}
+	}
+}
+
+void Geometry::FlattenBezier(Vector2* pPoints)
+{
+	constexpr int BufferCount = 16;
+	POINT points[BufferCount];
+	for (int i = 0; i < 4; i++)
+	{
+		points[i].x = pPoints[i].x * 16;
+		points[i].y = pPoints[i].y * 16;
+	}
+	CMILBezier bezier(points, nullptr);
+	BOOL haveMore = true;
+	while (haveMore)
+	{
+		auto count = bezier.Flatten(points, BufferCount, &haveMore);
+		for (int i = 0; i < count; i++)
+		{
+			_FlattenLines.emplace_back(Vector2(points[i].x / 16.0f, points[i].y / 16.0f));
+		}
+	}
 }
 
 int Geometry::Rasterize()
 {
+	Flatten();
 	return 0;
 }
 
