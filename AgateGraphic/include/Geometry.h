@@ -9,7 +9,13 @@
 /// <summary>
 /// ÃèÊöÏß¶Î×éºÏ
 /// </summary>
-/// 
+///
+///  
+enum class PointType
+{
+	Line,
+	Bezier
+};
 
 class Figure
 {
@@ -40,12 +46,24 @@ public:
 
 	friend class Geometry;
 private:
-	std::unique_ptr<FigureData> _Data;
+	
+	Vector2* AddPoints(int count);
+	
+	PointType* AddTypes(int count);
+	
+	bool IsEmpty()
+	{
+		return _Points.empty();
+	}
+private:
+	std::vector<Vector2> _Points;
+	std::vector<PointType> _Types;
+	bool  _Closed;
 };
 
 struct SimpleBuffer
 {
-	void* buffer;
+	char* buffer;
 	int	count;
 	SimpleBuffer() :buffer{}, count{}
 	{
@@ -100,7 +118,7 @@ public:
 	
 	void Freeze();
 
-	int Rasterize();
+	uint32_t Rasterize();
 
 	const RasterizeData& GetRasterizeData(uint32_t index);
 private:
@@ -111,7 +129,7 @@ private:
 	void RasterizeStroke(uint32_t color);
 
 private:
-	std::vector<std::unique_ptr<FigureData>> _Figures;
+	std::vector<Figure> _Figures;
 	std::vector<Vector2> _FlattenLines;
 	
 	RasterizeData  _RasterizeData[2];

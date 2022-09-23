@@ -19,107 +19,45 @@ constexpr uint32_t  Frozen_Flag_Mask = 1;
 
 constexpr uint32_t  Closed_Flag_Mask = 1 << 1;
 
-enum class PointType
-{
-	Line,
-	Bezier
-};
 
-class FigureData
-{
-public:
-	FigureData() :_Closed{false} 
-	{
-
-	};
-
-	void Reserve(int ptCount, int typeCount)
-	{
-		_Points.reserve(ptCount);
-		_Types.reserve(typeCount);
-	}
-
-	FigureData(const FigureData& from)
-	{
-		_Points.reserve(from._Points.size());
-		_Types.reserve(from._Types.size());
-		_Points.assign(from._Points.begin(), from._Points.end());
-		_Types.assign(from._Types.begin(), from._Types.end());
-		_Closed = from._Closed;
-	}
-
-
-	void StartAt(float x, float y)
-	{
-		assert(IsEmpty());
-		_Points.emplace_back(Vector2(x, y));
-	}
-
-	bool IsEmpty()
-	{
-		return _Points.empty();
-	}
-
-	void Close()
-	{
-		_Closed = true;
-	}
-
-	Vector2* AddPoints(int count)
-	{
-		auto size = _Points.size();
-		_Points.resize(size + count);
-		return _Points.data() + size;
-
-	}
-	
-	PointType* AddTypes(int count)
-	{
-		auto size = _Types.size();
-		_Types.resize(size + count);
-		return _Types.data() + size;
-	}
-	friend class Geometry;
-private:
-	std::vector<Vector2> _Points;
-	std::vector<PointType> _Types;
-	bool  _Closed;
-	
-};
-
-Figure::Figure(): _Data{std::make_unique<FigureData>()}
+Figure::Figure() : _Closed{}
 {
 }
 
-Figure::Figure(const Figure& figure):_Data{ std::make_unique<FigureData>(*figure._Data)}
+Figure::Figure(const Figure& figure)
 {
-
+	_Points.assign(figure._Points.begin(), figure._Points.end());
+	_Types.assign(figure._Types.begin(), figure._Types.end());
+	_Closed = figure._Closed;
 }
 
-Figure::Figure(Figure&& figure)
+Figure::Figure(Figure&& figure):_Points{ std::move(figure._Points)}, 
+_Types{std::move(figure._Types)},
+_Closed{figure._Closed}
 {
-	_Data = std::move(figure._Data);
 }
 
 void Figure::Reserve(int ptCount, int typeCount)
 {
-	_Data->Reserve(ptCount, typeCount);
+	_Points.reserve(ptCount);
+	_Types.reserve(typeCount);
 }
 
 void Figure::StartAt(float x, float y)
 {
-	_Data->StartAt(x, y);
+	assert(IsEmpty());
+	_Points.emplace_back(Vector2(x, y));
 }
 
 void Figure::StartAt(const Vector2& pt)
 {
-	_Data->StartAt(pt.x, pt.y);
+	StartAt(pt.x, pt.y);
 }
 
 void Figure::LineTo(const Vector2& pt)
 {
-	auto ppt = _Data->AddPoints(1);
-	auto ptype = _Data->AddTypes(1);
+	auto ppt = AddPoints(1);
+	auto ptype = AddTypes(1);
 	ppt->x = pt.x;
 	ppt->y = pt.y;
 	*ptype = PointType::Line;
@@ -127,8 +65,8 @@ void Figure::LineTo(const Vector2& pt)
 
 void Figure::LineTo(const Vector2* pts, int count)
 {
-	auto ppt = _Data->AddPoints(count);
-	auto ptype = _Data->AddTypes(count);
+	auto ppt = AddPoints(count);
+	auto ptype = AddTypes(count);
 	for (size_t i = 0; i < count; i++)
 	{
 		ppt->x = pts->x;
@@ -142,8 +80,8 @@ void Figure::LineTo(const Vector2* pts, int count)
 
 void Figure::BezierTo(const Vector2& ctr1, const Vector2& ctr2, const Vector2& endPt)
 {
-	auto ppt = _Data->AddPoints(3);
-	auto ptype = _Data->AddTypes(1);
+	auto ppt = AddPoints(3);
+	auto ptype = AddTypes(1);
 	ppt[0].x = ctr1.x;
 	ppt[0].y = ctr1.y;
 	ppt[1].x = ctr2.x;
@@ -157,8 +95,8 @@ void Figure::BezierTo(const Vector2* pts, int count)
 {
 	assert(count % 3 == 0);
 	auto bCount = count / 3;
-	auto ppt = _Data->AddPoints(bCount * 3);
-	auto ptype = _Data->AddTypes(bCount);
+	auto ppt = AddPoints(bCount * 3);
+	auto ptype = AddTypes(bCount);
 	for (int i = 0; i < bCount; i++)
 	{
 		ppt[0] = pts[0];
@@ -175,12 +113,28 @@ void Figure::BezierTo(const Vector2* pts, int count)
 
 void Figure::Reset()
 {
-	_Data = std::make_unique<FigureData>();
+	_Points.clear();
+	_Types.clear();
+	_Closed = false;
 }
 
 void Figure::Close()
 {
-	_Data->Close();
+	_Closed = true;
+}
+
+Vector2* Figure::AddPoints(int count)
+{
+	auto size = _Points.size();
+	_Points.resize(size + count);
+	return _Points.data() + size;
+}
+
+PointType* Figure::AddTypes(int count)
+{
+	auto size = _Types.size();
+	_Types.resize(size + count);
+	return _Types.data() + size;
 }
 
 void Geometry::AddFigure(Figure&& figure)
@@ -188,7 +142,7 @@ void Geometry::AddFigure(Figure&& figure)
 	assert((_Flags & Frozen_Flag_Mask) == 0);
 	if ((_Flags & Frozen_Flag_Mask) == 0)
 	{
-		_Figures.emplace_back(std::move(figure._Data));
+		_Figures.emplace_back(std::move(figure));
 	}
 }
 
@@ -219,11 +173,10 @@ void Geometry::Freeze()
 
 void Geometry::Flatten()
 {
-	for (size_t i = 0; i < _Figures.size(); i++)
+	for (auto& figure :_Figures)
 	{
-		FigureData* figure = _Figures[i].get();
-		auto ppt = figure->_Points.data();
-		for (auto ptt : figure->_Types)
+        auto ppt = figure._Points.data();
+		for (auto ptt : figure._Types)
 		{
 			if (ptt == PointType::Line)
 			{
@@ -246,8 +199,8 @@ void Geometry::FlattenBezier(Vector2* pPoints)
 	POINT points[BufferCount];
 	for (int i = 0; i < 4; i++)
 	{
-		points[i].x = pPoints[i].x * 16;
-		points[i].y = pPoints[i].y * 16;
+		points[i].x = LONG(pPoints[i].x * 16);
+		points[i].y = LONG(pPoints[i].y * 16);
 	}
 	CMILBezier bezier(points, nullptr);
 	BOOL haveMore = true;
@@ -431,10 +384,10 @@ void Geometry::RasterizeStroke(uint32_t col)
 	_RasterizeData[0].vertexCount = _StrokeVertexBuffer.count;
 }
 
-int Geometry::Rasterize()
+uint32_t Geometry::Rasterize()
 {
 	Flatten();
-	return 0;
+	return 1;
 }
 
 const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
