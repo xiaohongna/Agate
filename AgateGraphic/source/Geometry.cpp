@@ -378,7 +378,7 @@ void Geometry::RasterizeStroke(uint32_t col)
     }
 	_RasterizeData[0].pipline = PiplineType::Color;
 	_RasterizeData[0].blend = BlendMode::Blend;
-	_RasterizeData[0].indexBuffer = (DrawIndex*)_StrokeVertexBuffer.buffer;
+	_RasterizeData[0].indexBuffer = _StrokeDrawIndex.buffer;
 	_RasterizeData[0].indexCount = _StrokeDrawIndex.count;
 	_RasterizeData[0].vertexBuffer = _StrokeVertexBuffer.buffer;
 	_RasterizeData[0].vertexCount = _StrokeVertexBuffer.count;

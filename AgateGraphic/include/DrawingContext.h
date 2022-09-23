@@ -38,11 +38,11 @@ private:
 
 	
 private:
-	IRenderer*		_Renderer;
-	SimpleBuffer	_VertextBuffer;
-	uint32_t		_VertextCount;
-	SimpleBuffer	_IndexBuffer;
-	uint32_t		_IndexCount;
+	IRenderer*				_Renderer;
+	FixedBuffer<char>		_VertextBuffer;
+	uint32_t				_VertextCount;
+	FixedBuffer<DrawIndex>	_IndexBuffer;
+	uint32_t				_IndexCount;
 
 	int32_t	_ViewWidth;
 	int32_t	_ViewHeight;

@@ -61,21 +61,26 @@ private:
 	bool  _Closed;
 };
 
-struct SimpleBuffer
+
+template<typename T>
+struct FixedBuffer
 {
-	char* buffer;
-	int	count;
-	SimpleBuffer() :buffer{}, count{}
+	T* buffer;
+	uint32_t count;   //元素数量
+	uint32_t size;    //buffer内存大小
+	FixedBuffer() :buffer{}, count{}, size{}
 	{
+
 	}
 	
-	template<typename T>
-	T* Alloc(int count)
+	template<typename T1>
+	T1* Alloc(int count)
 	{
 		Free();
 		this->count = count;
-		buffer = (char*)malloc(count * sizeof(T));
-		return (T*)buffer;
+		size = count * sizeof(T1);
+		buffer = (T*)malloc(size);
+		return (T1*)buffer;
 	}
 
 	void Free()
@@ -88,16 +93,34 @@ struct SimpleBuffer
 		}
 	}
 
-	~SimpleBuffer() 
+	template<typename T1>
+	T1* As() const
+	{
+		assert(size == count * sizeof(T1));
+		return (T1*)buffer;
+	}
+
+	~FixedBuffer() 
 	{
 		Free();
+	}
+};
+
+struct RasterizeData
+{
+	PiplineType pipline;
+	BlendMode   blend;
+	FixedBuffer<char> vertex;
+	FixedBuffer<DrawIndex> index;
+	{
+		
 	}
 };
 
 class Geometry
 {
 public:
-	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }, _RasterizeData{}
+	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }
 	{
 
 	}
@@ -132,13 +155,8 @@ private:
 	std::vector<Figure> _Figures;
 	std::vector<Vector2> _FlattenLines;
 	
-	RasterizeData  _RasterizeData[2];
-
-	SimpleBuffer  _StrokeVertexBuffer;
-	SimpleBuffer  _StrokeDrawIndex;
-
-	SimpleBuffer  _FillVertexBuffer;
-	SimpleBuffer  _FillDrawIndex;
+	RasterizeData	_StrokeData;
+	RasterizeData	_FillData;
 
 	uint32_t	_Flags;
 	float		_StrokeWidth;

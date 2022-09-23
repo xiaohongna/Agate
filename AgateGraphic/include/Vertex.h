@@ -58,14 +58,3 @@ struct VertexXYUVColor
 	Vector2 uv;
 	uint32_t col;
 };
-
-struct RasterizeData
-{
-	PiplineType pipline;
-	BlendMode   blend;
-	void*		texture;
-	void*		vertexBuffer;
-	int			vertexCount;
-	DrawIndex*	indexBuffer;
-	int			indexCount;
-};
