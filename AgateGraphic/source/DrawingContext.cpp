@@ -4,12 +4,13 @@ constexpr  uint32_t Max_IndexBuffer_Count = 1024 * 20;
 
 constexpr  uint32_t Max_VertexBuffer_Count = 1024 * 10;
 
-DrawingContext::DrawingContext():_Pipline{PiplineType::Color}, 
+DrawingContext::DrawingContext(IRenderer* delegate):_Pipline{PiplineType::Color},
 _BlendMode{BlendMode::Blend},
 _IndexCount{},
 _VertextCount{},
 _ViewWidth{1024},
-_ViewHeight{768}
+_ViewHeight{768},
+_Renderer(delegate)
 
 {
 	_VertextBuffer.Alloc<char>(Max_VertexBuffer_Count * sizeof(VertexXYUVColor));
@@ -62,6 +63,12 @@ void DrawingContext::Draw(Geometry& geometry)
 	}
 }
 
+void DrawingContext::Present(uint32_t sync)
+{
+	Flush();
+	_Renderer->Present(sync);
+}
+
 bool DrawingContext::NeedFlush(const RasterizeData& data)
 {
 	if (_Pipline != data.pipline || _BlendMode != data.blend)
@@ -83,18 +90,23 @@ bool DrawingContext::NeedFlush(const RasterizeData& data)
 	return false;
 }
 
-uint32_t DrawingContext::GetVertextItemSize()
-{
-	return uint32_t();
-}
-
 void DrawingContext::Flush()
 {
 	if (_VertextCount == 0)
 	{
 		return;
 	}
-
+	RasterizeData data
+	{
+		_Pipline,
+		_BlendMode,
+		nullptr,
+		_VertextBuffer.buffer,
+		_VertextCount,
+		(DrawIndex*)_IndexBuffer.buffer,
+		_IndexCount
+	};
+	_Renderer->Draw(data);
 	_VertextCount = 0;
 	_IndexCount = 0;
 }

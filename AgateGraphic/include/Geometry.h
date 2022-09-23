@@ -74,7 +74,7 @@ struct SimpleBuffer
 	{
 		Free();
 		this->count = count;
-		buffer = malloc(count * sizeof(T));
+		buffer = (char*)malloc(count * sizeof(T));
 		return (T*)buffer;
 	}
 

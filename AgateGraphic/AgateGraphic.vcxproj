@@ -23,6 +23,7 @@
     <ClInclude Include="include\DrawingContext.h" />
     <ClInclude Include="include\Geometry.h" />
     <ClInclude Include="include\Matrix.h" />
+    <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="source\bezier.h" />

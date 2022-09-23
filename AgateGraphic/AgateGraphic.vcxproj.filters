@@ -39,6 +39,9 @@
     <ClInclude Include="include\DrawingContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Geometry.cpp">

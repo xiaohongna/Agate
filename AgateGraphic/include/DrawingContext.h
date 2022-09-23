@@ -1,23 +1,25 @@
 #pragma once
 
 #include "Geometry.h"
-
+#include "Renderer.h"
 
 class DrawingContext
 {
 public:
-	DrawingContext();
+	DrawingContext(IRenderer* delegate);
 
 	void SetViewSize(uint32_t width, uint32_t height);
 
 	void SetClip(Vector4 clip);
-
+	
 	void Draw(Geometry& geometry);
 
-	void Flush();
+	void Present(uint32_t sync);
 private:
 	bool NeedFlush(const RasterizeData& data);
 	
+	void Flush();
+
 	uint32_t GetVertextItemSize()
 	{
 		switch (_Pipline)
@@ -36,6 +38,7 @@ private:
 
 	
 private:
+	IRenderer*		_Renderer;
 	SimpleBuffer	_VertextBuffer;
 	uint32_t		_VertextCount;
 	SimpleBuffer	_IndexBuffer;
