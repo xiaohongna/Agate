@@ -92,7 +92,7 @@ bool GraphicContext::CreateDeviceD3D(HWND hWnd)
     return true;
 }
 
-void GraphicContext::SetViewSize(int width, int height)
+void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
 {
     if (!_init)
     {
@@ -130,7 +130,7 @@ void GraphicContext::SetViewSize(int width, int height)
     CreateRenderTarget();
 }
 
-void GraphicContext::Render(DrawerList* list)
+void GraphicContext::Draw(const BatchDrawData& data)
 {
     if (!_init)
     {
@@ -147,8 +147,7 @@ void GraphicContext::Render(DrawerList* list)
     
     SetupRenderState();
     _DeviceContext->DrawIndexed(list->GetVertexIndexCount(), 0, 0);
-    //_DeviceContext->Draw()
-    HRESULT hr = _SwapChain->Present(1, 0);
+    
 }
 
 void* GraphicContext::LoadTexture(const std::wstring& fileName)
@@ -205,6 +204,12 @@ void* GraphicContext::LoadTexture(const std::wstring& fileName)
     delete bits;
     _TextureStorage[fileName] = resourceView;
     return resourceView;
+}
+
+
+void GraphicContext::Present(uint32_t sync)
+{
+    HRESULT hr = _SwapChain->Present(1, 0);
 }
 
 void GraphicContext::CleanupDeviceD3D()

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "Renderer.h"
 
 #define NameSpace_Render_D11_Header  namespace agate { namespace render { namespace D11 {
 #define NameSpace_Render_D11_Tail  } } }
@@ -131,15 +132,21 @@ private:
     BufferType _Type;
 };
 
-    class GraphicContext
+    class GraphicContext:public IRenderer
     {
     public:
         GraphicContext();
         ~GraphicContext();
         bool CreateDeviceD3D(HWND hWnd);
-        void SetViewSize(int width, int height);
-        void Render(DrawerList* list);
+
         void* LoadTexture(const std::wstring& fileName);
+
+        void SetViewPort(uint32_t width, uint32_t height) override;
+
+        void Draw(const BatchDrawData& data) override;
+
+        void Present(uint32_t sync) override;
+
     private:
         void CleanupDeviceD3D();
         void CreateRenderTarget();
@@ -156,8 +163,8 @@ private:
         ID3D11RenderTargetView* _MainRenderTargetView;
 
         IDXGIFactory* _Factory;
-        GPUBuffer<DrawVert> _VertexBuffer;
-        GPUBuffer<ImDrawIdx> _VertexIndexBuffer;
+        GPUBuffer<VertexXYColor> _VertexBuffer;
+        GPUBuffer<DrawIndex> _VertexIndexBuffer;
         ID3D11VertexShader* _VertexShader;
         ID3D11InputLayout* _InputLayout;
         GPUBuffer<float>  _VertexConstantBuffer;

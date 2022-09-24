@@ -4,26 +4,40 @@ constexpr  uint32_t Max_IndexBuffer_Count = 1024 * 20;
 
 constexpr  uint32_t Max_VertexBuffer_Count = 1024 * 10;
 
-DrawingContext::DrawingContext(IRenderer* delegate):_Pipline{PiplineType::Color},
-_BlendMode{BlendMode::Blend},
-_IndexCount{},
-_VertextCount{},
+DrawingContext::DrawingContext(IRenderer* delegate):
 _ViewWidth{1024},
 _ViewHeight{768},
-_Renderer(delegate)
-
+_ClipX{0},
+_ClipY{0},
+_ClipWidth{1024},
+_ClipHeight{768},
+_Renderer(delegate),
+_CurrentBatch{},
+_ClipChanged{true}
 {
 	_VertextBuffer.Alloc<char>(Max_VertexBuffer_Count * sizeof(VertexXYUVColor));
 	_IndexBuffer.Alloc<DrawIndex>(Max_IndexBuffer_Count);
+	_CurrentBatch.vertexData = _VertextBuffer.buffer;
+	_CurrentBatch.indexData = _IndexBuffer.buffer;
 }
 
 void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
 {
-
+	_ViewWidth = width;
+	_ViewHeight = height;
+	_ClipX = 0;
+	_ClipY = 0;
+	_ClipWidth = width;
+	_ClipHeight = height;
 }
 
 void DrawingContext::SetClip(Vector4 clip)
 {
+	_ClipX = clip.x;
+	_ClipY = clip.y;
+	_ClipWidth = clip.z - clip.x;
+	_ClipHeight = clip.w - clip.y;
+	_ClipChanged = true;
 }
 
 void DrawingContext::Draw(Geometry& geometry)
@@ -36,29 +50,29 @@ void DrawingContext::Draw(Geometry& geometry)
 		if (NeedFlush(data))
 		{
 			Flush();
-			_Pipline = data.pipline;
-			_BlendMode = data.blend;
 		}
-		auto vsize = GetVertextItemSize();
-		if(_VertextCount == 0)
+		PushCommnd(data);
+
+		auto itemSize = _VertextBuffer.preSize;
+		if(_CurrentBatch.vertexCount == 0)
 		{
 			//全新的buffer，直接copy就行
-			memcpy_s(_VertextBuffer.buffer, _VertextBuffer.count, data.vertexBuffer, data.vertexCount * vsize);
-			memcpy_s(_IndexBuffer.buffer, _IndexBuffer.count * sizeof(DrawIndex), data.indexBuffer, data.indexCount * sizeof(DrawIndex));
+			memcpy_s(_VertextBuffer.buffer, _VertextBuffer.size, data.vertex.buffer, data.vertex.size);
+			memcpy_s(_IndexBuffer.buffer, _IndexBuffer.size, data.index.buffer, data.index.size);
 		}
 		else
 		{
-			auto vertexPtr = _VertextBuffer.buffer + vsize * _VertextCount;
-			memcpy_s(vertexPtr, _VertextBuffer.count - vsize * _VertextCount, data.vertexBuffer, data.vertexCount * vsize);
-			auto indexPtr = _IndexBuffer.buffer + _IndexCount * sizeof(DrawIndex);
-			memcpy_s(indexPtr, _IndexBuffer.count - _IndexCount * sizeof(DrawIndex), data.indexBuffer, data.indexCount * sizeof(DrawIndex));
-			auto pIndex = (DrawIndex*)indexPtr;
-			for (size_t i = 0; i < data.indexCount; i++)
+			auto vertexPtr = _VertextBuffer.buffer + itemSize * _CurrentBatch.vertexCount;
+			memcpy_s(vertexPtr, _VertextBuffer.size - itemSize * _CurrentBatch.vertexCount, data.vertex.buffer, data.vertex.size);
+			auto indexPtr = _IndexBuffer.buffer + _CurrentBatch.indexCount;
+			memcpy_s(indexPtr, _IndexBuffer.size - _CurrentBatch.indexCount * sizeof(DrawIndex), data.index.buffer, data.index.size);
+			for (size_t i = 0; i < data.index.count; i++)
 			{
-				pIndex[i] += _IndexCount;
+				*indexPtr += _CurrentBatch.indexCount;
+				indexPtr++;
 			}
-			_VertextCount += data.vertexCount;
-			_IndexCount += data.indexCount;
+			_CurrentBatch.vertexCount += data.vertex.count;
+			_CurrentBatch.indexCount += data.index.count;
 		}
 	}
 }
@@ -71,18 +85,18 @@ void DrawingContext::Present(uint32_t sync)
 
 bool DrawingContext::NeedFlush(const RasterizeData& data)
 {
-	if (_Pipline != data.pipline || _BlendMode != data.blend)
+	if (_CurrentBatch.pipline != data.pipline)
 	{
-		//渲染或者混合模式不行
+		//渲染管线不同
 		return true;
 	}
-	if (data.indexCount + _IndexCount > _IndexBuffer.count)
+	if (data.index.count + _CurrentBatch.indexCount > _IndexBuffer.count)
 	{
 		/// indexbuff 满了
 		return true;
 	}
-	uint32_t vertexsize = GetVertextItemSize();
-	if (data.vertexCount * _VertextCount * vertexsize > _VertextBuffer.count)
+	
+	if (data.vertex.count + _CurrentBatch.vertexCount > _VertextBuffer.count)
 	{
 		//vertex满了
 		return true;
@@ -92,21 +106,54 @@ bool DrawingContext::NeedFlush(const RasterizeData& data)
 
 void DrawingContext::Flush()
 {
-	if (_VertextCount == 0)
+	if (_CurrentBatch.commands.empty())
 	{
 		return;
 	}
-	RasterizeData data
+	_Renderer->Draw(_CurrentBatch);
+	_CurrentBatch.indexCount = 0;
+	_CurrentBatch.vertexCount = 0;
+	_CurrentBatch.commands.clear();
+}
+
+void DrawingContext::PushCommnd(const RasterizeData& data)
+{
+	if (_CurrentBatch.commands.empty()) 
 	{
-		_Pipline,
-		_BlendMode,
-		nullptr,
-		_VertextBuffer.buffer,
-		_VertextCount,
-		(DrawIndex*)_IndexBuffer.buffer,
-		_IndexCount
-	};
-	_Renderer->Draw(data);
-	_VertextCount = 0;
-	_IndexCount = 0;
+		DrawCommand cmd 
+		{ 
+			data.blend, 
+			data.index.count,
+			_ClipX,
+			_ClipY,
+			_ClipWidth,
+			_ClipHeight
+		};
+		_ClipChanged = false;
+		_CurrentBatch.commands.emplace_back(cmd);
+	}
+	else
+	{
+		auto& back = _CurrentBatch.commands.back();
+		if (back.blend != data.blend || _ClipChanged)
+		{
+			DrawCommand cmd{};
+			cmd.blend = data.blend;
+			if (_ClipChanged)
+			{
+				cmd.clipLeft = _ClipX;
+				cmd.clipTop = _ClipY;
+				cmd.clipWidth = _ClipWidth;
+				cmd.clipHeight = _ClipHeight;
+			}
+			cmd.indexCount = data.index.count;
+			cmd.startIndexLocation = _CurrentBatch.indexCount - 1;
+			_ClipChanged = false;
+		}
+		else
+		{
+			back.indexCount += data.index.count;
+		}
+	}
+	
 }

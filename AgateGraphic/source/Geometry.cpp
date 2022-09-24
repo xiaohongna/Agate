@@ -236,8 +236,8 @@ void Geometry::RasterizeStroke(uint32_t col)
     const int idx_count = thick_line ? count * 18 : count * 12;
     const int vtx_count = thick_line ? points_count * 4 : points_count * 3;
 
-    auto idxWritePtr = _StrokeDrawIndex.Alloc<DrawIndex>(idx_count);
-    auto vtxWritePtr = _StrokeVertexBuffer.Alloc<VertexXYColor>(vtx_count);
+    auto idxWritePtr = _StrokeData.index.Alloc<DrawIndex>(idx_count);
+    auto vtxWritePtr = _StrokeData.vertex.Alloc<VertexXYColor>(vtx_count);
 
     Vector2* temp_normals = (Vector2*)_malloca(points_count * (thick_line ? 5 : 3) * sizeof(Vector2));
     Vector2* temp_points = temp_normals + points_count;
@@ -376,12 +376,8 @@ void Geometry::RasterizeStroke(uint32_t col)
             vtxWritePtr += 4;
         }
     }
-	_RasterizeData[0].pipline = PiplineType::Color;
-	_RasterizeData[0].blend = BlendMode::Blend;
-	_RasterizeData[0].indexBuffer = _StrokeDrawIndex.buffer;
-	_RasterizeData[0].indexCount = _StrokeDrawIndex.count;
-	_RasterizeData[0].vertexBuffer = _StrokeVertexBuffer.buffer;
-	_RasterizeData[0].vertexCount = _StrokeVertexBuffer.count;
+    _StrokeData.pipline = PiplineType::Color;
+    _StrokeData.blend = BlendMode::Blend;
 }
 
 uint32_t Geometry::Rasterize()
@@ -393,6 +389,5 @@ uint32_t Geometry::Rasterize()
 const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
 {
 	assert(index < 2);
-	return _RasterizeData[index];
-	// TODO: 在此处插入 return 语句
+    return index == 0 ? _StrokeData : _FillData;
 }

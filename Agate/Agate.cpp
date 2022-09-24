@@ -149,18 +149,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_LBUTTONDOWN:
     {
-        /*
-        test("2424");
-        int z = 5;
-     
-        Agate::TaskQueue::Async([]{
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-            return 5;
-            },[hWnd](int i) {
-                OutputDebugString(L"延迟调用");
-                SetWindowText(hWnd, L"接受到了");
-            });
-            */
             
     }
         break;

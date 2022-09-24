@@ -20,36 +20,21 @@ private:
 	
 	void Flush();
 
-	uint32_t GetVertextItemSize()
-	{
-		switch (_Pipline)
-		{
-		case PiplineType::Color:
-			return sizeof(VertexXYColor);
-		case PiplineType::Texture:
-			return sizeof(VertexXYUV);
-		case PiplineType::TextureColor:
-			return sizeof(VertexXYUVColor);
-		default:
-			assert(false);
-			return 0;
-		}
-	}
+	void PushCommnd(const RasterizeData& data);
 
-	
 private:
 	IRenderer*				_Renderer;
 	FixedBuffer<char>		_VertextBuffer;
-	uint32_t				_VertextCount;
 	FixedBuffer<DrawIndex>	_IndexBuffer;
-	uint32_t				_IndexCount;
 
-	int32_t	_ViewWidth;
-	int32_t	_ViewHeight;
+	BatchDrawData		    _CurrentBatch;
 
-	PiplineType  _Pipline;
-	BlendMode	_BlendMode;
-	Vector4		_ClipRgn;
-
+	uint32_t	_ViewWidth;
+	uint32_t	_ViewHeight;
+	uint32_t	_ClipX;
+	uint32_t	_ClipY;
+	uint32_t	_ClipWidth;
+	uint32_t	_ClipHeight;
+	bool		_ClipChanged;
 };
 

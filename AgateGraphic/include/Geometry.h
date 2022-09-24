@@ -67,8 +67,9 @@ struct FixedBuffer
 {
 	T* buffer;
 	uint32_t count;   //元素数量
+	uint32_t preSize;  //单元素大小
 	uint32_t size;    //buffer内存大小
-	FixedBuffer() :buffer{}, count{}, size{}
+	FixedBuffer() :buffer{}, count{}, size{}, preSize{1}
 	{
 
 	}
@@ -76,20 +77,21 @@ struct FixedBuffer
 	template<typename T1>
 	T1* Alloc(int count)
 	{
-		Free();
 		this->count = count;
+		preSize = sizeof(T1);
 		size = count * sizeof(T1);
 		buffer = (T*)malloc(size);
 		return (T1*)buffer;
 	}
 
-	void Free()
+	void Reset()
 	{
 		if (buffer)
 		{
 			delete buffer;
 			buffer = nullptr;
 			count = 0;
+			size = 0;
 		}
 	}
 
@@ -102,7 +104,7 @@ struct FixedBuffer
 
 	~FixedBuffer() 
 	{
-		Free();
+		Reset();
 	}
 };
 
@@ -112,6 +114,7 @@ struct RasterizeData
 	BlendMode   blend;
 	FixedBuffer<char> vertex;
 	FixedBuffer<DrawIndex> index;
+	RasterizeData():pipline{PiplineType::Color}, blend{BlendMode::Blend}
 	{
 		
 	}
