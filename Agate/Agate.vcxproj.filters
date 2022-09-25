@@ -36,6 +36,9 @@
     <ClInclude Include="GraphicContext.h">
       <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="RenderDemo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agate.cpp">
@@ -46,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="GraphicContext.cpp">
       <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderDemo.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -42,7 +42,12 @@ void DrawingContext::SetClip(Vector4 clip)
 
 void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 {
-
+	_Renderer->SetRenderTarget();
+	if (clear)
+	{
+		Vector4 clr(1.0f, 1.0f, 0, 0);
+		_Renderer->Clear(clr);
+	}
 }
 
 void DrawingContext::Draw(Geometry& geometry)

@@ -9,6 +9,7 @@
 #include <future>
 #include "GraphicContext.h"
 #include "DrawingContext.h"
+#include "RenderDemo.h"
 
 #define MAX_LOADSTRING 100
 
@@ -22,6 +23,10 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+GraphicContext D3D11Context;
+std::unique_ptr<DrawingContext> Canvas;
+RenderDemo Demo;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -49,15 +54,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // 主消息循环:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
+            {
+                return 0;
+            }
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            Demo.Render(*Canvas);
         }
     }
-
     return (int) msg.wParam;
 }
 
@@ -100,8 +115,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        创建和显示主程序窗口。
 //
 
-GraphicContext D3D11Context;
-std::unique_ptr<DrawingContext> Canvas;
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
