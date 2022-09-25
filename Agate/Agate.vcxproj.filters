@@ -61,4 +61,12 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Color_VS.hlsl">
+      <Filter>D3D11</Filter>
+    </FxCompile>
+    <FxCompile Include="Color_PS.hlsl">
+      <Filter>D3D11</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

@@ -12,9 +12,11 @@ public:
 
 	void SetClip(Vector4 clip);
 	
+	void BeginDraw(bool clear, uint32_t clearColor);
+
 	void Draw(Geometry& geometry);
 
-	void Present(uint32_t sync);
+	void EndDraw(uint32_t sync);
 private:
 	bool NeedFlush(const RasterizeData& data);
 	

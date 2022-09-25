@@ -132,56 +132,60 @@ private:
     BufferType _Type;
 };
 
-    class GraphicContext:public IRenderer
-    {
-    public:
-        GraphicContext();
-        ~GraphicContext();
-        bool CreateDeviceD3D(HWND hWnd);
+class GraphicContext :public IRenderer
+{
+public:
+    GraphicContext();
+    ~GraphicContext();
+    bool CreateDeviceD3D(HWND hWnd);
 
-        void* LoadTexture(const std::wstring& fileName);
+    //void* LoadTexture(const std::wstring& fileName);
 
-        void SetViewPort(uint32_t width, uint32_t height) override;
+    void SetViewPort(uint32_t width, uint32_t height) override;
 
-        void Draw(const BatchDrawData& data) override;
+    void SetRenderTarget() override;
 
-        void Present(uint32_t sync) override;
+    void Clear(const Vector4& color) override;
 
-    private:
-        void CleanupDeviceD3D();
-        void CreateRenderTarget();
-        void CleanupRenderTarget();
-        void LoadVertexShader();
-        void LoadPixelShader();
-        void CreateOther();
+    void Draw(const BatchDrawData& data) override;
 
-        void SetupRenderState();
-    private:
-        IDXGISwapChain* _SwapChain;
-        ID3D11Device* _Device;
-        ID3D11DeviceContext* _DeviceContext;
-        ID3D11RenderTargetView* _MainRenderTargetView;
+    void Present(uint32_t sync) override;
 
-        IDXGIFactory* _Factory;
-        GPUBuffer<VertexXYColor> _VertexBuffer;
-        GPUBuffer<DrawIndex> _VertexIndexBuffer;
-        ID3D11VertexShader* _VertexShader;
-        ID3D11InputLayout* _InputLayout;
-        GPUBuffer<float>  _VertexConstantBuffer;
-        GPUBuffer<float>  _VertexColorConstantBuffer;
-        ID3D11PixelShader* _PixelShader;
-        ID3D11SamplerState* _Sampler;
-        ID3D11ShaderResourceView* _FontTextureView;
-        ID3D11RasterizerState* _RasterizerState;
-        ID3D11BlendState* _BlendState;
-        ID3D11DepthStencilState* _DepthStencilState;
-        std::map<std::wstring, ID3D11ShaderResourceView*> _TextureStorage;
-        int                         _VertexBufferSize;
-        int                         _IndexBufferSize;
+private:
+    void CleanupDeviceD3D();
+    void CreateRenderTarget();
+    void CleanupRenderTarget();
+    void LoadVertexShader();
+    void LoadPixelShader();
+    void CreateOther();
 
-        int _Width;
-        int _Height;
-        bool _init;
-    };
+    void SetupRenderState();
+private:
+    IDXGISwapChain* _SwapChain;
+    ID3D11Device* _Device;
+    ID3D11DeviceContext* _DeviceContext;
+    ID3D11RenderTargetView* _MainRenderTargetView;
+
+    IDXGIFactory* _Factory;
+    GPUBuffer<VertexXYColor> _VertexBuffer;
+    GPUBuffer<DrawIndex> _VertexIndexBuffer;
+    ID3D11VertexShader* _VertexShader;
+    ID3D11InputLayout* _InputLayout;
+    GPUBuffer<float>  _VertexConstantBuffer;
+    GPUBuffer<float>  _VertexColorConstantBuffer;
+    ID3D11PixelShader* _PixelShader;
+    ID3D11SamplerState* _Sampler;
+    ID3D11ShaderResourceView* _FontTextureView;
+    ID3D11RasterizerState* _RasterizerState;
+    ID3D11BlendState* _BlendState;
+    ID3D11DepthStencilState* _DepthStencilState;
+    std::map<std::wstring, ID3D11ShaderResourceView*> _TextureStorage;
+    int                         _VertexBufferSize;
+    int                         _IndexBufferSize;
+
+    int _Width;
+    int _Height;
+    bool _init;
+};
 
 //NameSpace_Render_D11_Tail

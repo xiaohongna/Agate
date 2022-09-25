@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include <future>
+#include "GraphicContext.h"
+#include "DrawingContext.h"
 
 #define MAX_LOADSTRING 100
 
@@ -98,6 +100,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        创建和显示主程序窗口。
 //
 
+GraphicContext D3D11Context;
+std::unique_ptr<DrawingContext> Canvas;
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 将实例句柄存储在全局变量中
@@ -109,6 +114,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
+   D3D11Context.CreateDeviceD3D(hWnd);
+   Canvas = std::make_unique<DrawingContext>(&D3D11Context);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 

@@ -1,9 +1,11 @@
+
+#include "pch.h"
 #include "GraphicContext.h"
 #include <d3dcompiler.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-
+//#include "stb/stb_image.h"
 #include <DirectXMath.h>
+#include <filesystem>
 
 #define Safe_Release(obj) if(obj) { obj->Release(); obj = nullptr;}
 
@@ -130,26 +132,36 @@ void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
     CreateRenderTarget();
 }
 
+void GraphicContext::SetRenderTarget()
+{
+    _DeviceContext->OMSetRenderTargets(1, &_MainRenderTargetView, NULL);
+}
+
+void GraphicContext::Clear(const Vector4& color)
+{
+    _DeviceContext->ClearRenderTargetView(_MainRenderTargetView, (float*)&color);
+}
+
 void GraphicContext::Draw(const BatchDrawData& data)
 {
     if (!_init)
     {
         return;
     }
-    
-    const float clear_color_with_alpha[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    _DeviceContext->OMSetRenderTargets(1, &_MainRenderTargetView, NULL);
-    _DeviceContext->ClearRenderTargetView(_MainRenderTargetView, clear_color_with_alpha);
-    _DeviceContext->PSSetShaderResources(0, list->GetTextureCount(), (ID3D11ShaderResourceView**)(list->GetAllTexture()));
-    _VertexBuffer.Update(_DeviceContext, list->GetVertex(), list->GetVertexCount());
-    _VertexIndexBuffer.Update(_DeviceContext, list->GetVertexIndex(), list->GetVertexIndexCount());
-    _VertexColorConstantBuffer.Update(_DeviceContext, list->GetColor(), list->GetColorCount());
+
+    //_DeviceContext->PSSetShaderResources(0, list->GetTextureCount(), (ID3D11ShaderResourceView**)(list->GetAllTexture()));
+    _VertexBuffer.Update(_DeviceContext, (VertexXYColor*)data.vertexData, data.vertexCount);
+    _VertexIndexBuffer.Update(_DeviceContext, data.indexData, data.indexCount);
+    //_VertexColorConstantBuffer.Update(_DeviceContext, list->GetColor(), list->GetColorCount());
     
     SetupRenderState();
-    _DeviceContext->DrawIndexed(list->GetVertexIndexCount(), 0, 0);
+    for (auto cmd : data.commands)
+    {
+        _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
+    }
     
 }
-
+/*
 void* GraphicContext::LoadTexture(const std::wstring& fileName)
 {
     auto found = _TextureStorage.find(fileName);
@@ -205,6 +217,7 @@ void* GraphicContext::LoadTexture(const std::wstring& fileName)
     _TextureStorage[fileName] = resourceView;
     return resourceView;
 }
+*/
 
 
 void GraphicContext::Present(uint32_t sync)
@@ -229,12 +242,19 @@ void GraphicContext::CreateRenderTarget()
 
 void GraphicContext::CleanupRenderTarget()
 {
+
 }
 
 void GraphicContext::LoadVertexShader()
 {
+    wchar_t pathBuffer[512];
+    GetModuleFileName(0, pathBuffer, 512);
+    std::wstring path(pathBuffer);
+    auto pos = path.rfind(LR"(\)");
+    path = path.substr(0, pos);
+    path = path + LR"(\Color_VS.cso)";
     ID3DBlob* vertexShaderBlob{};
-    if (FAILED(D3DReadFileToBlob(L"E:\\Agate\\Agate\\x64\\Debug\\VertexShader.cso", &vertexShaderBlob)))
+    if (FAILED(D3DReadFileToBlob(path.c_str(), &vertexShaderBlob)))
     {
         return;
     }
@@ -247,12 +267,12 @@ void GraphicContext::LoadVertexShader()
     D3D11_INPUT_ELEMENT_DESC local_layout[] =
     {
         
-        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(DrawVert, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(DrawVert, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "INDEX",   0, DXGI_FORMAT_R32_UINT, 0, (UINT)offsetof(DrawVert, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        //{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     
-    if (_Device->CreateInputLayout(local_layout, 3, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_InputLayout) != S_OK)
+    if (_Device->CreateInputLayout(local_layout, 2, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_InputLayout) != S_OK)
     {
         vertexShaderBlob->Release();
         return;
@@ -264,8 +284,15 @@ void GraphicContext::LoadVertexShader()
 
 void GraphicContext::LoadPixelShader()
 {
+    wchar_t pathBuffer[512];
+    GetModuleFileName(0, pathBuffer, 512);
+    std::wstring path(pathBuffer);
+    auto pos = path.rfind(LR"(\)");
+    path = path.substr(0, pos);
+    path = path + LR"(\Color_PS.cso)";
+
     ID3DBlob* pixelShaderBlob{};
-    if (FAILED(D3DReadFileToBlob(L"E:\\Agate\\Agate\\x64\\Debug\\Color_PS.cso", &pixelShaderBlob)))
+    if (FAILED(D3DReadFileToBlob(path.c_str(), &pixelShaderBlob)))
     {
         return;
     }

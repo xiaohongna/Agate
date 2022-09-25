@@ -40,6 +40,11 @@ void DrawingContext::SetClip(Vector4 clip)
 	_ClipChanged = true;
 }
 
+void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
+{
+
+}
+
 void DrawingContext::Draw(Geometry& geometry)
 {
 	geometry.Freeze();
@@ -77,7 +82,7 @@ void DrawingContext::Draw(Geometry& geometry)
 	}
 }
 
-void DrawingContext::Present(uint32_t sync)
+void DrawingContext::EndDraw(uint32_t sync)
 {
 	Flush();
 	_Renderer->Present(sync);

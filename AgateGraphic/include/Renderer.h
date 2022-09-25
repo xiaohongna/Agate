@@ -29,6 +29,10 @@ class IRenderer
 public:
 	virtual void SetViewPort(uint32_t width, uint32_t height) = 0;
 
+	virtual void SetRenderTarget() = 0;
+
+	virtual void Clear(const Vector4& color) = 0;
+
 	virtual void Draw(const BatchDrawData& data)  = 0;
 
 	virtual void Present(uint32_t sync) = 0;
