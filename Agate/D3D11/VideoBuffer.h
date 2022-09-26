@@ -1,4 +1,6 @@
 #pragma once
+
+#include <atlbase.h>
 #include <stdint.h>
 #include <d3d11.h>
 
@@ -13,17 +15,8 @@ template <typename T, VideoBufferType bufferType = VideoBufferType::Vertex>
 class VideoBuffer
 {
 public:
-    VideoBuffer() :_Device{}, _Buffer{}, _Capacity{}, _Size{}
+    VideoBuffer() :_Device{}, _Capacity{}, _Size{}
     {
-    }
-
-    ~VideoBuffer()
-    {
-        if (_Buffer)
-        {
-            _Buffer->Release();
-            _Buffer = nullptr;
-        }
     }
 
     void Init(ID3D11Device* device, UINT32 capacity = 5000)
@@ -41,11 +34,7 @@ public:
     {
         if (count != _Capacity)
         {
-            if (_Buffer)
-            {
-                _Buffer->Release();
-                _Buffer = nullptr;
-            }
+            _Buffer = nullptr;
         }
         _Capacity = count;
 
@@ -115,7 +104,7 @@ public:
     }
 
 private:
-    ID3D11Buffer* _Buffer;
+    CComPtr<ID3D11Buffer> _Buffer;
     uint32_t  _Capacity;
     uint32_t  _Size;
     ID3D11Device* _Device;

@@ -14,59 +14,21 @@ struct VERTEX_CONSTANT_BUFFER
     float   mvp[4][4];
 };
 
-GraphicContext::GraphicContext() :_SwapChain{}, _Device{}, _DeviceContext{}, _MainRenderTargetView{},
-_Factory{},
-_VertexShader{},
-_InputLayout{},
-_VertexConstantBuffer{},
-_PixelShader{},
-_Sampler{},
-_FontTextureView{},
-_RasterizerState{},
-_BlendState{},
-_DepthStencilState{},
-_VertexBufferSize{},
-_IndexBufferSize{},
-_Width{},
-_Height{},
-_init{false},
-_VertexBuffer {},
-_VertexIndexBuffer {}
-{
-
-}
-
-GraphicContext::~GraphicContext()
-{
-    Safe_Release(_SwapChain);
-    Safe_Release(_Device);
-    Safe_Release(_DeviceContext);
-    Safe_Release(_MainRenderTargetView);
-    Safe_Release(_Factory);
-    Safe_Release(_VertexShader);
-    Safe_Release(_InputLayout);
-    Safe_Release(_PixelShader);
-    Safe_Release(_Sampler);
-    Safe_Release(_RasterizerState);
-    Safe_Release(_BlendState);
-    Safe_Release(_DepthStencilState);
-    for (auto& item : _TextureStorage)
-    {
-        item.second->Release();
-    }
-}
-
 bool GraphicContext::CreateDeviceD3D(HWND hWnd)
 {
     if (_init)
     {
         return false;
     }
-    DXGI_SWAP_CHAIN_DESC sd;
-    ZeroMemory(&sd, sizeof(sd));
+    RECT rt{};
+    GetClientRect(hWnd, &rt);
+    _Width = rt.right - rt.left;
+    _Height = rt.bottom - rt.top;
+
+    DXGI_SWAP_CHAIN_DESC sd{};
     sd.BufferCount = 2;
-    sd.BufferDesc.Width = 800;
-    sd.BufferDesc.Height = 600;
+    sd.BufferDesc.Width = _Width;
+    sd.BufferDesc.Height = _Height;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     sd.BufferDesc.RefreshRate.Numerator = 60;
     sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -86,9 +48,8 @@ bool GraphicContext::CreateDeviceD3D(HWND hWnd)
         return false;
 
     CreateRenderTarget();
-    LoadVertexShader();
-    LoadPixelShader();
     CreateOther();
+    CreateBlendState();
     _init = true;
     return true;
 }
@@ -108,9 +69,9 @@ void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
     auto constant =  _VertexConstantBuffer.Map(_DeviceContext);
 
     float L = 0;
-    float R = width;
+    float R = (float)width;
     float T = 0;
-    float B = height;
+    float B = (float)height;
     float mvp[4][4] =
     {
         { 2.0f / (R - L),       0.0f,                0.0f,       0.0f },
@@ -118,17 +79,14 @@ void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
         { 0.0f,                 0.0f,                0.5f,       0.0f },
         {(R + L) / (L - R),     (T + B) / (B - T),   0.5f,       1.0f },
     };
-    auto matrix = DirectX::XMMatrixScaling(2 / (R - L), - 2 / (B - T), 0) * DirectX::XMMatrixTranslation(-1, 1, 0.7);
+    auto matrix = DirectX::XMMatrixScaling(2 / (R - L), - 2 / (B - T), 0) * DirectX::XMMatrixTranslation(-1, 1, 0.7f);
     memcpy(constant, &(matrix.r[0]), sizeof(matrix));
 
     _VertexConstantBuffer.UnMap(_DeviceContext);
-    if (_MainRenderTargetView)
-    {
-        _MainRenderTargetView->Release();
-        _MainRenderTargetView = nullptr;
-    }
+    _MainRenderTargetView.Release();
     _SwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
     CreateRenderTarget();
+
 }
 
 void GraphicContext::SetRenderTarget()
@@ -149,8 +107,8 @@ void GraphicContext::Draw(const BatchDrawData& data)
     }
 
     //_DeviceContext->PSSetShaderResources(0, list->GetTextureCount(), (ID3D11ShaderResourceView**)(list->GetAllTexture()));
-    _VertexBuffer.Update(_DeviceContext, (VertexXYColor*)data.vertexData, data.vertexCount);
-    _VertexIndexBuffer.Update(_DeviceContext, data.indexData, data.indexCount);
+   // _VertexBuffer.Update(_DeviceContext, (VertexXYColor*)data.vertexData, data.vertexCount);
+    //_VertexIndexBuffer.Update(_DeviceContext, data.indexData, data.indexCount);
     //_VertexColorConstantBuffer.Update(_DeviceContext, list->GetColor(), list->GetColorCount());
     
     SetupRenderState();
@@ -230,12 +188,10 @@ void GraphicContext::CleanupDeviceD3D()
 
 void GraphicContext::CreateRenderTarget()
 {
-    ID3D11Texture2D* pBackBuffer{};
-    _SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-    if (pBackBuffer)
+    CComPtr<ID3D11Texture2D> backBuffer;
+    if(SUCCEEDED(_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
     {
-        _Device->CreateRenderTargetView(pBackBuffer, NULL, &_MainRenderTargetView);
-        pBackBuffer->Release();
+        _Device->CreateRenderTargetView(backBuffer, NULL, &_MainRenderTargetView);
     }
 }
 
@@ -244,70 +200,8 @@ void GraphicContext::CleanupRenderTarget()
 
 }
 
-void GraphicContext::LoadVertexShader()
-{
-    wchar_t pathBuffer[512];
-    GetModuleFileName(0, pathBuffer, 512);
-    std::wstring path(pathBuffer);
-    auto pos = path.rfind(LR"(\)");
-    path = path.substr(0, pos);
-    path = path + LR"(\Color_VS.cso)";
-    ID3DBlob* vertexShaderBlob{};
-    if (FAILED(D3DReadFileToBlob(path.c_str(), &vertexShaderBlob)))
-    {
-        return;
-    }
-    if (FAILED(_Device->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &_VertexShader)))
-    {
-        vertexShaderBlob->Release();
-        return;
-    }
-    
-    D3D11_INPUT_ELEMENT_DESC local_layout[] =
-    {
-        
-        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        //{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    
-    if (_Device->CreateInputLayout(local_layout, 2, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_InputLayout) != S_OK)
-    {
-        vertexShaderBlob->Release();
-        return;
-    }
-    vertexShaderBlob->Release();
-    _VertexConstantBuffer.Init(_Device, 16);
-}
-
-void GraphicContext::LoadPixelShader()
-{
-    wchar_t pathBuffer[512];
-    GetModuleFileName(0, pathBuffer, 512);
-    std::wstring path(pathBuffer);
-    auto pos = path.rfind(LR"(\)");
-    path = path.substr(0, pos);
-    path = path + LR"(\Color_PS.cso)";
-
-    ID3DBlob* pixelShaderBlob{};
-    if (FAILED(D3DReadFileToBlob(path.c_str(), &pixelShaderBlob)))
-    {
-        return;
-    }
-    if (_Device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &_PixelShader) != S_OK)
-    {
-        pixelShaderBlob->Release();
-    }
-    pixelShaderBlob->Release();
-    
-}
-
 void GraphicContext::CreateOther()
 {
-    //_Device->CreateBuffer()
-    _VertexBuffer.Init(_Device);
-    _VertexIndexBuffer.Init(_Device);
-   
     {
         D3D11_SAMPLER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
@@ -319,24 +213,8 @@ void GraphicContext::CreateOther()
         desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
         desc.MinLOD = 0.f;
         desc.MaxLOD = 0.f;
-        _Device->CreateSamplerState(&desc, &_Sampler);
+       // _Device->CreateSamplerState(&desc, &_Sampler);
     }
-
-    {
-        D3D11_BLEND_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.AlphaToCoverageEnable = false;
-        desc.RenderTarget[0].BlendEnable = true;
-        desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-        desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-        desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-        desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-        desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-        desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-        _Device->CreateBlendState(&desc, &_BlendState);
-    }
-
     
     {
         D3D11_RASTERIZER_DESC desc;
@@ -360,25 +238,58 @@ void GraphicContext::CreateOther()
         desc.BackFace = desc.FrontFace;
         _Device->CreateDepthStencilState(&desc, &_DepthStencilState);
     }
+    _VertexConstantBuffer.Init(_Device, 16);
+}
+
+void GraphicContext::CreateBlendState()
+{
+    D3D11_BLEND_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.AlphaToCoverageEnable = false;
+    desc.RenderTarget[0].BlendEnable = true;
+    desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    _Device->CreateBlendState(&desc, &_BlendStates[0]);  //Blend
+
+    desc.RenderTarget[0].BlendEnable = false;
+    desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+    desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+    desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    _Device->CreateBlendState(&desc, &_BlendStates[1]);  //Blend
+
+    desc.RenderTarget[0].BlendEnable = true;
+    desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    _Device->CreateBlendState(&desc, &_BlendStates[2]);  //Additive
+
+    desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+    _Device->CreateBlendState(&desc, &_BlendStates[3]);  //Additive
+
+    desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC_COLOR;
+    desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
+    desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    _Device->CreateBlendState(&desc, &_BlendStates[4]);  //Multiply
 }
 
 void GraphicContext::SetupRenderState()
 {
     D3D11_VIEWPORT vp{};
-    vp.Width = _Width;
-    vp.Height = _Height;
+    vp.Width = (float)_Width;
+    vp.Height = (float)_Height;
     vp.MaxDepth = 1.0f;
     _DeviceContext->RSSetViewports(1, &vp);
     //×°Åä
-    _DeviceContext->IASetInputLayout(_InputLayout);
-    _VertexBuffer.Bind(_DeviceContext);
-    _VertexIndexBuffer.Bind(_DeviceContext);
-    _DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    _DeviceContext->VSSetShader(_VertexShader, NULL, 0);
+    _DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _VertexConstantBuffer.Bind(_DeviceContext, 0);
-    _DeviceContext->PSSetShader(_PixelShader, NULL, 0);
-    _DeviceContext->PSSetSamplers(0, 1, &_Sampler);
     _DeviceContext->GSSetShader(NULL, NULL, 0);
     _DeviceContext->HSSetShader(NULL, NULL, 0); 
     _DeviceContext->DSSetShader(NULL, NULL, 0); 
@@ -386,7 +297,7 @@ void GraphicContext::SetupRenderState()
 
     //ºÏ³É½×¶Î
     const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
-    _DeviceContext->OMSetBlendState(_BlendState, blend_factor, 0xffffffff);
+    _DeviceContext->OMSetBlendState(_BlendStates[1], blend_factor, 0xffffffff);
     _DeviceContext->OMSetDepthStencilState(_DepthStencilState, 0);
     _DeviceContext->RSSetState(_RasterizerState);
 
