@@ -8,8 +8,8 @@ struct DrawCommand
 	uint32_t indexCount;
 	uint32_t startIndexLocation;
 
-	uint32_t clipLeft;
-	uint32_t clipTop;
+	uint32_t clipX;
+	uint32_t clipY;
 	uint32_t clipWidth;
 	uint32_t clipHeight;
 };
@@ -22,6 +22,11 @@ struct BatchDrawData
 	DrawIndex* indexData;
 	uint32_t indexCount;
 	std::vector<DrawCommand> commands;
+};
+
+struct RendererConfig
+{
+
 };
 
 class IRenderer

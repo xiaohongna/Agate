@@ -19,6 +19,9 @@ constexpr uint32_t  Frozen_Flag_Mask = 1;
 
 constexpr uint32_t  Closed_Flag_Mask = 1 << 1;
 
+constexpr uint32_t  Flatten_Flag_Mask = 1 << 2;
+
+constexpr uint32_t  Rasterized_Flag_Mask = 1 << 3;
 
 Figure::Figure() : _Closed{}
 {
@@ -139,7 +142,7 @@ PointType* Figure::AddTypes(int count)
 
 void Geometry::AddFigure(Figure&& figure)
 {
-	assert((_Flags & Frozen_Flag_Mask) == 0);
+    assert(!HaveFlag(Frozen_Flag_Mask));
 	if ((_Flags & Frozen_Flag_Mask) == 0)
 	{
 		_Figures.emplace_back(std::move(figure));
@@ -148,18 +151,18 @@ void Geometry::AddFigure(Figure&& figure)
 
 void Geometry::SetStrokeWidth(float width)
 {
-    assert((_Flags & Frozen_Flag_Mask) == 0);
+    assert(!HaveFlag(Frozen_Flag_Mask));
 	_StrokeWidth = width;
 }
 
 void Geometry::SetFillBrush(Brush& brush)
 {
-    assert((_Flags & Frozen_Flag_Mask) == 0);
+    assert(!HaveFlag(Frozen_Flag_Mask));
 }
 
 void Geometry::SetStrokeBrush(Brush& brush)
 {
-    assert((_Flags & Frozen_Flag_Mask) == 0);
+    assert(!HaveFlag(Frozen_Flag_Mask));
 }
 
 Vector4 Geometry::GetBounds()
@@ -191,6 +194,7 @@ void Geometry::Flatten()
 			}
 		}
 	}
+    AddFlag(Flatten_Flag_Mask);
 }
 
 void Geometry::FlattenBezier(Vector2* pPoints)
@@ -378,11 +382,23 @@ void Geometry::RasterizeStroke(uint32_t col)
     }
     _StrokeData.pipline = PiplineType::Color;
     _StrokeData.blend = BlendMode::Blend;
+    AddFlag(Rasterized_Flag_Mask);
 }
 
 uint32_t Geometry::Rasterize()
 {
-	Flatten();
+    if (HaveFlag(Flatten_Flag_Mask) == false)
+    {
+        Flatten();
+    }
+    if (_FlattenLines.empty())
+    {
+        return 0;
+    }
+    if (HaveFlag(Rasterized_Flag_Mask) == false)
+    {
+        RasterizeStroke(0xFF00FFFF);
+    }
 	return 1;
 }
 

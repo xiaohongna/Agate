@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <future>
-#include "GraphicContext.h"
+#include "D3D11/GraphicContext.h"
 #include "DrawingContext.h"
 #include "RenderDemo.h"
 
@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_AGATE, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
-
+    auto hr = ::CoInitialize(NULL);
     // 执行应用程序初始化:
     if (!InitInstance (hInstance, nCmdShow))
     {
@@ -129,6 +129,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    }
    D3D11Context.CreateDeviceD3D(hWnd);
    Canvas = std::make_unique<DrawingContext>(&D3D11Context);
+   RECT rt{};
+   GetClientRect(hWnd, &rt);
+   Canvas->SetViewSize(rt.right - rt.left, rt.bottom - rt.top);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -180,6 +183,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
+    case WM_SIZE:
+        Canvas->SetViewSize((UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+        break;
+    case WM_ERASEBKGND:
+    {
+        return 1;
+    }
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

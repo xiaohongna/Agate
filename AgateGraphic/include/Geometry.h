@@ -148,6 +148,22 @@ public:
 
 	const RasterizeData& GetRasterizeData(uint32_t index);
 private:
+
+	void AddFlag(uint32_t flag)
+	{
+		_Flags = _Flags | flag;
+	}
+
+	void RemoveFlag(uint32_t flag)
+	{
+		_Flags = _Flags & ~flag;
+	}
+	
+	bool HaveFlag(uint32_t flag)
+	{
+		return (_Flags & flag) != 0;
+	}
+
 	void Flatten();
 
 	void FlattenBezier(Vector2* pPoints);

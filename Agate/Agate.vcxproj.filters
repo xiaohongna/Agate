@@ -33,11 +33,14 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicContext.h">
-      <Filter>D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="RenderDemo.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11\GraphicContext.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11\VideoBuffer.h">
+      <Filter>D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -47,11 +50,11 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicContext.cpp">
-      <Filter>D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="RenderDemo.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11\GraphicContext.cpp">
+      <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,10 +71,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Color_VS.hlsl">
+    <FxCompile Include="D3D11\Color_PS.hlsl">
       <Filter>D3D11</Filter>
     </FxCompile>
-    <FxCompile Include="Color_PS.hlsl">
+    <FxCompile Include="D3D11\Color_VS.hlsl">
       <Filter>D3D11</Filter>
     </FxCompile>
   </ItemGroup>

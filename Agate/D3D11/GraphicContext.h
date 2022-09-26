@@ -6,12 +6,14 @@
 #include <string>
 #include <map>
 #include "Renderer.h"
+#include "VideoBuffer.h"
 
 #define NameSpace_Render_D11_Header  namespace agate { namespace render { namespace D11 {
 #define NameSpace_Render_D11_Tail  } } }
 
 //NameSpace_Render_D11_Header
 
+/*
 enum class BufferType
 {
     Constant,
@@ -131,6 +133,7 @@ private:
     ID3D11Device* _Device;
     BufferType _Type;
 };
+*/
 
 class GraphicContext :public IRenderer
 {
@@ -167,12 +170,11 @@ private:
     ID3D11RenderTargetView* _MainRenderTargetView;
 
     IDXGIFactory* _Factory;
-    GPUBuffer<VertexXYColor> _VertexBuffer;
-    GPUBuffer<DrawIndex> _VertexIndexBuffer;
+    VideoBuffer<VertexXYColor, VideoBufferType::Vertex> _VertexBuffer;
+    VideoBuffer<DrawIndex, VideoBufferType::VertexIndex> _VertexIndexBuffer;
     ID3D11VertexShader* _VertexShader;
     ID3D11InputLayout* _InputLayout;
-    GPUBuffer<float>  _VertexConstantBuffer;
-    GPUBuffer<float>  _VertexColorConstantBuffer;
+    VideoBuffer<float, VideoBufferType::Constant>  _VertexConstantBuffer;
     ID3D11PixelShader* _PixelShader;
     ID3D11SamplerState* _Sampler;
     ID3D11ShaderResourceView* _FontTextureView;

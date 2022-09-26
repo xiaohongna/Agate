@@ -18,8 +18,7 @@ GraphicContext::GraphicContext() :_SwapChain{}, _Device{}, _DeviceContext{}, _Ma
 _Factory{},
 _VertexShader{},
 _InputLayout{},
-_VertexConstantBuffer{BufferType::Constant},
-_VertexColorConstantBuffer{BufferType::Constant},
+_VertexConstantBuffer{},
 _PixelShader{},
 _Sampler{},
 _FontTextureView{},
@@ -31,8 +30,8 @@ _IndexBufferSize{},
 _Width{},
 _Height{},
 _init{false},
-_VertexBuffer { BufferType::Vertex},
-_VertexIndexBuffer {BufferType::VertexIndex}
+_VertexBuffer {},
+_VertexIndexBuffer {}
 {
 
 }
@@ -155,7 +154,7 @@ void GraphicContext::Draw(const BatchDrawData& data)
     //_VertexColorConstantBuffer.Update(_DeviceContext, list->GetColor(), list->GetColorCount());
     
     SetupRenderState();
-    for (auto cmd : data.commands)
+    for (auto& cmd : data.commands)
     {
         _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
     }
@@ -279,7 +278,6 @@ void GraphicContext::LoadVertexShader()
     }
     vertexShaderBlob->Release();
     _VertexConstantBuffer.Init(_Device, 16);
-    _VertexColorConstantBuffer.Init(_Device, 1000);
 }
 
 void GraphicContext::LoadPixelShader()
@@ -379,7 +377,6 @@ void GraphicContext::SetupRenderState()
 
     _DeviceContext->VSSetShader(_VertexShader, NULL, 0);
     _VertexConstantBuffer.Bind(_DeviceContext, 0);
-    _VertexColorConstantBuffer.Bind(_DeviceContext, 1);
     _DeviceContext->PSSetShader(_PixelShader, NULL, 0);
     _DeviceContext->PSSetSamplers(0, 1, &_Sampler);
     _DeviceContext->GSSetShader(NULL, NULL, 0);

@@ -29,6 +29,7 @@ void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
 	_ClipY = 0;
 	_ClipWidth = width;
 	_ClipHeight = height;
+	_Renderer->SetViewPort(width, height);
 }
 
 void DrawingContext::SetClip(Vector4 clip)
@@ -45,7 +46,7 @@ void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 	_Renderer->SetRenderTarget();
 	if (clear)
 	{
-		Vector4 clr(1.0f, 1.0f, 0, 0);
+		Vector4 clr(0.0f, 0.0f, 0.0f, 1.0f);
 		_Renderer->Clear(clr);
 	}
 }
@@ -69,6 +70,8 @@ void DrawingContext::Draw(Geometry& geometry)
 			//全新的buffer，直接copy就行
 			memcpy_s(_VertextBuffer.buffer, _VertextBuffer.size, data.vertex.buffer, data.vertex.size);
 			memcpy_s(_IndexBuffer.buffer, _IndexBuffer.size, data.index.buffer, data.index.size);
+			_CurrentBatch.vertexCount = data.vertex.count;
+			_CurrentBatch.indexCount = data.index.count;
 		}
 		else
 		{
@@ -130,16 +133,17 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 {
 	if (_CurrentBatch.commands.empty()) 
 	{
-		DrawCommand cmd 
-		{ 
-			data.blend, 
-			data.index.count,
-			_ClipX,
-			_ClipY,
-			_ClipWidth,
-			_ClipHeight
-		};
-		_ClipChanged = false;
+		DrawCommand cmd{};
+		cmd.blend = data.blend;
+		cmd.indexCount = data.index.count;
+		if (_ClipChanged)
+		{
+			cmd.clipX = _ClipX;
+			cmd.clipY = _ClipY;
+			cmd.clipWidth = _ClipWidth;
+			cmd.clipHeight = _ClipHeight;
+			_ClipChanged = false;
+		}
 		_CurrentBatch.commands.emplace_back(cmd);
 	}
 	else
@@ -151,8 +155,8 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 			cmd.blend = data.blend;
 			if (_ClipChanged)
 			{
-				cmd.clipLeft = _ClipX;
-				cmd.clipTop = _ClipY;
+				cmd.clipX = _ClipX;
+				cmd.clipY = _ClipY;
 				cmd.clipWidth = _ClipWidth;
 				cmd.clipHeight = _ClipHeight;
 			}
