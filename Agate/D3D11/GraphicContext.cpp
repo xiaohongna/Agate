@@ -54,6 +54,22 @@ bool GraphicContext::CreateDeviceD3D(HWND hWnd)
     return true;
 }
 
+void GraphicContext::BeginDraw()
+{
+    _DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    _VertexConstantBuffer.Bind(_DeviceContext, 0);
+    _DeviceContext->GSSetShader(NULL, NULL, 0);
+    _DeviceContext->HSSetShader(NULL, NULL, 0);
+    _DeviceContext->DSSetShader(NULL, NULL, 0);
+    _DeviceContext->CSSetShader(NULL, NULL, 0);
+    _DeviceContext->OMSetDepthStencilState(_DepthStencilState, 0);
+    _DeviceContext->RSSetState(_RasterizerState);
+    //ºÏ³É½×¶Î
+    SetBlend(BlendMode::Blend);
+    const D3D11_RECT r = { (LONG)0, (LONG)0, (LONG)_Width, (LONG)_Height };
+    _DeviceContext->RSSetScissorRects(1, &r);
+}
+
 void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
 {
     if (!_init)
@@ -106,78 +122,30 @@ void GraphicContext::Draw(const BatchDrawData& data)
         return;
     }
 
-    //_DeviceContext->PSSetShaderResources(0, list->GetTextureCount(), (ID3D11ShaderResourceView**)(list->GetAllTexture()));
-   // _VertexBuffer.Update(_DeviceContext, (VertexXYColor*)data.vertexData, data.vertexCount);
-    //_VertexIndexBuffer.Update(_DeviceContext, data.indexData, data.indexCount);
-    //_VertexColorConstantBuffer.Update(_DeviceContext, list->GetColor(), list->GetColorCount());
-    
-    SetupRenderState();
+    if (_CurrentPipline || _CurrentPipline->GetType() != data.pipline)
+    {
+        _CurrentPipline = _Piplines[(int)data.pipline].get();
+        _CurrentPipline->Active(_DeviceContext);
+    }
+    _CurrentPipline->UpdateVertex(_DeviceContext, data.vertexData, data.vertexCount);
+    _CurrentPipline->UpdateIndex(_DeviceContext, data.indexData, data.indexCount);
     for (auto& cmd : data.commands)
     {
+        if (cmd.blend != _CurrentBlend)
+        {
+            SetBlend(cmd.blend);
+        }
+        if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
+        {
+            const D3D11_RECT r = {cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipY};
+            _DeviceContext->RSSetScissorRects(1, &r);
+        }
         _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
     }
     
 }
-/*
-void* GraphicContext::LoadTexture(const std::wstring& fileName)
-{
-    auto found = _TextureStorage.find(fileName);
 
-    if (found != _TextureStorage.end())
-    {
-        return found->second;
-    }
-    FILE* f = nullptr;
-    if (0 != _wfopen_s(&f, fileName.c_str(), L"rb"))
-    {
-        return nullptr;
-    }
-    int channel = 0;
-    int w{}, h{};
-    auto bits = stbi_load_from_file(f, &w, &h, &channel, 4);
-    if (bits == nullptr)
-    {
-        return nullptr;
-    }
-
-    D3D11_TEXTURE2D_DESC desc;
-    ZeroMemory(&desc, sizeof(desc));
-    desc.Width = w;
-    desc.Height = h;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    desc.CPUAccessFlags = 0;
-
-    ID3D11Texture2D* pTexture{};
-    D3D11_SUBRESOURCE_DATA subResource;
-    subResource.pSysMem = bits;
-    subResource.SysMemPitch = desc.Width * 4;
-    subResource.SysMemSlicePitch = 0;
-    auto hr = _Device->CreateTexture2D(&desc, &subResource, &pTexture);
-    assert(SUCCEEDED(hr));
-    ID3D11ShaderResourceView* resourceView{};
-    // Create texture view
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    ZeroMemory(&srvDesc, sizeof(srvDesc));
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = desc.MipLevels;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    hr = _Device->CreateShaderResourceView(pTexture, &srvDesc, &resourceView);
-    assert(SUCCEEDED(hr));
-    pTexture->Release();
-    delete bits;
-    _TextureStorage[fileName] = resourceView;
-    return resourceView;
-}
-*/
-
-
-void GraphicContext::Present(uint32_t sync)
+void GraphicContext::EndDraw(uint32_t sync)
 {
     HRESULT hr = _SwapChain->Present(1, 0);
 }
@@ -203,20 +171,6 @@ void GraphicContext::CleanupRenderTarget()
 void GraphicContext::CreateOther()
 {
     {
-        D3D11_SAMPLER_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.MipLODBias = 0.f;
-        desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-        desc.MinLOD = 0.f;
-        desc.MaxLOD = 0.f;
-       // _Device->CreateSamplerState(&desc, &_Sampler);
-    }
-    
-    {
         D3D11_RASTERIZER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
         desc.FillMode = D3D11_FILL_SOLID;
@@ -239,6 +193,12 @@ void GraphicContext::CreateOther()
         _Device->CreateDepthStencilState(&desc, &_DepthStencilState);
     }
     _VertexConstantBuffer.Init(_Device, 16);
+     
+    auto colorPPL = std::make_unique<ColorPipline>();
+    if (colorPPL->Load(_Device))
+    {
+        _Piplines[0] = std::move(colorPPL);
+    }
 }
 
 void GraphicContext::CreateBlendState()
@@ -303,4 +263,11 @@ void GraphicContext::SetupRenderState()
 
     const D3D11_RECT r = { (LONG)0, (LONG)0, (LONG)_Width, (LONG)_Height };
     _DeviceContext->RSSetScissorRects(1, &r);
+}
+
+void GraphicContext::SetBlend(BlendMode blend)
+{
+    constexpr float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
+    _DeviceContext->OMSetBlendState(_BlendStates[(int)blend], blend_factor, 0xffffffff);
+    _CurrentBlend = blend;
 }

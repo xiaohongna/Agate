@@ -21,7 +21,7 @@ public:
     GraphicContext() :_Width{}, 
         _Height{}, 
         _init{false},
-        _CurrentPipline{PiplineType::Color},
+        _CurrentPipline{},
         _CurrentBlend{BlendMode::Blend}
     {
 
@@ -31,6 +31,8 @@ public:
 
     //void* LoadTexture(const std::wstring& fileName);
 
+    void BeginDraw() override;
+
     void SetViewPort(uint32_t width, uint32_t height) override;
 
     void SetRenderTarget() override;
@@ -39,7 +41,7 @@ public:
 
     void Draw(const BatchDrawData& data) override;
 
-    void Present(uint32_t sync) override;
+    void EndDraw(uint32_t sync) override;
 
 private:
     void CleanupDeviceD3D();
@@ -47,8 +49,8 @@ private:
     void CleanupRenderTarget();
     void CreateOther();
     void CreateBlendState();
-
     void SetupRenderState();
+    void SetBlend(BlendMode blend);
 private:
     CComPtr<IDXGIFactory>           _Factory;
     CComPtr<IDXGISwapChain>         _SwapChain;
@@ -64,7 +66,7 @@ private:
     CComPtr<ID3D11BlendState>       _BlendStates[5];
     std::unique_ptr<PiplineBase>    _Piplines[2];
 
-    PiplineType _CurrentPipline;
+    PiplineBase* _CurrentPipline;
     BlendMode   _CurrentBlend;
 
     uint32_t        _Width;

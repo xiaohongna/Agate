@@ -93,7 +93,7 @@ void DrawingContext::Draw(Geometry& geometry)
 void DrawingContext::EndDraw(uint32_t sync)
 {
 	Flush();
-	_Renderer->Present(sync);
+	_Renderer->EndDraw(sync);
 }
 
 bool DrawingContext::NeedFlush(const RasterizeData& data)

@@ -12,26 +12,18 @@ void PiplineBase::Active(ID3D11DeviceContext* context)
     context->PSSetShader(_PixelShader, NULL, 0);
 }
 
-void PiplineBase::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t size)
+void PiplineBase::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count)
 {
-    _VertexBuffer.Update(context, data, size);
+    _VertexBuffer.Update(context, data, count);
 }
 
-void PiplineBase::UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t size)
+void PiplineBase::UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count)
 {
-    _IndexBuffer.Update(context, data, size);
+    _IndexBuffer.Update(context, data, count);
 }
 
 bool PiplineBase::LoadVertexShader(ID3D11Device* device, const std::wstring& csofile)
 {
-    /*
-    wchar_t pathBuffer[512];
-    GetModuleFileName(0, pathBuffer, 512);
-    std::wstring path(pathBuffer);
-    auto pos = path.rfind(LR"(\)");
-    path = path.substr(0, pos);
-    path = path + LR"(\Color_VS.cso)";
-    */
     CComPtr<ID3DBlob> vertexShaderBlob;
     if (FAILED(D3DReadFileToBlob(csofile.c_str(), &vertexShaderBlob)))
     {
@@ -41,28 +33,12 @@ bool PiplineBase::LoadVertexShader(ID3D11Device* device, const std::wstring& cso
     {
         return false;
     }
-
-    D3D11_INPUT_ELEMENT_DESC local_layout[] =
-    {
-
-        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        //{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-
-    auto hr = device->CreateInputLayout(local_layout, 2, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_InputLayout);
+    auto hr = CreateInputLayout(device, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
     return SUCCEEDED(hr);
 }
 
 bool PiplineBase::LoadPixelShader(ID3D11Device* device, const std::wstring& csofile)
-{/*
-    wchar_t pathBuffer[512];
-    GetModuleFileName(0, pathBuffer, 512);
-    std::wstring path(pathBuffer);
-    auto pos = path.rfind(LR"(\)");
-    path = path.substr(0, pos);
-    path = path + LR"(\Color_PS.cso)";
-    */
+{
     CComPtr<ID3DBlob> pixelShaderBlob;
     if (FAILED(D3DReadFileToBlob(csofile.c_str(), &pixelShaderBlob)))
     {
@@ -70,4 +46,26 @@ bool PiplineBase::LoadPixelShader(ID3D11Device* device, const std::wstring& csof
     }
     auto rt = device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &_PixelShader);
     return SUCCEEDED(rt);
+}
+
+bool ColorPipline::Load(ID3D11Device* device)
+{
+    wchar_t pathBuffer[512];
+    GetModuleFileName(0, pathBuffer, 512);
+    std::wstring path(pathBuffer);
+    auto pos = path.rfind(LR"(\)");
+    path = path.substr(0, pos);
+    return LoadVertexShader(device, path + LR"(\Color_VS.cso)") && LoadPixelShader(device, path + LR"(\Color_Ps.cso)");
+}
+
+HRESULT ColorPipline::CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength)
+{
+    D3D11_INPUT_ELEMENT_DESC local_layout[] =
+    {
+
+        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        //{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+    return device->CreateInputLayout(local_layout, 2, pShaderBytecodeWithInputSignature, BytecodeLength, &_InputLayout);
 }

@@ -26,7 +26,7 @@ private:
 
 private:
 	IRenderer*				_Renderer;
-	FixedBuffer<char>		_VertextBuffer;
+	FixedBuffer<unsigned char>		_VertextBuffer;
 	FixedBuffer<DrawIndex>	_IndexBuffer;
 
 	BatchDrawData		    _CurrentBatch;
