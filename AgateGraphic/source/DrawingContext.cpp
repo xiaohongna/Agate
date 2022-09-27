@@ -63,7 +63,7 @@ void DrawingContext::Draw(Geometry& geometry)
 		}
 		PushCommnd(data);
 
-		auto itemSize = _VertextBuffer.preSize;
+		auto itemSize = data.vertex.preSize;
 		if(_CurrentBatch.vertexCount == 0)
 		{
 			//全新的buffer，直接copy就行
@@ -80,7 +80,7 @@ void DrawingContext::Draw(Geometry& geometry)
 			memcpy_s(indexPtr, _IndexBuffer.size - _CurrentBatch.indexCount * sizeof(DrawIndex), data.index.buffer, data.index.size);
 			for (size_t i = 0; i < data.index.count; i++)
 			{
-				*indexPtr += _CurrentBatch.indexCount;
+				*indexPtr += _CurrentBatch.vertexCount;
 				indexPtr++;
 			}
 			_CurrentBatch.vertexCount += data.vertex.count;

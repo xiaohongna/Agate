@@ -35,7 +35,12 @@ public:
 	void LineTo(const Vector2& pt);
 
 	void LineTo(const Vector2* pts, int count);
-
+    /// <summary>
+    /// ÇúÏß£¬ ÑéÖ¤  https://www.bezier-curve.com/ 
+    /// </summary>
+    /// <param name="ctr1"></param>
+    /// <param name="ctr2"></param>
+    /// <param name="endPt"></param>
     void BezierTo(const Vector2& ctr1, const Vector2& ctr2, const Vector2& endPt);
 
 	void BezierTo(const Vector2* pts, int count);
@@ -127,6 +132,7 @@ public:
 	{
 
 	}
+	
 	void AddFigure(Figure&& figure);
 
 	void SetStrokeWidth(float width);
