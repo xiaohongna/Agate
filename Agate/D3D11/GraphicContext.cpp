@@ -56,6 +56,11 @@ bool GraphicContext::CreateDeviceD3D(HWND hWnd)
 
 void GraphicContext::BeginDraw()
 {
+    D3D11_VIEWPORT vp{};
+    vp.Width = (float)_Width;
+    vp.Height = (float)_Height;
+    vp.MaxDepth = 1.0f;
+    _DeviceContext->RSSetViewports(1, &vp);
     _DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _VertexConstantBuffer.Bind(_DeviceContext, 0);
     _DeviceContext->GSSetShader(NULL, NULL, 0);
@@ -82,23 +87,6 @@ void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
     }
     _Width = width;
     _Height = height;
-    auto constant =  _VertexConstantBuffer.Map(_DeviceContext);
-
-    float L = 0;
-    float R = (float)width;
-    float T = 0;
-    float B = (float)height;
-    float mvp[4][4] =
-    {
-        { 2.0f / (R - L),       0.0f,                0.0f,       0.0f },
-        { 0.0f,                 2.0f / (T - B),      0.0f,       0.0f },
-        { 0.0f,                 0.0f,                0.5f,       0.0f },
-        {(R + L) / (L - R),     (T + B) / (B - T),   0.5f,       1.0f },
-    };
-    auto matrix = DirectX::XMMatrixScaling(2 / (R - L), - 2 / (B - T), 0) * DirectX::XMMatrixTranslation(-1, 1, 0.7f);
-    memcpy(constant, &(matrix.r[0]), sizeof(matrix));
-
-    _VertexConstantBuffer.UnMap(_DeviceContext);
     _MainRenderTargetView.Release();
     _SwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
     CreateRenderTarget();
@@ -107,7 +95,23 @@ void GraphicContext::SetViewPort(uint32_t width, uint32_t height)
 
 void GraphicContext::SetRenderTarget()
 {
-    _DeviceContext->OMSetRenderTargets(1, &_MainRenderTargetView, NULL);
+    auto constant = _VertexConstantBuffer.Map(_DeviceContext);
+
+    float L = 0;
+    float R = (float)_Width;
+    float T = 0;
+    float B = (float)_Height;
+    float mvp[4][4] =
+    {
+        { 2.0f / (R - L),       0.0f,                0.0f,       0.0f },
+        { 0.0f,                 2.0f / (T - B),      0.0f,       0.0f },
+        { 0.0f,                 0.0f,                0.5f,       0.0f },
+        {(R + L) / (L - R),     (T + B) / (B - T),   0.5f,       1.0f },
+    };
+    auto matrix = DirectX::XMMatrixScaling(2 / (R - L), -2 / (B - T), 0) * DirectX::XMMatrixTranslation(-1, 1, 0.7f);
+    memcpy(constant, &(matrix.r[0]), sizeof(matrix));
+    _VertexConstantBuffer.UnMap(_DeviceContext);
+    _DeviceContext->OMSetRenderTargets(1, &_MainRenderTargetView.p, NULL);
 }
 
 void GraphicContext::Clear(const Vector4& color)
@@ -122,7 +126,7 @@ void GraphicContext::Draw(const BatchDrawData& data)
         return;
     }
 
-    if (_CurrentPipline || _CurrentPipline->GetType() != data.pipline)
+    if (_CurrentPipline == nullptr || _CurrentPipline->GetType() != data.pipline)
     {
         _CurrentPipline = _Piplines[(int)data.pipline].get();
         _CurrentPipline->Active(_DeviceContext);

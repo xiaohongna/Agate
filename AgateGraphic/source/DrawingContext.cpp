@@ -23,8 +23,6 @@ _ClipChanged{true}
 
 void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
 {
-	_ViewWidth = width;
-	_ViewHeight = height;
 	_ClipX = 0;
 	_ClipY = 0;
 	_ClipWidth = width;
@@ -43,6 +41,7 @@ void DrawingContext::SetClip(Vector4 clip)
 
 void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 {
+	_Renderer->BeginDraw();
 	_Renderer->SetRenderTarget();
 	if (clear)
 	{

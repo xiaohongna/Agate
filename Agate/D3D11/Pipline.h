@@ -23,7 +23,7 @@ protected:
 	bool LoadVertexShader(ID3D11Device* device, const std::wstring& csofile);
 	bool LoadPixelShader(ID3D11Device* device, const std::wstring& csofile);
 protected:
-	VideoBuffer<byte, VideoBufferType::Vertex> _VertexBuffer;
+	VideoBuffer<VertexXYColor, VideoBufferType::Vertex> _VertexBuffer;
 	VideoBuffer<DrawIndex, VideoBufferType::VertexIndex> _IndexBuffer;
 	CComPtr<ID3D11VertexShader> _VertexShader;
 	CComPtr<ID3D11InputLayout> _InputLayout;
@@ -34,6 +34,10 @@ protected:
 class ColorPipline: public PiplineBase
 {
 public:
+	ColorPipline() : PiplineBase(PiplineType::Color)
+	{
+
+	}
 	bool Load(ID3D11Device* device);
 protected:
 	HRESULT CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength) override;

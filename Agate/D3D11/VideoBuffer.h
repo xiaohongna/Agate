@@ -78,20 +78,25 @@ public:
         {
             unsigned int stride = sizeof(T);
             unsigned int offset = 0;
-            context->IASetVertexBuffers(StartSlot, 1, &_Buffer, &stride, &offset);
+            context->IASetVertexBuffers(StartSlot, 1, &_Buffer.p, &stride, &offset);
         }
         else if (bufferType == VideoBufferType::Constant)
         {
-            context->VSSetConstantBuffers(StartSlot, 1, &_Buffer);
+            context->VSSetConstantBuffers(StartSlot, 1, &_Buffer.p);
         }
         else
         {
-            context->IASetIndexBuffer(_Buffer, sizeof(T) == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+            context->IASetIndexBuffer(_Buffer.p, sizeof(T) == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
         }
     }
 
     void Update(ID3D11DeviceContext* context, const T* data, uint32_t dataCount)
     {
+        uint32_t dataSize = dataCount * sizeof(T);
+        if (dataSize > _Capacity)
+        {
+            setCapacity(dataSize + sizeof(T) * 1024);
+        }
         auto dest = Map(context);
         memcpy(dest, data, dataCount * sizeof(T));
         UnMap(context);

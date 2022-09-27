@@ -14,7 +14,7 @@ void PiplineBase::Active(ID3D11DeviceContext* context)
 
 void PiplineBase::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count)
 {
-    _VertexBuffer.Update(context, data, count);
+    _VertexBuffer.Update(context, (VertexXYColor*)data, count);
 }
 
 void PiplineBase::UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count)
@@ -50,6 +50,8 @@ bool PiplineBase::LoadPixelShader(ID3D11Device* device, const std::wstring& csof
 
 bool ColorPipline::Load(ID3D11Device* device)
 {
+    _VertexBuffer.Init(device, 5000);
+    _IndexBuffer.Init(device, 6000);
     wchar_t pathBuffer[512];
     GetModuleFileName(0, pathBuffer, 512);
     std::wstring path(pathBuffer);
