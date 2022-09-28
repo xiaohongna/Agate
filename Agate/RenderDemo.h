@@ -9,7 +9,9 @@ public:
 	void Render(DrawingContext& canvs);
 private:
 	Geometry  _Line;
-	Geometry  _bezier;
+	Geometry  _Bezier;
+	Geometry  _Rectangle;
+	Geometry  _RoundedRect;
 };
 
 

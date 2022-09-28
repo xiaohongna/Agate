@@ -75,6 +75,13 @@ public:
         return rotation;
     }
 
+    void Set(float m11, float m12, float m21, float m22, float m31, float m32)
+    {
+        _11 = m11; _12 = m12;
+        _21 = m21; _22 = m22;
+        _31 = m31; _32 = m32;
+    }
+
     Vector2 TransformPoint(const Vector2& point) const
     {
         Vector2 result =
@@ -85,7 +92,7 @@ public:
         return result;
     }
 
-    void TransformPoint(Vector2* point, const int count)
+    void TransformPoint(Vector2* point, const int count) const
     {
         for (int i = 0; i < count; i++)
         {
@@ -95,6 +102,12 @@ public:
             point->y = y;
             point++;
         }
+    }
+
+    void TransformPoint(Vector2& dest, const Vector2& source) const
+    {
+        dest.x = source.x * _11 + source.y * _21 + _31;
+        dest.y = source.x * _12 + source.y * _22 + _32;
     }
 
     float GetScale() const
@@ -175,7 +188,7 @@ private:
         _31 = a._31 * b._11 + a._32 * b._21 + b._31;
         _32 = a._31 * b._12 + a._32 * b._22 + b._32;
     }
-private:
+public:
     union
     {
         struct

@@ -30,12 +30,12 @@ void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
 	_Renderer->SetViewPort(width, height);
 }
 
-void DrawingContext::SetClip(Vector4 clip)
+void DrawingContext::SetClip(const Vector4& clip)
 {
-	_ClipX = clip.x;
-	_ClipY = clip.y;
-	_ClipWidth = clip.z - clip.x;
-	_ClipHeight = clip.w - clip.y;
+	_ClipX = (uint32_t)clip.left;
+	_ClipY = (uint32_t)clip.top;
+	_ClipWidth = (uint32_t)(clip.right - clip.left);
+	_ClipHeight = (uint32_t)(clip.bottom - clip.top);
 	_ClipChanged = true;
 }
 
@@ -160,8 +160,9 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 				cmd.clipHeight = _ClipHeight;
 			}
 			cmd.indexCount = data.index.count;
-			cmd.startIndexLocation = _CurrentBatch.indexCount - 1;
+			cmd.startIndexLocation = _CurrentBatch.indexCount;
 			_ClipChanged = false;
+			_CurrentBatch.commands.emplace_back(cmd);
 		}
 		else
 		{

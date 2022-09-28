@@ -32,7 +32,12 @@ public:
 
 	void StartAt(const Vector2& pt);
 
-	void LineTo(const Vector2& pt);
+	void LineTo(float x, float y);
+
+	void LineTo(const Vector2& pt)
+	{
+		LineTo(pt.x, pt.y);
+	}
 
 	void LineTo(const Vector2* pts, int count);
     /// <summary>
@@ -45,9 +50,22 @@ public:
 
 	void BezierTo(const Vector2* pts, int count);
 
+	void ArcTo(float xRadius,  float yRadius,  float rRotation,  bool fLargeArc,  bool fSweepUp,  float xEnd,  float yEnd);    
+
 	void Reset();
 
 	void Close();
+
+	bool IsClosed()
+	{
+		return _Closed;
+	}
+
+	static Figure InitAsRectangle(const Vector4& rect);
+
+	static Figure InitAsRoundedRectangle(const Vector4& rect, float rRadiusX, float rRadiusY);
+
+	static Figure InitAsEllipse(float rCenterX, float rCenterY,float rRadiusX, float rRadiusY);
 
 	friend class Geometry;
 private:

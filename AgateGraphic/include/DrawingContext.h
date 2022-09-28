@@ -10,7 +10,7 @@ public:
 
 	void SetViewSize(uint32_t width, uint32_t height);
 
-	void SetClip(Vector4 clip);
+	void SetClip(const Vector4& clip);
 	
 	void BeginDraw(bool clear, uint32_t clearColor);
 

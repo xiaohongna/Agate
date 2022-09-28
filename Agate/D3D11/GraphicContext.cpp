@@ -141,7 +141,7 @@ void GraphicContext::Draw(const BatchDrawData& data)
         }
         if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
         {
-            const D3D11_RECT r = {cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipY};
+            const D3D11_RECT r = {cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipHeight};
             _DeviceContext->RSSetScissorRects(1, &r);
         }
         _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
