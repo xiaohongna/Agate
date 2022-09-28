@@ -17,8 +17,11 @@ union Color
 class Brush
 {
 public:
-	Brush(Color color);
+	Brush(Color color) :_Color{ color }
+	{
 
-	VertexType GetVertexType();
+	}
+private:
+	Color _Color;
 };
 

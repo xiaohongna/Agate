@@ -28,9 +28,6 @@ RenderDemo::RenderDemo()
 
 void RenderDemo::Render(DrawingContext& canvs)
 {
-	auto l = sizeof(Color);
-	Color clr;
-	clr.color = 2;
 	canvs.BeginDraw(true, 0xFFFFFFFF);
 	
 	canvs.Draw(_Bezier);
