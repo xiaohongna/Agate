@@ -12,6 +12,7 @@ private:
 	Geometry  _Bezier;
 	Geometry  _Rectangle;
 	Geometry  _RoundedRect;
+	Geometry  _Ellipse;
 };
 
 

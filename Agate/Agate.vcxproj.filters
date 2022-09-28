@@ -53,14 +53,14 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="RenderDemo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="D3D11\GraphicContext.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="D3D11\Pipeline.cpp">
       <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderDemo.cpp">
+      <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

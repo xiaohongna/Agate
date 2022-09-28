@@ -15,9 +15,9 @@ static inline float  ImRsqrt(float x) { return 1.0f / sqrtf(x); }
 #define IM_COL32_A_MASK     0xFF000000
 
 constexpr float FUZZ = 1.e-6;           // Relative 0
-constexpr float PI_OVER_180 = 0.0174532925199432957692;  // PI/180
-constexpr float FOUR_THIRDS = 1.33333333333333333; // = 4/3
-constexpr float ARC_AS_BEZIER = 0.5522847498307933984; // =(\/2 - 1)*4/3
+constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
+constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
+constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
 
 constexpr uint32_t  Frozen_Flag_Mask = 1;
 
@@ -596,7 +596,25 @@ Figure Figure::InitAsRoundedRectangle(const Vector4& rect, float rRadiusX, float
 
 Figure Figure::InitAsEllipse(float rCenterX, float rCenterY, float rRadiusX, float rRadiusY)
 {
-    return Figure();
+    Figure figure;
+    auto pPoints = figure.AddPoints(13);
+    auto pTypes = figure.AddTypes(4, PointType::Bezier);
+    float rMid = rRadiusX * ARC_AS_BEZIER;
+
+    pPoints[0].x = pPoints[1].x = pPoints[11].x = pPoints[12].x = rCenterX + rRadiusX;
+    pPoints[2].x = pPoints[10].x = rCenterX + rMid;
+    pPoints[3].x = pPoints[9].x = rCenterX;
+    pPoints[4].x = pPoints[8].x = rCenterX - rMid;
+    pPoints[5].x = pPoints[6].x = pPoints[7].x = rCenterX - rRadiusX;
+
+    rMid = rRadiusY * ARC_AS_BEZIER;
+    pPoints[2].y = pPoints[3].y = pPoints[4].y = rCenterY + rRadiusY;
+    pPoints[1].y = pPoints[5].y = rCenterY + rMid;
+    pPoints[0].y = pPoints[6].y = pPoints[12].y = rCenterY;
+    pPoints[7].y = pPoints[11].y = rCenterY - rMid;
+    pPoints[8].y = pPoints[9].y = pPoints[10].y = rCenterY - rRadiusY;
+
+    return figure;
 }
 
 Vector2* Figure::AddPoints(int count)
@@ -606,10 +624,10 @@ Vector2* Figure::AddPoints(int count)
 	return _Points.data() + size;
 }
 
-PointType* Figure::AddTypes(int count)
+PointType* Figure::AddTypes(int count, PointType defType)
 {
 	auto size = _Types.size();
-	_Types.resize(size + count);
+	_Types.resize(size + count, defType);
 	return _Types.data() + size;
 }
 
@@ -874,7 +892,7 @@ void Geometry::RasterizeFill(uint32_t color)
     }
     // Anti-aliased Fill
     const float AA_SIZE = _FringeScale;
-    const uint32_t col_trans = color & 0xFFFFFF00;
+    const uint32_t col_trans = color & 0xFFFFFF;
     const int idx_count = (points_count - 2) * 3 + points_count * 6;
     const int vtx_count = (points_count * 2);
     auto _IdxWritePtr = _FillData.index.Alloc<DrawIndex>(idx_count);
@@ -949,7 +967,7 @@ uint32_t Geometry::Rasterize()
     if (HaveFlag(Rasterized_Flag_Mask) == false)
     {
         //RasterizeStroke(0xFF0000FF);
-        RasterizeFill(0xFF0000FF);
+        RasterizeFill(0xFFFF0000);
     }
 	return 1;
 }

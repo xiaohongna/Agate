@@ -23,16 +23,21 @@ RenderDemo::RenderDemo()
 	//_Rectangle.SetStrokeWidth(2.0f);
 	_RoundedRect.AddFigure(Figure::InitAsRoundedRectangle(Vector4(230.5f, 10.5f, 380.5, 180.5), 20, 20));
 	_RoundedRect.SetStrokeWidth(2.0f);
+	_Ellipse.AddFigure(Figure::InitAsEllipse(150, 400, 100, 20));
 }
 
 void RenderDemo::Render(DrawingContext& canvs)
 {
-	canvs.BeginDraw(true, 0xFFFF0000);
+	auto l = sizeof(Color);
+	Color clr;
+	clr.color = 2;
+	canvs.BeginDraw(true, 0xFFFFFFFF);
 	
-	//canvs.Draw(_Bezier);
+	canvs.Draw(_Bezier);
+	canvs.Draw(_Ellipse);
 	//canvs.Draw(_Rectangle);
 	//canvs.SetClip({ 250, 20, 390, 500 });
-	canvs.Draw(_RoundedRect);
+	//canvs.Draw(_RoundedRect);
 	//canvs.Draw(_Line);
 	canvs.EndDraw(1);
 }

@@ -67,7 +67,7 @@ HRESULT ColorPipline::CreateInputLayout(ID3D11Device* device, const void* pShade
 
         { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
         //{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",   0, DXGI_FORMAT_B8G8R8A8_UNORM, 0, (UINT)offsetof(VertexXYColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     return device->CreateInputLayout(local_layout, 2, pShaderBytecodeWithInputSignature, BytecodeLength, &_InputLayout);
 }

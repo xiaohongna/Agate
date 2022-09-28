@@ -72,7 +72,7 @@ private:
 	
 	Vector2* AddPoints(int count);
 	
-	PointType* AddTypes(int count);
+	PointType* AddTypes(int count, PointType defType = PointType::Line);
 	
 	bool IsEmpty()
 	{
