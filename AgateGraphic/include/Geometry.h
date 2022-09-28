@@ -133,11 +133,11 @@ struct FixedBuffer
 
 struct RasterizeData
 {
-	PiplineType pipline;
+	PipelineType pipline;
 	BlendMode   blend;
 	FixedBuffer<char> vertex;
 	FixedBuffer<DrawIndex> index;
-	RasterizeData():pipline{PiplineType::Color}, blend{BlendMode::Blend}
+	RasterizeData():pipline{PipelineType::Color}, blend{BlendMode::Blend}
 	{
 		
 	}

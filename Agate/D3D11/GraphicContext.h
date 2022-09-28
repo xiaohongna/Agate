@@ -64,9 +64,9 @@ private:
     CComPtr<ID3D11DepthStencilState>  _DepthStencilState;
     
     CComPtr<ID3D11BlendState>       _BlendStates[5];
-    std::unique_ptr<PiplineBase>    _Piplines[2];
+    std::unique_ptr<PipelineBase>    _Piplines[2];
 
-    PiplineBase* _CurrentPipline;
+    PipelineBase* _CurrentPipline;
     BlendMode   _CurrentBlend;
 
     uint32_t        _Width;

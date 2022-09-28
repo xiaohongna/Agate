@@ -3,10 +3,10 @@
 #include "Renderer.h"
 #include "VideoBuffer.h"
 
-class PiplineBase
+class PipelineBase
 {
 public:
-	PiplineBase(PiplineType plt):_PiplineType(PiplineType::Color)
+	PipelineBase(PipelineType plt):_PiplineType(PipelineType::Color)
 	{
 
 	}
@@ -14,7 +14,7 @@ public:
 	virtual void Active(ID3D11DeviceContext* context);
 	void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count);
 	void UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count);
-	PiplineType GetType()
+	PipelineType GetType()
 	{
 		return _PiplineType;
 	}
@@ -28,13 +28,13 @@ protected:
 	CComPtr<ID3D11VertexShader> _VertexShader;
 	CComPtr<ID3D11InputLayout> _InputLayout;
 	CComPtr<ID3D11PixelShader> _PixelShader;
-	PiplineType		_PiplineType;
+	PipelineType		_PiplineType;
 };
 
-class ColorPipline: public PiplineBase
+class ColorPipline: public PipelineBase
 {
 public:
-	ColorPipline() : PiplineBase(PiplineType::Color)
+	ColorPipline() : PipelineBase(PipelineType::Color)
 	{
 
 	}

@@ -3,7 +3,7 @@
 #include <d3dcompiler.h>
 
 
-void PiplineBase::Active(ID3D11DeviceContext* context)
+void PipelineBase::Active(ID3D11DeviceContext* context)
 {
     _VertexBuffer.Bind(context);
     _IndexBuffer.Bind(context);
@@ -12,17 +12,17 @@ void PiplineBase::Active(ID3D11DeviceContext* context)
     context->PSSetShader(_PixelShader, NULL, 0);
 }
 
-void PiplineBase::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count)
+void PipelineBase::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count)
 {
     _VertexBuffer.Update(context, (VertexXYColor*)data, count);
 }
 
-void PiplineBase::UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count)
+void PipelineBase::UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count)
 {
     _IndexBuffer.Update(context, data, count);
 }
 
-bool PiplineBase::LoadVertexShader(ID3D11Device* device, const std::wstring& csofile)
+bool PipelineBase::LoadVertexShader(ID3D11Device* device, const std::wstring& csofile)
 {
     CComPtr<ID3DBlob> vertexShaderBlob;
     if (FAILED(D3DReadFileToBlob(csofile.c_str(), &vertexShaderBlob)))
@@ -37,7 +37,7 @@ bool PiplineBase::LoadVertexShader(ID3D11Device* device, const std::wstring& cso
     return SUCCEEDED(hr);
 }
 
-bool PiplineBase::LoadPixelShader(ID3D11Device* device, const std::wstring& csofile)
+bool PipelineBase::LoadPixelShader(ID3D11Device* device, const std::wstring& csofile)
 {
     CComPtr<ID3DBlob> pixelShaderBlob;
     if (FAILED(D3DReadFileToBlob(csofile.c_str(), &pixelShaderBlob)))

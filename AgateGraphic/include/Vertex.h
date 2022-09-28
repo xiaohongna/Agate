@@ -5,7 +5,7 @@
 
 typedef unsigned short DrawIndex;
 
-enum class PiplineType
+enum class PipelineType
 {
 	Color,
 	TextureColor,

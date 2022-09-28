@@ -858,7 +858,7 @@ void Geometry::RasterizeStroke(uint32_t col)
             vtxWritePtr += 4;
         }
     }
-    _StrokeData.pipline = PiplineType::Color;
+    _StrokeData.pipline = PipelineType::Color;
     _StrokeData.blend = BlendMode::Blend;
     AddFlag(Rasterized_Flag_Mask);
 }

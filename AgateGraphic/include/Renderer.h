@@ -16,7 +16,7 @@ struct DrawCommand
 
 struct BatchDrawData
 {
-	PiplineType pipline;
+	PipelineType pipline;
 	unsigned char* vertexData;
 	uint32_t vertexCount;
 	DrawIndex* indexData;
