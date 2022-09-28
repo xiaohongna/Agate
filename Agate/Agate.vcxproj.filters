@@ -42,7 +42,7 @@
     <ClInclude Include="D3D11\VideoBuffer.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11\Pipline.h">
+    <ClInclude Include="D3D11\Pipeline.h">
       <Filter>D3D11</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClCompile Include="D3D11\GraphicContext.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
-    <ClCompile Include="D3D11\Pipline.cpp">
+    <ClCompile Include="D3D11\Pipeline.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>

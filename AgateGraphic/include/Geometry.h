@@ -194,6 +194,7 @@ private:
 
 	void RasterizeStroke(uint32_t color);
 
+	void RasterizeFill(uint32_t color);
 private:
 	std::vector<Figure> _Figures;
 	std::vector<Vector2> _FlattenLines;

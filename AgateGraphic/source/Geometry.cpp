@@ -863,6 +863,79 @@ void Geometry::RasterizeStroke(uint32_t col)
     AddFlag(Rasterized_Flag_Mask);
 }
 
+void Geometry::RasterizeFill(uint32_t color)
+{
+    constexpr float _FringeScale = 1.0f;
+    auto points_count = _FlattenLines.size();
+    if (points_count < 3)
+    {
+        //assert(false);
+        return;
+    }
+    // Anti-aliased Fill
+    const float AA_SIZE = _FringeScale;
+    const uint32_t col_trans = color & 0xFFFFFF00;
+    const int idx_count = (points_count - 2) * 3 + points_count * 6;
+    const int vtx_count = (points_count * 2);
+    auto _IdxWritePtr = _FillData.index.Alloc<DrawIndex>(idx_count);
+    auto _VtxWritePtr = _FillData.vertex.Alloc<VertexXYColor>(vtx_count);
+    // Add indexes for fill
+    uint32_t vtx_inner_idx = 0;
+    uint32_t vtx_outer_idx = 1;
+    for (int i = 2; i < points_count; i++)
+    {
+        _IdxWritePtr[0] = (DrawIndex)(vtx_inner_idx); _IdxWritePtr[1] = (DrawIndex)(vtx_inner_idx + ((i - 1) << 1)); _IdxWritePtr[2] = (DrawIndex)(vtx_inner_idx + (i << 1));
+        _IdxWritePtr += 3;
+    }
+
+    // Compute normals
+    auto temp_normals = (Vector2*)_malloca(points_count * sizeof(Vector2));
+    //uint32_t mask = 1;
+    for (int i0 = points_count - 1, i1 = 0; i1 < points_count; i0 = i1++)
+    {
+        //if ((1 & mask))
+        {
+            const Vector2& p0 = _FlattenLines[i0];
+            const Vector2& p1 = _FlattenLines[i1];
+            float dx = p1.x - p0.x;
+            float dy = p1.y - p0.y;
+            IM_NORMALIZE2F_OVER_ZERO(dx, dy);
+            temp_normals[i0].x = dy;
+            temp_normals[i0].y = -dx;
+        }
+        /*
+        else
+        {
+            temp_normals[i0].x = 0.0f;
+            temp_normals[i0].y = 0.0f;
+        }
+        mask = mask << 1;
+        */
+    }
+
+    for (int i0 = points_count - 1, i1 = 0; i1 < points_count; i0 = i1++)
+    {
+        // Average normals
+        const Vector2& n0 = temp_normals[i0];
+        const Vector2& n1 = temp_normals[i1];
+        float dm_x = (n0.x + n1.x) * 0.5f;
+        float dm_y = (n0.y + n1.y) * 0.5f;
+        IM_FIXNORMAL2F(dm_x, dm_y);
+        dm_x *= AA_SIZE * 0.5f;
+        dm_y *= AA_SIZE * 0.5f;
+
+        // Add vertices
+        _VtxWritePtr[0].pos.x = (_FlattenLines[i1].x - dm_x); _VtxWritePtr[0].pos.y = (_FlattenLines[i1].y - dm_y); _VtxWritePtr[0].col = color;        // Inner
+        _VtxWritePtr[1].pos.x = (_FlattenLines[i1].x + dm_x); _VtxWritePtr[1].pos.y = (_FlattenLines[i1].y + dm_y); _VtxWritePtr[1].col = col_trans;  // Outer
+        _VtxWritePtr += 2;
+
+        // Add indexes for fringes
+        _IdxWritePtr[0] = (DrawIndex)(vtx_inner_idx + (i1 << 1)); _IdxWritePtr[1] = (DrawIndex)(vtx_inner_idx + (i0 << 1)); _IdxWritePtr[2] = (DrawIndex)(vtx_outer_idx + (i0 << 1));
+        _IdxWritePtr[3] = (DrawIndex)(vtx_outer_idx + (i0 << 1)); _IdxWritePtr[4] = (DrawIndex)(vtx_outer_idx + (i1 << 1)); _IdxWritePtr[5] = (DrawIndex)(vtx_inner_idx + (i1 << 1));
+        _IdxWritePtr += 6;
+    }
+}
+
 uint32_t Geometry::Rasterize()
 {
     if (HaveFlag(Flatten_Flag_Mask) == false)
@@ -875,7 +948,8 @@ uint32_t Geometry::Rasterize()
     }
     if (HaveFlag(Rasterized_Flag_Mask) == false)
     {
-        RasterizeStroke(0xFF0000FF);
+        //RasterizeStroke(0xFF0000FF);
+        RasterizeFill(0xFF0000FF);
     }
 	return 1;
 }
@@ -883,5 +957,5 @@ uint32_t Geometry::Rasterize()
 const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
 {
 	assert(index < 2);
-    return index == 0 ? _StrokeData : _FillData;
+    return index == 1 ? _StrokeData : _FillData;
 }

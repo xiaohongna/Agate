@@ -8,7 +8,7 @@
 #include <map>
 #include "Renderer.h"
 #include "VideoBuffer.h"
-#include "Pipline.h"
+#include "Pipeline.h"
 
 #define NameSpace_Render_D11_Header  namespace agate { namespace render { namespace D11 {
 #define NameSpace_Render_D11_Tail  } } }
