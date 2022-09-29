@@ -110,6 +110,17 @@ public:
         dest.y = source.x * _12 + source.y * _22 + _32;
     }
 
+    void TransformPoint(Vector2* dest, const Vector2* source, const int count) const
+    {
+        for (int i = 0; i < count; i++)
+        {
+            dest->x = source->x * _11 + source->y * _21 + _31;
+            dest->y = source->x * _12 + source->y * _22 + _32;
+            dest++;
+            source++;
+        }
+    }
+
     float GetScale() const
     {
         return sqrtf(_11 * _11 + _12 * _12);
@@ -177,6 +188,15 @@ public:
     bool IsRotation() const
     {
         return abs(_11 + _21 - _12 - _22) > 0.00001f;
+    }
+
+    bool operator == (const Matrix3X2& matrix) const
+    {
+        return memcmp(t, matrix.t, sizeof(t)) == 0;
+    }
+    bool operator != (const Matrix3X2& matrix) const
+    {
+        return memcmp(t, matrix.t, sizeof(t)) != 0;
     }
 private:
     void SetProduct(const Matrix3X2& a, const Matrix3X2& b)

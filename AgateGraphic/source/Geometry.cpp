@@ -31,6 +31,8 @@ constexpr uint32_t  Geometry_Flag_Stroke_RS = 1 << 5;
 
 constexpr uint32_t  Geometry_Flag_Fill_RS = 1 << 6;
 
+constexpr uint32_t  Geometry_Flag_Transform = 1 << 7;
+
 Figure::Figure() : _Closed{}
 {
 }
@@ -649,6 +651,16 @@ void Geometry::AddFigure(Figure&& figure)
 	}
 }
 
+void Geometry::SetTransform(const Matrix3X2& transition)
+{
+    if (_Matrix != transition)
+    {
+        _Matrix = transition;
+        AddFlag(Geometry_Flag_Transform);
+        RemoveFlag(Geometry_Flag_Flatten | Geometry_Flag_Stroke_RS | Geometry_Flag_Fill_RS);
+    }
+}
+
 void Geometry::SetStrokeWidth(float width)
 {
     assert(!HaveFlag(Geometry_Flag_Frozen));
@@ -681,25 +693,53 @@ void Geometry::Freeze()
 
 void Geometry::Flatten()
 {
+    auto trans = HaveFlag(Geometry_Flag_Transform);
 	for (auto& figure :_Figures)
 	{
         auto ppt = figure._Points.data();
-        _FlattenLines.push_back(*ppt);
-		for (auto ptt : figure._Types)
-		{
-			if (ptt == PointType::Line)
-			{
-                ppt++;
-				_FlattenLines.push_back(*ppt);
-			}
-			else
-			{
-				FlattenBezier(ppt);
-				ppt += 3;
-			}
-		}
+        if (trans)
+        {
+            Vector2* tranPpt = (Vector2*)_malloca(figure._Points.size() * sizeof(Vector2));
+            if (tranPpt == nullptr)
+            {
+                return;
+            }
+            _Matrix.TransformPoint(tranPpt, ppt, figure._Points.size());
+            _FlattenLines.push_back(*tranPpt);
+            for (auto ptt : figure._Types)
+            {
+                if (ptt == PointType::Line)
+                {
+                    tranPpt++;
+                    _FlattenLines.push_back(*tranPpt);
+                }
+                else
+                {
+                    FlattenBezier(tranPpt);
+                    tranPpt += 3;
+                }
+            }
+        }
+        else
+        {
+            _FlattenLines.push_back(*ppt);
+            for (auto ptt : figure._Types)
+            {
+                if (ptt == PointType::Line)
+                {
+                    ppt++;
+                    _FlattenLines.push_back(*ppt);
+                }
+                else
+                {
+                    FlattenBezier(ppt);
+                    ppt += 3;
+                }
+            }
+        }
 	}
     AddFlag(Geometry_Flag_Flatten);
+    RemoveFlag(Geometry_Flag_Transform);
 }
 
 void Geometry::FlattenBezier(Vector2* pPoints)
@@ -729,13 +769,15 @@ void Geometry::RasterizeStroke(uint32_t col)
     auto points_count = _FlattenLines.size();
     if (points_count < 2)
         return;
+    _StrokeData.index.Reset();
+    _StrokeData.vertex.Reset();
     const bool closed = _Flags & Geometry_Flag_Closed;
     const int count = closed ? points_count : points_count - 1; 
     const bool thick_line = (_StrokeWidth > FringeScale);
 
     // Anti-aliased stroke
     const float AA_SIZE = FringeScale;
-    const uint32_t col_trans = col & 0xFFFFFF00; // ~IM_COL32_A_MASK;
+    const uint32_t col_trans = col & 0xFFFFFF; // ~IM_COL32_A_MASK;
     //宽度至少一个像素
     auto thickness = max(_StrokeWidth, 1.0f);
 
@@ -899,9 +941,11 @@ void Geometry::RasterizeFill(uint32_t color)
         //assert(false);
         return;
     }
+    _FillData.index.Reset();
+    _FillData.vertex.Reset();
     // Anti-aliased Fill
     const float AA_SIZE = _FringeScale;
-    const uint32_t col_trans = color & 0xFFFFFF00;
+    const uint32_t col_trans = color & 0xFFFFFF;
     const int idx_count = (points_count - 2) * 3 + points_count * 6;
     const int vtx_count = (points_count * 2);
     auto _IdxWritePtr = _FillData.index.Alloc<DrawIndex>(idx_count);
@@ -966,7 +1010,7 @@ void Geometry::RasterizeFill(uint32_t color)
 
 uint32_t Geometry::Rasterize()
 {
-    if (HaveFlag(Geometry_Flag_Flatten) == false)
+    if (HaveFlag(Geometry_Flag_Transform) || HaveFlag(Geometry_Flag_Flatten) == false)
     {
         Flatten();
     }
@@ -976,8 +1020,9 @@ uint32_t Geometry::Rasterize()
     }
     if (HaveFlag(Geometry_Flag_Fill) && !HaveFlag(Geometry_Flag_Fill_RS))
     {
-        RasterizeFill(0x5F6A3510);
+        RasterizeFill(_FillColor.color);
     }
+    _FlattenLines.clear();
     int count = 0;
     if (HaveFlag(Geometry_Flag_Stroke_RS))
     {
@@ -992,6 +1037,13 @@ uint32_t Geometry::Rasterize()
 
 const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
 {
-	assert(index < 2);
-    return index == 0 ? _StrokeData : _FillData;
+    if (index == 0)
+    {
+        return HaveFlag(Geometry_Flag_Fill_RS) ? _FillData : _StrokeData;
+    }
+    else
+    {
+        assert(HaveFlag(Geometry_Flag_Stroke_RS));
+        return _StrokeData;
+    }
 }

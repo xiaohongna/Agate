@@ -145,12 +145,19 @@ struct RasterizeData
 class Geometry
 {
 public:
-	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }, _StrokeColor{}, _FillColor{}
+	Geometry() :_Flags{ }, 
+		_StrokeWidth{ 1.0f }, 
+		_StrokeColor{},
+		_FillColor{},
+		_Matrix{}
 	{
-
+		_Matrix._11 = 1.0f;
+		_Matrix._22 = 1.0f;
 	}
 	
 	void AddFigure(Figure&& figure);
+
+	void SetTransform(const Matrix3X2& transition);
 
 	void SetStrokeWidth(float width);
 
@@ -205,5 +212,6 @@ private:
 
 	uint32_t	_Flags;
 	float		_StrokeWidth;
+	Matrix3X2		_Matrix;
 
 };

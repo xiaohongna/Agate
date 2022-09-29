@@ -10,6 +10,7 @@
 #include "D3D11/GraphicContext.h"
 #include "DrawingContext.h"
 #include "RenderDemo.h"
+#include <crtdbg.h> 
 
 #define MAX_LOADSTRING 100
 
@@ -52,7 +53,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGATE));
 
     MSG msg;
-
     // 主消息循环:
     while (true)
     {
@@ -60,6 +60,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             if (msg.message == WM_QUIT)
             {
+                _CrtDumpMemoryLeaks();
                 return 0;
             }
             if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -73,6 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             Demo.Render(*Canvas);
         }
     }
+    _CrtDumpMemoryLeaks();
     return (int) msg.wParam;
 }
 

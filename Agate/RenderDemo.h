@@ -13,6 +13,7 @@ private:
 	Geometry  _Rectangle;
 	Geometry  _RoundedRect;
 	Geometry  _Ellipse;
+	float _Rotation;
 };
 
 
