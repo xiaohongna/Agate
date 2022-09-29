@@ -9,23 +9,27 @@ static inline float  ImRsqrt(float x) { return 1.0f / sqrtf(x); }
 #endif
 
 #define IM_NORMALIZE2F_OVER_ZERO(VX,VY)     { float d2 = VX*VX + VY*VY; if (d2 > 0.0f) { float inv_len = ImRsqrt(d2); VX *= inv_len; VY *= inv_len; } } (void)0
-#define IM_FIXNORMAL2F_MAX_INVLEN2          100.0f // 500.0f (see #4053, #3366)
+#define IM_FIXNORMAL2F_MAX_INVLEN2          100.0f 
 #define IM_FIXNORMAL2F(VX,VY)               { float d2 = VX*VX + VY*VY; if (d2 > 0.000001f) { float inv_len2 = 1.0f / d2; if (inv_len2 > IM_FIXNORMAL2F_MAX_INVLEN2) inv_len2 = IM_FIXNORMAL2F_MAX_INVLEN2; VX *= inv_len2; VY *= inv_len2; } } (void)0
-
-#define IM_COL32_A_MASK     0xFF000000
 
 constexpr float FUZZ = 1.e-6;           // Relative 0
 constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
 constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
 constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
 
-constexpr uint32_t  Frozen_Flag_Mask = 1;
+constexpr uint32_t  Geometry_Flag_Frozen = 1;
 
-constexpr uint32_t  Closed_Flag_Mask = 1 << 1;
+constexpr uint32_t  Geometry_Flag_Closed = 1 << 1;
 
-constexpr uint32_t  Flatten_Flag_Mask = 1 << 2;
+constexpr uint32_t  Geometry_Flag_Flatten = 1 << 2;
 
-constexpr uint32_t  Rasterized_Flag_Mask = 1 << 3;
+constexpr uint32_t  Geometry_Flag_Stroke = 1 << 3;
+
+constexpr uint32_t  Geometry_Flag_Fill = 1 << 4;
+
+constexpr uint32_t  Geometry_Flag_Stroke_RS = 1 << 5;
+
+constexpr uint32_t  Geometry_Flag_Fill_RS = 1 << 6;
 
 Figure::Figure() : _Closed{}
 {
@@ -63,6 +67,7 @@ void Figure::StartAt(const Vector2& pt)
 
 void Figure::LineTo(float x, float y)
 {
+    assert(!IsEmpty());
     auto ppt = AddPoints(1);
     auto ptype = AddTypes(1);
     ppt->x = x;
@@ -633,12 +638,12 @@ PointType* Figure::AddTypes(int count, PointType defType)
 
 void Geometry::AddFigure(Figure&& figure)
 {
-    assert(!HaveFlag(Frozen_Flag_Mask));
-	if ((_Flags & Frozen_Flag_Mask) == 0)
+    assert(!HaveFlag(Geometry_Flag_Frozen));
+	if ((_Flags & Geometry_Flag_Frozen) == 0)
 	{
         if (figure.IsClosed())
         {
-            AddFlag(Closed_Flag_Mask);
+            AddFlag(Geometry_Flag_Closed);
         }
 		_Figures.emplace_back(std::move(figure));
 	}
@@ -646,18 +651,22 @@ void Geometry::AddFigure(Figure&& figure)
 
 void Geometry::SetStrokeWidth(float width)
 {
-    assert(!HaveFlag(Frozen_Flag_Mask));
+    assert(!HaveFlag(Geometry_Flag_Frozen));
 	_StrokeWidth = width;
 }
 
 void Geometry::SetFillBrush(Brush& brush)
 {
-    assert(!HaveFlag(Frozen_Flag_Mask));
+    assert(!HaveFlag(Geometry_Flag_Frozen));
+    _FillColor = brush._Color; 
+    AddFlag(Geometry_Flag_Fill);
 }
 
 void Geometry::SetStrokeBrush(Brush& brush)
 {
-    assert(!HaveFlag(Frozen_Flag_Mask));
+    assert(!HaveFlag(Geometry_Flag_Frozen));
+    _StrokeColor = brush._Color;
+    AddFlag(Geometry_Flag_Stroke);
 }
 
 Vector4 Geometry::GetBounds()
@@ -667,7 +676,7 @@ Vector4 Geometry::GetBounds()
 
 void Geometry::Freeze()
 {
-    AddFlag(Frozen_Flag_Mask);
+    AddFlag(Geometry_Flag_Frozen);
 }
 
 void Geometry::Flatten()
@@ -690,7 +699,7 @@ void Geometry::Flatten()
 			}
 		}
 	}
-    AddFlag(Flatten_Flag_Mask);
+    AddFlag(Geometry_Flag_Flatten);
 }
 
 void Geometry::FlattenBezier(Vector2* pPoints)
@@ -720,7 +729,7 @@ void Geometry::RasterizeStroke(uint32_t col)
     auto points_count = _FlattenLines.size();
     if (points_count < 2)
         return;
-    const bool closed = _Flags & Closed_Flag_Mask;
+    const bool closed = _Flags & Geometry_Flag_Closed;
     const int count = closed ? points_count : points_count - 1; 
     const bool thick_line = (_StrokeWidth > FringeScale);
 
@@ -878,7 +887,7 @@ void Geometry::RasterizeStroke(uint32_t col)
     }
     _StrokeData.pipline = PipelineType::Color;
     _StrokeData.blend = BlendMode::Blend;
-    AddFlag(Rasterized_Flag_Mask);
+    AddFlag(Geometry_Flag_Stroke_RS);
 }
 
 void Geometry::RasterizeFill(uint32_t color)
@@ -892,7 +901,7 @@ void Geometry::RasterizeFill(uint32_t color)
     }
     // Anti-aliased Fill
     const float AA_SIZE = _FringeScale;
-    const uint32_t col_trans = color & 0xFFFFFF;
+    const uint32_t col_trans = color & 0xFFFFFF00;
     const int idx_count = (points_count - 2) * 3 + points_count * 6;
     const int vtx_count = (points_count * 2);
     auto _IdxWritePtr = _FillData.index.Alloc<DrawIndex>(idx_count);
@@ -952,28 +961,37 @@ void Geometry::RasterizeFill(uint32_t color)
         _IdxWritePtr[3] = (DrawIndex)(vtx_outer_idx + (i0 << 1)); _IdxWritePtr[4] = (DrawIndex)(vtx_outer_idx + (i1 << 1)); _IdxWritePtr[5] = (DrawIndex)(vtx_inner_idx + (i1 << 1));
         _IdxWritePtr += 6;
     }
+    AddFlag(Geometry_Flag_Fill_RS);
 }
 
 uint32_t Geometry::Rasterize()
 {
-    if (HaveFlag(Flatten_Flag_Mask) == false)
+    if (HaveFlag(Geometry_Flag_Flatten) == false)
     {
         Flatten();
     }
-    if (_FlattenLines.empty())
+    if (HaveFlag(Geometry_Flag_Stroke) && !HaveFlag(Geometry_Flag_Stroke_RS))
     {
-        return 0;
+        RasterizeStroke(_StrokeColor.color);
     }
-    if (HaveFlag(Rasterized_Flag_Mask) == false)
+    if (HaveFlag(Geometry_Flag_Fill) && !HaveFlag(Geometry_Flag_Fill_RS))
     {
-        //RasterizeStroke(0xFF0000FF);
-        RasterizeFill(0xFFFF0000);
+        RasterizeFill(0x5F6A3510);
     }
-	return 1;
+    int count = 0;
+    if (HaveFlag(Geometry_Flag_Stroke_RS))
+    {
+        count++;
+    }
+    if (HaveFlag(Geometry_Flag_Fill_RS))
+    {
+        count++;
+    }
+    return count;
 }
 
 const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
 {
 	assert(index < 2);
-    return index == 1 ? _StrokeData : _FillData;
+    return index == 0 ? _StrokeData : _FillData;
 }

@@ -84,7 +84,6 @@ private:
 	bool  _Closed;
 };
 
-
 template<typename T>
 struct FixedBuffer
 {
@@ -146,7 +145,7 @@ struct RasterizeData
 class Geometry
 {
 public:
-	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }
+	Geometry() :_Flags{ }, _StrokeWidth{ 1.0f }, _StrokeColor{}, _FillColor{}
 	{
 
 	}
@@ -185,7 +184,7 @@ private:
 	
 	bool HaveFlag(uint32_t flag)
 	{
-		return (_Flags & flag) != 0;
+		return (_Flags & flag) == flag;
 	}
 
 	void Flatten();
@@ -201,6 +200,8 @@ private:
 	
 	RasterizeData	_StrokeData;
 	RasterizeData	_FillData;
+	Color			_StrokeColor;
+	Color			_FillColor;
 
 	uint32_t	_Flags;
 	float		_StrokeWidth;
