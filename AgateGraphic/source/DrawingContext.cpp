@@ -52,40 +52,12 @@ void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 
 void DrawingContext::Draw(Geometry& geometry)
 {
-	geometry.Freeze();
+	//geometry.Freeze();
 	auto count = geometry.Rasterize();
 	for (uint32_t i = 0; i < count; i++)
 	{
 		auto& data = geometry.GetRasterizeData(i);
-		if (NeedFlush(data))
-		{
-			Flush();
-		}
-		PushCommnd(data);
-
-		auto itemSize = data.vertex.preSize;
-		if(_CurrentBatch.vertexCount == 0)
-		{
-			//全新的buffer，直接copy就行
-			memcpy_s(_VertextBuffer.buffer, _VertextBuffer.size, data.vertex.buffer, data.vertex.size);
-			memcpy_s(_IndexBuffer.buffer, _IndexBuffer.size, data.index.buffer, data.index.size);
-			_CurrentBatch.vertexCount = data.vertex.count;
-			_CurrentBatch.indexCount = data.index.count;
-		}
-		else
-		{
-			auto vertexPtr = _VertextBuffer.buffer + itemSize * _CurrentBatch.vertexCount;
-			memcpy_s(vertexPtr, _VertextBuffer.size - itemSize * _CurrentBatch.vertexCount, data.vertex.buffer, data.vertex.size);
-			auto indexPtr = _IndexBuffer.buffer + _CurrentBatch.indexCount;
-			memcpy_s(indexPtr, _IndexBuffer.size - _CurrentBatch.indexCount * sizeof(DrawIndex), data.index.buffer, data.index.size);
-			for (size_t i = 0; i < data.index.count; i++)
-			{
-				*indexPtr += _CurrentBatch.vertexCount;
-				indexPtr++;
-			}
-			_CurrentBatch.vertexCount += data.vertex.count;
-			_CurrentBatch.indexCount += data.index.count;
-		}
+		Draw(data);
 	}
 }
 
@@ -93,6 +65,39 @@ void DrawingContext::EndDraw(uint32_t sync)
 {
 	Flush();
 	_Renderer->EndDraw(sync);
+}
+
+void DrawingContext::Draw(const RasterizeData& data)
+{
+	if (NeedFlush(data))
+	{
+		Flush();
+	}
+	PushCommnd(data);
+
+	auto itemSize = data.vertex.preSize;
+	if (_CurrentBatch.vertexCount == 0)
+	{
+		//全新的buffer，直接copy就行
+		memcpy_s(_VertextBuffer.buffer, _VertextBuffer.size, data.vertex.buffer, data.vertex.size);
+		memcpy_s(_IndexBuffer.buffer, _IndexBuffer.size, data.index.buffer, data.index.size);
+		_CurrentBatch.vertexCount = data.vertex.count;
+		_CurrentBatch.indexCount = data.index.count;
+	}
+	else
+	{
+		auto vertexPtr = _VertextBuffer.buffer + itemSize * _CurrentBatch.vertexCount;
+		memcpy_s(vertexPtr, _VertextBuffer.size - itemSize * _CurrentBatch.vertexCount, data.vertex.buffer, data.vertex.size);
+		auto indexPtr = _IndexBuffer.buffer + _CurrentBatch.indexCount;
+		memcpy_s(indexPtr, _IndexBuffer.size - _CurrentBatch.indexCount * sizeof(DrawIndex), data.index.buffer, data.index.size);
+		for (size_t i = 0; i < data.index.count; i++)
+		{
+			*indexPtr += _CurrentBatch.vertexCount;
+			indexPtr++;
+		}
+		_CurrentBatch.vertexCount += data.vertex.count;
+		_CurrentBatch.indexCount += data.index.count;
+	}
 }
 
 bool DrawingContext::NeedFlush(const RasterizeData& data)
@@ -143,12 +148,13 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 			cmd.clipHeight = _ClipHeight;
 			_ClipChanged = false;
 		}
+		cmd.texture = data.texture;
 		_CurrentBatch.commands.emplace_back(cmd);
 	}
 	else
 	{
 		auto& back = _CurrentBatch.commands.back();
-		if (back.blend != data.blend || _ClipChanged)
+		if (back.blend != data.blend || _ClipChanged || back.texture != data.texture)
 		{
 			DrawCommand cmd{};
 			cmd.blend = data.blend;
@@ -161,6 +167,7 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 			}
 			cmd.indexCount = data.index.count;
 			cmd.startIndexLocation = _CurrentBatch.indexCount;
+			cmd.texture = data.texture;
 			_ClipChanged = false;
 			_CurrentBatch.commands.emplace_back(cmd);
 		}

@@ -18,6 +18,8 @@ public:
 
 	void EndDraw(uint32_t sync);
 private:
+	void Draw(const RasterizeData& data);
+
 	bool NeedFlush(const RasterizeData& data);
 	
 	void Flush();
