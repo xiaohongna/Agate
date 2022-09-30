@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include "Drawingable.h"
 #include "Renderer.h"
 #include "VideoBuffer.h"
 #include "Pipeline.h"
@@ -42,6 +43,10 @@ public:
     void Draw(const BatchDrawData& data) override;
 
     void EndDraw(uint32_t sync) override;
+
+    Texture2D CreateTexture(const ImageData& data) override;
+
+    void ReleaseTexture(Texture2D texture) override;
 
 private:
     void CleanupDeviceD3D();

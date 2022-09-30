@@ -12,7 +12,7 @@ static inline float  ImRsqrt(float x) { return 1.0f / sqrtf(x); }
 #define IM_FIXNORMAL2F_MAX_INVLEN2          100.0f 
 #define IM_FIXNORMAL2F(VX,VY)               { float d2 = VX*VX + VY*VY; if (d2 > 0.000001f) { float inv_len2 = 1.0f / d2; if (inv_len2 > IM_FIXNORMAL2F_MAX_INVLEN2) inv_len2 = IM_FIXNORMAL2F_MAX_INVLEN2; VX *= inv_len2; VY *= inv_len2; } } (void)0
 
-constexpr float FUZZ = 1.e-6;           // Relative 0
+constexpr float FUZZ = 1.e-6f;           // Relative 0
 constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
 constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
 constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
@@ -125,6 +125,17 @@ void Figure::BezierTo(const Vector2* pts, int count)
 	*ptype = PointType::Bezier;
 }
 
+void Figure::QuadBezierTo(const Vector2& ctrl, const Vector2& endPt)
+{
+    constexpr float fact = 2.0f / 3.0f;
+    assert(!IsEmpty());
+    auto& back = _Points.back();
+    Vector2 bCtrl1{ back.x + fact * (ctrl.x - back.x), back.y + fact * (ctrl.y - back.y) };
+    Vector2 bCtrl2{ endPt.x + fact * (ctrl.x - endPt.x), endPt.y + fact * (ctrl.y - endPt.y) };
+    BezierTo(bCtrl1, bCtrl2, endPt);
+};
+
+
 bool AcceptRadius(float rHalfChord2,
     // (1/2 chord length)squared
     float rFuzz2,
@@ -160,9 +171,8 @@ inline float Determinant(const Vector2& a, const Vector2& b)
     return (a.x * b.y - a.y * b.x);
 }
 
-void
-GetArcAngle(
-     const Vector2& ptStart,
+void GetArcAngle(
+    const Vector2& ptStart,
     // Start point
     const Vector2& ptEnd,
     // End point
@@ -176,7 +186,7 @@ GetArcAngle(
     // Sine of a the sweep angle of one arc piece
     int& cPieces)      // Out: The number of pieces
 {
-    constexpr float TWO_PI = 6.2831853071795865;    // 2PI
+    constexpr float TWO_PI = 6.2831853071795865f;    // 2PI
     float rAngle;
 
     // The points are on the unit circle, so:
@@ -240,8 +250,7 @@ GetArcAngle(
     rSinArcAngle = sinf(rAngle);
 }
 
-float
-GetBezierDistance(  // Return the distance as a fraction of the radius
+float GetBezierDistance(  // Return the distance as a fraction of the radius
     float rDot,    // In: The dot product of the two radius vectors
     float rRadius = 1.0f) // In: The radius of the arc's circle (optional=1)
 {

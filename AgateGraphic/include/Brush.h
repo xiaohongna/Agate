@@ -5,9 +5,9 @@ union Color
 {
 	struct 
 	{
-		uint8_t blue;
-		uint8_t green;
 		uint8_t red;
+		uint8_t green;
+		uint8_t blue;
 		uint8_t alpha;
 	};
 	uint32_t color;
@@ -16,7 +16,7 @@ union Color
 		color = 0;
 	}
 	/// <summary>
-	/// ARGB
+	/// ABGR
 	/// </summary>
 	/// <param name="uintCol">32Î»ÑÕÉ«</param>
 	Color(uint32_t uintCol)

@@ -42,7 +42,7 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 
 void RenderDemo::Render(DrawingContext& canvs)
 {
-	_Rotation += 0.02;
+	_Rotation = min(_Rotation + 0.02, 3.1445f);
 	_Scale.x = min(_Scale.x + 0.01, 2);
 	_Scale.y = min(_Scale.y + 0.02, 2);
 	canvs.BeginDraw(true, 0xFFFFFFFF);

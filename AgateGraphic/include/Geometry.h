@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "Brush.h"
+#include "Drawingable.h"
 /// <summary>
 /// 描述线段组合
 /// </summary>
@@ -41,7 +42,7 @@ public:
 
 	void LineTo(const Vector2* pts, int count);
     /// <summary>
-    /// 曲线， 验证  https://www.bezier-curve.com/ 
+    /// 3次曲线， 验证  https://www.bezier-curve.com/ 
     /// </summary>
     /// <param name="ctr1"></param>
     /// <param name="ctr2"></param>
@@ -49,6 +50,12 @@ public:
     void BezierTo(const Vector2& ctr1, const Vector2& ctr2, const Vector2& endPt);
 
 	void BezierTo(const Vector2* pts, int count);
+	/// <summary>
+	/// 2次曲线
+	/// </summary>
+	/// <param name="ctrl"></param>
+	/// <param name="endPt"></param>
+	void QuadBezierTo(const Vector2& ctrl, const Vector2& endPt);
 
 	void ArcTo(float xRadius,  float yRadius,  float rRotation,  bool fLargeArc,  bool fSweepUp,  float xEnd,  float yEnd);    
 
@@ -84,65 +91,7 @@ private:
 	bool  _Closed;
 };
 
-template<typename T>
-struct FixedBuffer
-{
-	T* buffer;
-	uint32_t count;   //元素数量
-	uint32_t preSize;  //单元素大小
-	uint32_t size;    //buffer内存大小
-	FixedBuffer() :buffer{}, count{}, size{}, preSize{1}
-	{
-
-	}
-	
-	template<typename T1>
-	T1* Alloc(int count)
-	{
-		this->count = count;
-		preSize = sizeof(T1);
-		size = count * sizeof(T1);
-		buffer = (T*)malloc(size);
-		return (T1*)buffer;
-	}
-
-	void Reset()
-	{
-		if (buffer)
-		{
-			delete buffer;
-			buffer = nullptr;
-			count = 0;
-			size = 0;
-		}
-	}
-
-	template<typename T1>
-	T1* As() const
-	{
-		assert(size == count * sizeof(T1));
-		return (T1*)buffer;
-	}
-
-	~FixedBuffer() 
-	{
-		Reset();
-	}
-};
-
-struct RasterizeData
-{
-	PipelineType pipline;
-	BlendMode   blend;
-	FixedBuffer<char> vertex;
-	FixedBuffer<DrawIndex> index;
-	RasterizeData():pipline{PipelineType::Color}, blend{BlendMode::Blend}
-	{
-		
-	}
-};
-
-class Geometry
+class Geometry: public Drawingable
 {
 public:
 	Geometry() :_Flags{ }, 
@@ -169,14 +118,16 @@ public:
 	void SetFillBrush(Brush& brush);
 
 	void SetStrokeBrush(Brush& brush);
-		
+	
+	//void SetBlendMode(BlendMode blend);
+
 	Vector4 GetBounds();
 	
 	void Freeze();
 
-	uint32_t Rasterize();
+	uint32_t Rasterize() override;
 
-	const RasterizeData& GetRasterizeData(uint32_t index);
+	const RasterizeData& GetRasterizeData(uint32_t index) override;
 private:
 
 	void AddFlag(uint32_t flag)

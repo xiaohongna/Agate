@@ -133,7 +133,7 @@ void GraphicContext::Draw(const BatchDrawData& data)
     }
     _CurrentPipline->UpdateVertex(_DeviceContext, data.vertexData, data.vertexCount);
     _CurrentPipline->UpdateIndex(_DeviceContext, data.indexData, data.indexCount);
-    for (auto& cmd : data.commands)
+    for (auto const& cmd : data.commands)
     {
         if (cmd.blend != _CurrentBlend)
         {
@@ -152,6 +152,46 @@ void GraphicContext::Draw(const BatchDrawData& data)
 void GraphicContext::EndDraw(uint32_t sync)
 {
     HRESULT hr = _SwapChain->Present(1, 0);
+}
+
+Texture2D GraphicContext::CreateTexture(const ImageData& data)
+{
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = data.width;
+    desc.Height = data.height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+
+    CComPtr<ID3D11Texture2D> pTexture;
+    D3D11_SUBRESOURCE_DATA subResource;
+    subResource.pSysMem = data.bites;
+    subResource.SysMemPitch = desc.Width * 4;
+    subResource.SysMemSlicePitch = 0;
+    auto hr = _Device->CreateTexture2D(&desc, &subResource, &pTexture);
+    assert(SUCCEEDED(hr));
+
+    ID3D11ShaderResourceView* resourceView;
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    hr = _Device->CreateShaderResourceView(pTexture, &srvDesc, &resourceView);
+    assert(SUCCEEDED(hr));
+    return resourceView;
+}
+
+void GraphicContext::ReleaseTexture(Texture2D texture)
+{
+    ID3D11ShaderResourceView* view = (ID3D11ShaderResourceView*)texture;
+    view->Release();
 }
 
 void GraphicContext::CleanupDeviceD3D()

@@ -42,6 +42,15 @@
     <ClInclude Include="include\Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Spirit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Drawingable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Geometry.cpp">
@@ -54,6 +63,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\DrawingContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Spirit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

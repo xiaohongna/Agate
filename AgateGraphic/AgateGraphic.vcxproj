@@ -20,10 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Brush.h" />
+    <ClInclude Include="include\Drawingable.h" />
     <ClInclude Include="include\DrawingContext.h" />
     <ClInclude Include="include\Geometry.h" />
+    <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\Spirit.h" />
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="source\bezier.h" />
@@ -34,6 +37,8 @@
     <ClCompile Include="source\Brush.cpp" />
     <ClCompile Include="source\DrawingContext.cpp" />
     <ClCompile Include="source\Geometry.cpp" />
+    <ClCompile Include="source\Image.cpp" />
+    <ClCompile Include="source\Spirit.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -124,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;ENABLE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)thirdPart;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>

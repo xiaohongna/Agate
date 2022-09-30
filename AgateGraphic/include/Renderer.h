@@ -1,13 +1,12 @@
 #pragma once
-
 #include "Vertex.h"
-
+#include "Image.h"
 struct DrawCommand
 {
 	BlendMode blend;
 	uint32_t indexCount;
 	uint32_t startIndexLocation;
-
+	Texture2D texture;
 	uint32_t clipX;
 	uint32_t clipY;
 	uint32_t clipWidth;
@@ -43,6 +42,10 @@ public:
 	virtual void Draw(const BatchDrawData& data)  = 0;
 
 	virtual void EndDraw(uint32_t sync) = 0;
+
+	virtual Texture2D CreateTexture(const ImageData& data) = 0;
+
+	virtual void ReleaseTexture(Texture2D texture) = 0;
 
 };
 
