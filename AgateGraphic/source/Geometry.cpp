@@ -694,50 +694,35 @@ void Geometry::Freeze()
 void Geometry::Flatten()
 {
     auto trans = HaveFlag(Geometry_Flag_Transform);
-	for (auto& figure :_Figures)
-	{
+    for (auto& figure : _Figures)
+    {
         auto ppt = figure._Points.data();
+        Vector2* tranPpt = nullptr;
         if (trans)
         {
-            Vector2* tranPpt = (Vector2*)_malloca(figure._Points.size() * sizeof(Vector2));
-            if (tranPpt == nullptr)
-            {
-                return;
-            }
+            tranPpt = (Vector2*)_malloca(figure._Points.size() * sizeof(Vector2));
             _Matrix.TransformPoint(tranPpt, ppt, figure._Points.size());
-            _FlattenLines.push_back(*tranPpt);
-            for (auto ptt : figure._Types)
-            {
-                if (ptt == PointType::Line)
-                {
-                    tranPpt++;
-                    _FlattenLines.push_back(*tranPpt);
-                }
-                else
-                {
-                    FlattenBezier(tranPpt);
-                    tranPpt += 3;
-                }
-            }
+            ppt = tranPpt;
         }
-        else
+        _FlattenLines.push_back(*ppt);
+        for (auto ptt : figure._Types)
         {
-            _FlattenLines.push_back(*ppt);
-            for (auto ptt : figure._Types)
+            if (ptt == PointType::Line)
             {
-                if (ptt == PointType::Line)
-                {
-                    ppt++;
-                    _FlattenLines.push_back(*ppt);
-                }
-                else
-                {
-                    FlattenBezier(ppt);
-                    ppt += 3;
-                }
+                ppt++;
+                _FlattenLines.push_back(*ppt);
+            }
+            else
+            {
+                FlattenBezier(ppt);
+                ppt += 3;
             }
         }
-	}
+        if (trans)
+        {
+            _freea(tranPpt);
+        }
+    }
     AddFlag(Geometry_Flag_Flatten);
     RemoveFlag(Geometry_Flag_Transform);
 }
@@ -927,6 +912,7 @@ void Geometry::RasterizeStroke(uint32_t col)
             vtxWritePtr += 4;
         }
     }
+    _freea(temp_normals);
     _StrokeData.pipline = PipelineType::Color;
     _StrokeData.blend = BlendMode::Blend;
     AddFlag(Geometry_Flag_Stroke_RS);
@@ -1005,6 +991,7 @@ void Geometry::RasterizeFill(uint32_t color)
         _IdxWritePtr[3] = (DrawIndex)(vtx_outer_idx + (i0 << 1)); _IdxWritePtr[4] = (DrawIndex)(vtx_outer_idx + (i1 << 1)); _IdxWritePtr[5] = (DrawIndex)(vtx_inner_idx + (i1 << 1));
         _IdxWritePtr += 6;
     }
+    _freea(temp_normals);
     AddFlag(Geometry_Flag_Fill_RS);
 }
 

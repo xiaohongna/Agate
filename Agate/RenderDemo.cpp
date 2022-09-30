@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "RenderDemo.h"
 
-RenderDemo::RenderDemo()
+RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 {
 	_Rotation = 0.0;
-
+	
 	Brush pureColor;
 	
 	{
@@ -43,11 +43,13 @@ RenderDemo::RenderDemo()
 void RenderDemo::Render(DrawingContext& canvs)
 {
 	_Rotation += 0.02;
+	_Scale.x = min(_Scale.x + 0.01, 2);
+	_Scale.y = min(_Scale.y + 0.02, 2);
 	canvs.BeginDraw(true, 0xFFFFFFFF);
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
 	_Line.SetTransform(matrix);
 	canvs.Draw(_Bezier);
-	auto matrix2 = Matrix3X2::Rotation(_Rotation, Vector2(150, 400));
+	auto matrix2 = Matrix3X2::Rotation(_Rotation, Vector2(150, 400)) * Matrix3X2::Scale(_Scale.x, _Scale.y);
 	_Ellipse.SetTransform(matrix2);
 	canvs.Draw(_Ellipse);
 	canvs.Draw(_Rectangle);

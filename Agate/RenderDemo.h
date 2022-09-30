@@ -14,6 +14,7 @@ private:
 	Geometry  _RoundedRect;
 	Geometry  _Ellipse;
 	float _Rotation;
+	Vector2 _Scale;
 };
 
 

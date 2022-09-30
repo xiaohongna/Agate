@@ -24,16 +24,18 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+void CleanUp();
 
-GraphicContext D3D11Context;
+std::unique_ptr<GraphicContext> D3D11Context;
 std::unique_ptr<DrawingContext> Canvas;
-RenderDemo Demo;
+std::unique_ptr<RenderDemo> Demo;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    //_CrtSetBreakAlloc(310);
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -60,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             if (msg.message == WM_QUIT)
             {
-                _CrtDumpMemoryLeaks();
+                CleanUp();
                 return 0;
             }
             if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -71,13 +73,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            Demo.Render(*Canvas);
+            Demo->Render(*Canvas);
         }
     }
-    _CrtDumpMemoryLeaks();
+    CleanUp();
     return (int) msg.wParam;
 }
 
+void CleanUp()
+{
+    D3D11Context.reset();
+    Canvas.reset();
+    Demo.reset();
+    _CrtDumpMemoryLeaks();
+}
 
 
 //
@@ -129,8 +138,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   D3D11Context.CreateDeviceD3D(hWnd);
-   Canvas = std::make_unique<DrawingContext>(&D3D11Context);
+   D3D11Context = std::make_unique<GraphicContext>();
+   D3D11Context->CreateDeviceD3D(hWnd);
+   Canvas = std::make_unique<DrawingContext>(D3D11Context.get());
+   Demo = std::make_unique<RenderDemo>();
    RECT rt{};
    GetClientRect(hWnd, &rt);
    Canvas->SetViewSize(rt.right - rt.left, rt.bottom - rt.top);
