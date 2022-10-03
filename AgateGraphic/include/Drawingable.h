@@ -61,11 +61,12 @@ struct RasterizeData
 
 	}
 };
+class DrawingContext;
 
 class Drawingable
 {
 public:
-	virtual uint32_t Rasterize() = 0;
+	virtual uint32_t Rasterize(DrawingContext& context) = 0;
 
 	virtual const RasterizeData& GetRasterizeData(uint32_t index) = 0;
 };

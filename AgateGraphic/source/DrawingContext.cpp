@@ -50,15 +50,26 @@ void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 	}
 }
 
-void DrawingContext::Draw(Geometry& geometry)
+void DrawingContext::Draw(Drawingable& drawing)
 {
 	//geometry.Freeze();
-	auto count = geometry.Rasterize();
+	auto count = drawing.Rasterize(*this);
 	for (uint32_t i = 0; i < count; i++)
 	{
-		auto& data = geometry.GetRasterizeData(i);
+		auto& data = drawing.GetRasterizeData(i);
 		Draw(data);
 	}
+}
+
+Texture2D DrawingContext::CreateTexture(Image* img)
+{
+	auto& data = img->GetImageData();
+	return _Renderer->CreateTexture(data);
+}
+
+void DrawingContext::ReleaseTexture(Image* img)
+{
+
 }
 
 void DrawingContext::EndDraw(uint32_t sync)
@@ -137,6 +148,7 @@ void DrawingContext::PushCommnd(const RasterizeData& data)
 {
 	if (_CurrentBatch.commands.empty()) 
 	{
+		_CurrentBatch.pipline = data.pipline;
 		DrawCommand cmd{};
 		cmd.blend = data.blend;
 		cmd.indexCount = data.index.count;

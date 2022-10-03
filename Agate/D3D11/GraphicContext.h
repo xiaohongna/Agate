@@ -54,6 +54,7 @@ private:
     void CleanupRenderTarget();
     void CreateOther();
     void CreateBlendState();
+    void CreateSamplerState();
     void SetupRenderState();
     void SetBlend(BlendMode blend);
 private:
@@ -69,6 +70,7 @@ private:
     CComPtr<ID3D11DepthStencilState>  _DepthStencilState;
     
     CComPtr<ID3D11BlendState>       _BlendStates[5];
+    CComPtr<ID3D11SamplerState>     _Sampler;
     std::unique_ptr<PipelineBase>    _Piplines[2];
 
     PipelineBase* _CurrentPipline;

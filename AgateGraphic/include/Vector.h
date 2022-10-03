@@ -37,6 +37,11 @@ struct Vector4
         {
             float left, top, right, bottom;
         };
+        struct
+        {
+            Vector2 pos;
+            Vector2 size;
+        };
     };
 
     Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }

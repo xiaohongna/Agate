@@ -98,7 +98,7 @@ public:
             setCapacity(dataSize + sizeof(T) * 1024);
         }
         auto dest = Map(context);
-        memcpy(dest, data, dataCount * sizeof(T));
+        memcpy(dest, data, dataSize);
         UnMap(context);
     }
 

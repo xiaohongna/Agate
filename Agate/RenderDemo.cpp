@@ -3,6 +3,13 @@
 
 RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 {
+	wchar_t pathBuffer[256];
+	GetModuleFileName(0, pathBuffer, 256);
+	std::wstring path(pathBuffer);
+	auto pos = path.rfind(LR"(\)");
+	path = path.substr(0, pos + 1);
+
+
 	_Rotation = 0.0;
 	
 	Brush pureColor;
@@ -38,14 +45,29 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 	_Ellipse.AddFigure(Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
 
+	_Image = Image::CreateFromFile(path + L"R.jpg");
+	_Spirit.SetImage(_Image);
+	auto& img = _Image->GetImageData();
+	Vector4 bounds{};
+	bounds.pos = { 200.f, 100.f };
+	bounds.size = { (float)img.width, (float)img.height };
+	_Spirit.SetBounds(bounds);
 }
 
 void RenderDemo::Render(DrawingContext& canvs)
 {
-	_Rotation = min(_Rotation + 0.02, 3.1445f);
-	_Scale.x = min(_Scale.x + 0.01, 2);
-	_Scale.y = min(_Scale.y + 0.02, 2);
 	canvs.BeginDraw(true, 0xFFFFFFFF);
+	RenderGeomegry(canvs);
+	RenderSpirit(canvs);
+	canvs.EndDraw(1);
+}
+
+void RenderDemo::RenderGeomegry(DrawingContext& canvs)
+{
+	_Rotation = min(_Rotation + 0.02f, 3.1445f);
+	_Scale.x = min(_Scale.x + 0.01f, 2);
+	_Scale.y = min(_Scale.y + 0.02f, 2);
+	
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
 	_Line.SetTransform(matrix);
 	canvs.Draw(_Bezier);
@@ -56,5 +78,12 @@ void RenderDemo::Render(DrawingContext& canvs)
 	//canvs.SetClip({ 250, 20, 390, 500 });
 	canvs.Draw(_RoundedRect);
 	canvs.Draw(_Line);
-	canvs.EndDraw(1);
+}
+
+void RenderDemo::RenderSpirit(DrawingContext& canvs)
+{
+	//_Rotation = min(_Rotation + 0.02f, 3.1445f);
+	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
+	_Spirit.SetTransform(matrix);
+	canvs.Draw(_Spirit);
 }

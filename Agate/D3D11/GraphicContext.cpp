@@ -50,6 +50,7 @@ bool GraphicContext::CreateDeviceD3D(HWND hWnd)
     CreateRenderTarget();
     CreateOther();
     CreateBlendState();
+    CreateSamplerState();
     _init = true;
     return true;
 }
@@ -68,6 +69,7 @@ void GraphicContext::BeginDraw()
     _DeviceContext->DSSetShader(NULL, NULL, 0);
     _DeviceContext->CSSetShader(NULL, NULL, 0);
     _DeviceContext->OMSetDepthStencilState(_DepthStencilState, 0);
+    _DeviceContext->PSSetSamplers(0, 1, (ID3D11SamplerState**)&_Sampler.p);
     _DeviceContext->RSSetState(_RasterizerState);
     //ºÏ³É½×¶Î
     SetBlend(BlendMode::Blend);
@@ -138,6 +140,10 @@ void GraphicContext::Draw(const BatchDrawData& data)
         if (cmd.blend != _CurrentBlend)
         {
             SetBlend(cmd.blend);
+        }
+        if (cmd.texture)
+        {
+            _DeviceContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView**)&cmd.texture);
         }
         if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
         {
@@ -243,6 +249,20 @@ void GraphicContext::CreateOther()
     {
         _Piplines[0] = std::move(colorPPL);
     }
+    else 
+    {
+        assert(false);
+    }
+
+    auto texturePPL = std::make_unique<TextureColorPipline>();
+    if (texturePPL->Load(_Device))
+    {
+        _Piplines[1] = std::move(texturePPL);
+    }
+    else
+    {
+        assert(false);
+    }
 }
 
 void GraphicContext::CreateBlendState()
@@ -281,6 +301,21 @@ void GraphicContext::CreateBlendState()
     desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
     desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
     _Device->CreateBlendState(&desc, &_BlendStates[4]);  //Multiply
+}
+
+void GraphicContext::CreateSamplerState()
+{
+    D3D11_SAMPLER_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    desc.MipLODBias = 0.f;
+    desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+    desc.MinLOD = 0.f;
+    desc.MaxLOD = 0.f;
+    _Device->CreateSamplerState(&desc, &_Sampler);
 }
 
 void GraphicContext::SetupRenderState()

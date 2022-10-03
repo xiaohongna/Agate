@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include <string>
+#include <memory>
+#include <map>
 
 typedef void* Texture2D;
 
@@ -15,30 +17,42 @@ struct ImageData
 class Image
 {
 public:
-	Image() : _Channel{ 4 },
-		_Width{0},
-		_Height{0},
-		_Bites {}
+
+	Image() : _Data{},
+		_Texture{}
 	{
 
 	}
+	
+	const ImageData& GetImageData()
+	{
+		return _Data;
+	}
+	
+	Texture2D GetTexture() 
+	{
+		return _Texture;
+	}
+	void SetTexture(Texture2D texture)
+	{
+		_Texture = texture;
+	}
 
-	bool Create(const std::wstring& fileName);
-
-	//bool Create(uint32_t width, uint32_t height);
+	static std::shared_ptr<Image> CreateFromFile(const std::wstring& fileName);
 
 	~Image()
 	{
-		if (_Bites)
+		if (_Data.bites)
 		{
-			delete _Bites;
+			delete _Data.bites;
+			_Data.bites = nullptr;
 		}
 	}
 private:
-	uint32_t	_Channel;
-	uint32_t	_Width;
-	uint32_t	_Height;
-	uint8_t*	_Bites;
+	ImageData	_Data;
+	Texture2D	_Texture;
+
+	static std::map<std::wstring, std::weak_ptr<Image>> g_ImageStorage;
 
 };
 

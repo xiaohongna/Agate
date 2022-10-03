@@ -1004,7 +1004,7 @@ void Geometry::RasterizeFill(uint32_t color)
     AddFlag(Geometry_Flag_Fill_RS);
 }
 
-uint32_t Geometry::Rasterize()
+uint32_t Geometry::Rasterize(DrawingContext& context)
 {
     if (HaveFlag(Geometry_Flag_Transform) || HaveFlag(Geometry_Flag_Flatten) == false)
     {

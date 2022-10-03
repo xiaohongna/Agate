@@ -125,7 +125,7 @@ public:
 	
 	void Freeze();
 
-	uint32_t Rasterize() override;
+	uint32_t Rasterize(DrawingContext& context) override;
 
 	const RasterizeData& GetRasterizeData(uint32_t index) override;
 private:

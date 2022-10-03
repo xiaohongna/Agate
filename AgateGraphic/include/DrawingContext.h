@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometry.h"
+#include "Drawingable.h"
 #include "Renderer.h"
 
 class DrawingContext
@@ -14,7 +14,11 @@ public:
 	
 	void BeginDraw(bool clear, uint32_t clearColor);
 
-	void Draw(Geometry& geometry);
+	void Draw(Drawingable& drawing);
+
+	Texture2D CreateTexture(Image* img);
+
+	void ReleaseTexture(Image* img);
 
 	void EndDraw(uint32_t sync);
 private:
