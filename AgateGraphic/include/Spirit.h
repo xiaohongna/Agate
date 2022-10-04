@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "Matrix.h"
 #include "Drawingable.h"
+#include "Brush.h"
 
 
 
@@ -10,7 +11,8 @@ class Spirit: public Drawingable
 {
 public:
 	Spirit():_Matrix {},
-		_Flags{0}
+		_Flags{0},
+		_Color{0xFFFFFFFF}
 	{
 		_Matrix._11 = 1.0f;
 		_Matrix._22 = 1.0f;
@@ -24,6 +26,8 @@ public:
 	void SetImage(const std::shared_ptr<Image>& img);
 
 	void SetClip(const Vector4& clip);
+
+	void SetColor(const Color clr);
 
 	void SetBlendMode(BlendMode blend);
 
@@ -47,10 +51,15 @@ private:
 	{
 		return (_Flags & flag) == flag;
 	}
+
+	void RasterizeNonoRotaion();
+
+	void GetUV(Vector2& minUV, Vector2& maxUV);
 private:
 	std::shared_ptr<Image>	_Image;
 	Vector4 _Bounds;
 	Vector4 _Clip;
+	Color	_Color;
 	Matrix3X2 _Matrix;
 	RasterizeData	_RasterData;
 	uint32_t	_Flags;

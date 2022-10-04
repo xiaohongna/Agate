@@ -47,6 +47,16 @@ struct Vector4
     Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
 
     Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
+
+    bool operator != (const Vector4 v4) const
+    {
+        return x != v4.x || y != v4.y || z != v4.z || w != v4.w;
+    }
+
+    bool operator == (const Vector4 v4) const
+    {
+        return x == v4.x && y == v4.y && z == v4.z && w == v4.w;
+    }
 };
 
 static inline Vector2 operator*(const Vector2& lhs, const float rhs) { return Vector2(lhs.x * rhs, lhs.y * rhs); }

@@ -57,7 +57,7 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 void RenderDemo::Render(DrawingContext& canvs)
 {
 	canvs.BeginDraw(true, 0xFFFFFFFF);
-	RenderGeomegry(canvs);
+	//RenderGeomegry(canvs);
 	RenderSpirit(canvs);
 	canvs.EndDraw(1);
 }
@@ -83,6 +83,7 @@ void RenderDemo::RenderGeomegry(DrawingContext& canvs)
 void RenderDemo::RenderSpirit(DrawingContext& canvs)
 {
 	//_Rotation = min(_Rotation + 0.02f, 3.1445f);
+	_Rotation = 0.3;
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
 	_Spirit.SetTransform(matrix);
 	canvs.Draw(_Spirit);

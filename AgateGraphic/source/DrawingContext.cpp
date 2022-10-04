@@ -45,7 +45,7 @@ void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
 	_Renderer->SetRenderTarget();
 	if (clear)
 	{
-		Vector4 clr(0.0f, 0.0f, 0.0f, 1.0f);
+		Vector4 clr(1.0f, 1.0f, 1.0f, 1.0f);
 		_Renderer->Clear(clr);
 	}
 }
