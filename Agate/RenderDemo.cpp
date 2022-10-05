@@ -51,6 +51,7 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 	Vector4 bounds{};
 	bounds.pos = { 200.f, 100.f };
 	bounds.size = { (float)img.width, (float)img.height };
+	_Spirit.SetClip(Vector4(0.f, 0.f, img.width, img.height));
 	_Spirit.SetBounds(bounds);
 }
 
@@ -84,6 +85,11 @@ void RenderDemo::RenderSpirit(DrawingContext& canvs)
 {
 	//_Rotation = min(_Rotation + 0.02f, 3.1445f);
 	_Rotation = 0.3;
+	//_Rotation += 0.01f;
+	if (_Rotation >= 3.14159265f)
+	{
+		_Rotation = 0;
+	}
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
 	_Spirit.SetTransform(matrix);
 	canvs.Draw(_Spirit);

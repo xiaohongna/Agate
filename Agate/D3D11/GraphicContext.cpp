@@ -223,7 +223,7 @@ void GraphicContext::CreateOther()
     {
         D3D11_RASTERIZER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
-        desc.FillMode = D3D11_FILL_SOLID;
+        desc.FillMode = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME;//
         desc.CullMode = D3D11_CULL_NONE;
         desc.ScissorEnable = true;
         desc.DepthClipEnable = true;

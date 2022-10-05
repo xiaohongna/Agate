@@ -54,6 +54,8 @@ private:
 
 	void RasterizeNonoRotaion();
 
+	void RasterizeRotaion();
+
 	void GetUV(Vector2& minUV, Vector2& maxUV);
 private:
 	std::shared_ptr<Image>	_Image;
