@@ -52,9 +52,9 @@ private:
 		return (_Flags & flag) == flag;
 	}
 
-	void RasterizeNonoRotaion();
+	void RasterizeNonoRotaion(Vector2* rect);
 
-	void RasterizeRotaion();
+	void RasterizeRotaionEx();
 
 	void GetUV(Vector2& minUV, Vector2& maxUV);
 private:

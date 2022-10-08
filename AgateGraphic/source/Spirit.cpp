@@ -53,15 +53,8 @@ uint32_t Spirit::Rasterize(DrawingContext& context)
         _Image->SetTexture(txt);
     }
     _RasterData.texture = _Image->GetTexture();
-    //if (_Matrix.IsRotation())
-    {
-        //RasterizeRotaion();
-    }
-    //else
-    {
-        RasterizeNonoRotaion();
-    }
-   // return 1;
+    RasterizeRotaionEx();
+    return 1;
 }
 
 const RasterizeData& Spirit::GetRasterizeData(uint32_t index)
@@ -69,31 +62,28 @@ const RasterizeData& Spirit::GetRasterizeData(uint32_t index)
     return _RasterData;
 }
 
-void Spirit::RasterizeNonoRotaion()
+void Spirit::RasterizeNonoRotaion(Vector2* rect)
 {
     auto vertex = _RasterData.vertex.Alloc<VertexXYUVColor>(4);
     auto index = _RasterData.index.Alloc<DrawIndex>(6);
-
-    Vector2 posMin = _Bounds.pos;
-    Vector2 posMax = _Bounds.pos + _Bounds.size;
 
     auto& img = _Image->GetImageData();
     Vector2 minUV(_Clip.x / img.width, _Clip.y / img.height);
     Vector2 maxUV(_Clip.right / img.width, _Clip.bottom / img.height);
 
-    vertex[0].pos = _Matrix.TransformPoint(posMin);
+    vertex[0].pos = rect[0];
     vertex[0].uv = minUV;
     vertex[0].col = _Color.color;
 
-    vertex[1].pos = _Matrix.TransformPoint({ posMax.x, posMin.y });
+    vertex[1].pos = rect[1];
     vertex[1].uv = { maxUV.x, minUV.y };
     vertex[1].col = _Color.color;
 
-    vertex[2].pos = _Matrix.TransformPoint(posMax);
+    vertex[2].pos = rect[2];
     vertex[2].uv = maxUV;
     vertex[3].col = _Color.color;
 
-    vertex[3].pos = _Matrix.TransformPoint({ posMin.x, posMax.y });
+    vertex[3].pos = rect[3];
     vertex[3].uv = { minUV.x, maxUV.y};
     vertex[3].col = _Color.color;
 
@@ -104,19 +94,36 @@ void Spirit::RasterizeNonoRotaion()
 inline void Normalize(float& vx, float& vy)
 {
     float d2 = vx * vx + vy * vy; 
-    if (d2 > 0.0f) 
+    if (d2 > 0.001f) 
     { 
         float inv_len = 1.0f / sqrtf(d2);
         vx *= inv_len; 
         vy *= inv_len; 
     }
+    else
+    {
+        vx = 0.f;
+        vy = 0.f;
+    }
 }
 
-void Spirit::RasterizeRotaion()
+inline bool IsAntiAliasing(Vector2* rect)
 {
-    constexpr float AA_SIZE = 1.f;
-    auto vertex = _RasterData.vertex.Alloc<VertexXYUVColor>(8);
-    auto index = _RasterData.index.Alloc<DrawIndex>(30);
+    for (int i = 1; i < 5; i++)
+    {
+        float vx = rect[i].x - rect[i - 1].x;
+        float vy = rect[i].y - rect[i - 1].y;
+        if (fabsf(vx) > 0.001f && fabsf(vy) > 0.001f)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Spirit::RasterizeRotaionEx()
+{
+    constexpr float AA_SIZE = 1.2f;
 
     Vector2 posMin = _Bounds.pos;
     Vector2 posMax = _Bounds.pos + _Bounds.size;
@@ -130,50 +137,49 @@ void Spirit::RasterizeRotaion()
     rect[3].y = posMax.y;
     _Matrix.TransformPoint(rect, 4);
     rect[4] = rect[0];
-    Vector2 temp_normals[4];
+    if (IsAntiAliasing(rect) == false)
+    {
+        RasterizeNonoRotaion(rect);
+        return;
+    }
+    Vector2 edge_normals[4];
     for (int i = 1; i < 5; i++)
     {
         float vx = rect[i].x - rect[i - 1].x;
         float vy = rect[i].y - rect[i - 1].y;
         Normalize(vx, vy);
-        temp_normals[i - 1].x = vy;
-        temp_normals[i - 1].y = - vx;
-    }
-
-    for (int i = 2; i < 4; i++)
-    {
-        index[0] = (DrawIndex)(0); index[1] = (DrawIndex)((i - 1) << 1); index[2] = (DrawIndex)(i << 1);
-        index += 3;
-    }
-    const uint32_t col_trans = _Color.color & 0xFFFFFF;
-    for (int i0 = 3, i1 = 0; i1 < 4; i0 = i1++)
-    {
-        const Vector2& n0 = temp_normals[i0];
-        const Vector2& n1 = temp_normals[i1];
-        float dm_x = (n0.x + n1.x) * 0.5f;
-        float dm_y = (n0.y + n1.y) * 0.5f;
-        dm_x *= AA_SIZE;
-        dm_y *= AA_SIZE;
-
-        vertex[0].pos.x = (rect[i1].x); vertex[0].pos.y = (rect[i1].y); vertex[0].col = _Color.color;        // Inner
-        vertex[1].pos.x = (rect[i1].x + dm_x); vertex[1].pos.y = (rect[i1].y + dm_y); vertex[1].col = col_trans;  // Outer
-        vertex += 2;
-
-        // Add indexes for fringes
-        index[0] = (DrawIndex)(i1 << 1); index[1] = (DrawIndex)(i0 << 1); index[2] = (DrawIndex)(1 + (i0 << 1));
-        index[3] = (DrawIndex)(1 + (i0 << 1)); index[4] = (DrawIndex)(1 + (i1 << 1)); index[5] = (DrawIndex)(i1 << 1);
-        index += 6;
+        edge_normals[i - 1].x = vy;
+        edge_normals[i - 1].y = -vx;
     }
 
     auto& img = _Image->GetImageData();
     Vector2 minUV(_Clip.x / img.width, _Clip.y / img.height);
     Vector2 maxUV(_Clip.right / img.width, _Clip.bottom / img.height);
-    auto vertexUV = _RasterData.vertex.As<VertexXYUVColor>();
-    vertexUV[6].uv = vertex[7].uv = minUV;
-    vertexUV[0].uv = vertexUV[1].uv = { maxUV.x, minUV.y };
-    vertexUV[2].uv = vertexUV[3].uv = maxUV;
-    vertexUV[4].uv = vertexUV[5].uv = { minUV.x, maxUV.y };
-    
+    const uint32_t col_trans = _Color.color  & 0xFFFFFF;
+    auto vertex = _RasterData.vertex.Alloc<VertexXYUVColor>(12);
+    auto index = _RasterData.index.Alloc<DrawIndex>(30);
+    for (int i = 0, indexbase = 0; i < 4; indexbase +=3, i++)
+    {
+        Vector2 offset{ edge_normals[i].x * AA_SIZE, edge_normals[i].y * AA_SIZE };
+        vertex[0].pos = rect[i];  vertex[0].col = _Color.color;
+        vertex[1].pos = rect[i] + offset; vertex[1].col = col_trans;
+        vertex[2].pos = rect[i + 1] + offset; vertex[2].col = col_trans;
+        index[0] = indexbase; index[1] = 1 + indexbase; index[2] =  2 + indexbase;
+        index[3] = 2 + indexbase; index[4] =  3 + indexbase; index[5] = indexbase;
+        index += 6;
+        vertex += 3;
+    }
+    index = _RasterData.index.As<DrawIndex>();
+    vertex = _RasterData.vertex.As<VertexXYUVColor>();
+    index[22] = 0;
+    index[23] = 9;
+    index[24] = 0; index[25] = 3; index[26] = 6;
+    index[27] = 6; index[28] = 9; index[29] = 0;
+
+    vertex[0].uv = vertex[1].uv = vertex[11].uv = minUV;
+    vertex[2].uv = vertex[3].uv = vertex[4].uv = Vector2(maxUV.x, minUV.y);
+    vertex[5].uv = vertex[6].uv = vertex[7].uv = maxUV;
+    vertex[8].uv = vertex[9].uv = vertex[10].uv = Vector2(minUV.x, maxUV.y);
 }
 
 void Spirit::GetUV(Vector2& minUV, Vector2& maxUV)

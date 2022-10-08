@@ -91,6 +91,6 @@ void RenderDemo::RenderSpirit(DrawingContext& canvs)
 		_Rotation = 0;
 	}
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
-	_Spirit.SetTransform(matrix);
+	//_Spirit.SetTransform(matrix);
 	canvs.Draw(_Spirit);
 }
