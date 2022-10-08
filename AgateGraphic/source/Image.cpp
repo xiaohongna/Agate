@@ -22,7 +22,7 @@ std::shared_ptr<Image> Image::CreateFromFile(const std::wstring& fileName)
         int channel = 0;
         int w{}, h{};
         auto bits = stbi_load_from_file(f, &w, &h, &channel, 4);
-        auto c = fclose(f);
+        fclose(f);
         if (bits != nullptr)
         {
             auto result = std::make_shared<Image>();

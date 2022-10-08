@@ -145,6 +145,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    RECT rt{};
    GetClientRect(hWnd, &rt);
    Canvas->SetViewSize(rt.right - rt.left, rt.bottom - rt.top);
+   Demo->SetViewSize(rt.right - rt.left, rt.bottom - rt.top);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -198,6 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_SIZE:
         Canvas->SetViewSize((UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+        Demo->SetViewSize((UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
         break;
     case WM_ERASEBKGND:
     {

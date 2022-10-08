@@ -2,10 +2,26 @@
 #include "DrawingContext.h"
 
 constexpr uint32_t Spirit_Flag_Rasterize = 1;
+constexpr uint32_t Spirit_Flag_ImageChanged = 1 << 1;
+constexpr uint32_t Spirit_Flag_ColorChanged = 1 << 2;
+
+
+void Spirit::SetBounds(const Vector4& bounds)
+{
+    if (_Bounds != bounds)
+    {
+        _Bounds = bounds;
+        RemoveFlag(Spirit_Flag_Rasterize);
+    }
+}
 
 void Spirit::SetImage(const std::shared_ptr<Image>& img)
 {
-    _Image = img;
+    if (_Image != img)
+    {
+        _Image = img;
+        AddFlag(Spirit_Flag_ImageChanged);
+    }
 }
 
 void Spirit::SetClip(const Vector4& clip)
@@ -13,7 +29,7 @@ void Spirit::SetClip(const Vector4& clip)
     if (clip != _Clip)
     {
         _Clip = clip;
-        RemoveFlag(Spirit_Flag_Rasterize);
+        AddFlag(Spirit_Flag_ImageChanged);
     }
 }
 
@@ -22,16 +38,11 @@ void Spirit::SetColor(const Color clr)
     if (clr.color != _Color.color)
     {
         _Color = clr;
-        RemoveFlag(Spirit_Flag_Rasterize);
+        AddFlag(Spirit_Flag_ColorChanged);
     }
 }
 
-void Spirit::SetBlendMode(BlendMode blend)
-{
-
-}
-
-void Spirit::SetTransform(const Matrix3X2 matrix)
+void Spirit::SetTransform(const Matrix3X2& matrix)
 {
     if (matrix != _Matrix)
     {
@@ -42,18 +53,33 @@ void Spirit::SetTransform(const Matrix3X2 matrix)
 
 uint32_t Spirit::Rasterize(DrawingContext& context)
 {
-    if (HaveFlag(Spirit_Flag_Rasterize))
+    if (_Flags == Spirit_Flag_Rasterize)
     {
         return 1;
     }
-    AddFlag(Spirit_Flag_Rasterize);
+
     if (_Image->GetTexture() == nullptr)
     {
         auto txt = context.CreateTexture(_Image.get());
         _Image->SetTexture(txt);
     }
     _RasterData.texture = _Image->GetTexture();
-    RasterizeRotaionEx();
+    if (HaveFlag(Spirit_Flag_Rasterize) == false)
+    {
+        Rasterize();
+    }
+    else
+    {
+        if (HaveFlag(Spirit_Flag_ImageChanged))
+        {
+            UpdateUV();
+        }
+        if (HaveFlag(Spirit_Flag_ColorChanged))
+        {
+            UpdateColor();
+        }
+    }
+    _Flags = Spirit_Flag_Rasterize;
     return 1;
 }
 
@@ -62,33 +88,23 @@ const RasterizeData& Spirit::GetRasterizeData(uint32_t index)
     return _RasterData;
 }
 
-void Spirit::RasterizeNonoRotaion(Vector2* rect)
+void Spirit::RasterizeNoAntiAliasing(Vector2* rect)
 {
     auto vertex = _RasterData.vertex.Alloc<VertexXYUVColor>(4);
     auto index = _RasterData.index.Alloc<DrawIndex>(6);
 
-    auto& img = _Image->GetImageData();
-    Vector2 minUV(_Clip.x / img.width, _Clip.y / img.height);
-    Vector2 maxUV(_Clip.right / img.width, _Clip.bottom / img.height);
-
     vertex[0].pos = rect[0];
-    vertex[0].uv = minUV;
     vertex[0].col = _Color.color;
-
     vertex[1].pos = rect[1];
-    vertex[1].uv = { maxUV.x, minUV.y };
     vertex[1].col = _Color.color;
-
     vertex[2].pos = rect[2];
-    vertex[2].uv = maxUV;
     vertex[3].col = _Color.color;
-
     vertex[3].pos = rect[3];
-    vertex[3].uv = { minUV.x, maxUV.y};
     vertex[3].col = _Color.color;
 
     index[0] = 0; index[1] = 1; index[2] = 2;
     index[3] = 2; index[4] = 3; index[5] = 0;
+    UpdateUV();
 }
 
 inline void Normalize(float& vx, float& vy)
@@ -121,9 +137,9 @@ inline bool IsAntiAliasing(Vector2* rect)
     return false;
 }
 
-void Spirit::RasterizeRotaionEx()
+void Spirit::Rasterize()
 {
-    constexpr float AA_SIZE = 1.2f;
+    constexpr float AA_SIZE = 1.0f;
 
     Vector2 posMin = _Bounds.pos;
     Vector2 posMax = _Bounds.pos + _Bounds.size;
@@ -139,7 +155,7 @@ void Spirit::RasterizeRotaionEx()
     rect[4] = rect[0];
     if (IsAntiAliasing(rect) == false)
     {
-        RasterizeNonoRotaion(rect);
+        RasterizeNoAntiAliasing(rect);
         return;
     }
     Vector2 edge_normals[4];
@@ -152,9 +168,6 @@ void Spirit::RasterizeRotaionEx()
         edge_normals[i - 1].y = -vx;
     }
 
-    auto& img = _Image->GetImageData();
-    Vector2 minUV(_Clip.x / img.width, _Clip.y / img.height);
-    Vector2 maxUV(_Clip.right / img.width, _Clip.bottom / img.height);
     const uint32_t col_trans = _Color.color  & 0xFFFFFF;
     auto vertex = _RasterData.vertex.Alloc<VertexXYUVColor>(12);
     auto index = _RasterData.index.Alloc<DrawIndex>(30);
@@ -175,18 +188,66 @@ void Spirit::RasterizeRotaionEx()
     index[23] = 9;
     index[24] = 0; index[25] = 3; index[26] = 6;
     index[27] = 6; index[28] = 9; index[29] = 0;
-
-    vertex[0].uv = vertex[1].uv = vertex[11].uv = minUV;
-    vertex[2].uv = vertex[3].uv = vertex[4].uv = Vector2(maxUV.x, minUV.y);
-    vertex[5].uv = vertex[6].uv = vertex[7].uv = maxUV;
-    vertex[8].uv = vertex[9].uv = vertex[10].uv = Vector2(minUV.x, maxUV.y);
+    UpdateUV();
 }
 
-void Spirit::GetUV(Vector2& minUV, Vector2& maxUV)
+inline float Clamp(float value)
 {
-    auto& img =_Image->GetImageData();
-    minUV.x = _Clip.x / img.width;
-    minUV.y = _Clip.y / img.height;
-    maxUV.x = _Clip.right / img.width;
-    maxUV.y = _Clip.bottom / img.height;
+    if (value > 1.0f)
+    {
+        return 1.0f;
+    }
+    else if(value < 0.0f)
+    { 
+        return 0.0f;
+    }
+    else
+    {
+        return value;
+    }
+}
+
+void Spirit::UpdateUV()
+{
+    auto& img = _Image->GetImageData();
+    Vector2 minUV(Clamp(_Clip.x / img.width), Clamp(_Clip.y / img.height));
+    Vector2 maxUV(Clamp(_Clip.right / img.width), Clamp(_Clip.bottom / img.height));
+    auto vertex = _RasterData.vertex.As<VertexXYUVColor>();
+    if (_RasterData.vertex.count == 12)
+    {
+        vertex[0].uv = vertex[1].uv = vertex[11].uv = minUV;
+        vertex[2].uv = vertex[3].uv = vertex[4].uv = Vector2(maxUV.x, minUV.y);
+        vertex[5].uv = vertex[6].uv = vertex[7].uv = maxUV;
+        vertex[8].uv = vertex[9].uv = vertex[10].uv = Vector2(minUV.x, maxUV.y);
+    }
+    else
+    {
+        vertex[0].uv = minUV;
+        vertex[1].uv = { maxUV.x, minUV.y };
+        vertex[2].uv = maxUV;
+        vertex[3].uv = { minUV.x, maxUV.y };
+    }
+}
+
+void Spirit::UpdateColor()
+{
+    auto vertex = _RasterData.vertex.As<VertexXYUVColor>();
+    if (_RasterData.vertex.count == 12)
+    {
+        const uint32_t col_trans = _Color.color & 0xFFFFFF;
+        for (int i = 0; i < 4; i++)
+        {
+            vertex[0].col = _Color.color;
+            vertex[1].col = col_trans;
+            vertex[2].col = col_trans;
+            vertex += 3;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            vertex[i].col = _Color.color;
+        }
+    }
 }

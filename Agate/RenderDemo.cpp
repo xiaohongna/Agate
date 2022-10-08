@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "RenderDemo.h"
 
-RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
+RenderDemo::RenderDemo():_Scale{1.0f, 1.0f},
+_SpiritColor(0xFF0000FF)
 {
 	wchar_t pathBuffer[256];
 	GetModuleFileName(0, pathBuffer, 256);
@@ -45,7 +46,7 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 	_Ellipse.AddFigure(Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
 
-	_Image = Image::CreateFromFile(path + L"R.jpg");
+	_Image = Image::CreateFromFile(path + L"Splash01.png");
 	_Spirit.SetImage(_Image);
 	auto& img = _Image->GetImageData();
 	Vector4 bounds{};
@@ -53,14 +54,34 @@ RenderDemo::RenderDemo():_Scale{1.0f, 1.0f}
 	bounds.size = { (float)img.width, (float)img.height };
 	_Spirit.SetClip(Vector4(0.f, 0.f, img.width, img.height));
 	_Spirit.SetBounds(bounds);
+	_Spirit.SetColor(_SpiritColor);
+	_Spirit.SetBlendMode(BlendMode::Subtract);
+
+	auto bk = Image::CreateFromFile(path + L"bk.jpg");
+	auto& imgbk = bk->GetImageData();
+	_Background.SetImage(bk);
+	bounds.pos = { 0.f, 0.f };
+	bounds.size = { (float)imgbk.width, (float)imgbk.height };
+	_Background.SetClip(bounds);
+	_Background.SetBounds(bounds);
 }
 
 void RenderDemo::Render(DrawingContext& canvs)
 {
-	canvs.BeginDraw(true, 0xFFFFFFFF);
-	//RenderGeomegry(canvs);
-	RenderSpirit(canvs);
+	canvs.BeginDraw(false, 0xFFFFFFFF);
+	canvs.Draw(_Background);
+	RenderGeomegry(canvs);
+	//RenderSpirit(canvs);
+	RenderSpiritColor(canvs);
 	canvs.EndDraw(1);
+}
+
+void RenderDemo::SetViewSize(uint32_t width, uint32_t height)
+{
+	Vector4 bounds{};
+	bounds.size.x = width;
+	bounds.size.y = height;
+	_Background.SetBounds(bounds);
 }
 
 void RenderDemo::RenderGeomegry(DrawingContext& canvs)
@@ -84,13 +105,28 @@ void RenderDemo::RenderGeomegry(DrawingContext& canvs)
 void RenderDemo::RenderSpirit(DrawingContext& canvs)
 {
 	//_Rotation = min(_Rotation + 0.02f, 3.1445f);
-	_Rotation = 0.3;
-	//_Rotation += 0.01f;
+	//_Rotation = 0.3;
+	_Rotation += 0.01f;
 	if (_Rotation >= 3.14159265f)
 	{
 		_Rotation = 0;
 	}
 	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
-	//_Spirit.SetTransform(matrix);
+	_Spirit.SetTransform(matrix);
+	canvs.Draw(_Spirit);
+}
+
+void RenderDemo::RenderSpiritColor(DrawingContext& canvs)
+{
+	if (_SpiritColor.alpha > 1)
+	{
+		_SpiritColor.alpha -= 1;
+	}
+	else
+	{
+		_SpiritColor.alpha = 255;
+	}
+	
+	_Spirit.SetColor(_SpiritColor);
 	canvs.Draw(_Spirit);
 }

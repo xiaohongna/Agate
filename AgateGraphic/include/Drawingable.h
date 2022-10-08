@@ -16,6 +16,7 @@ struct FixedBuffer
 	template<typename T1>
 	T1* Alloc(int count)
 	{
+		Reset();
 		this->count = count;
 		preSize = sizeof(T1);
 		size = count * sizeof(T1);

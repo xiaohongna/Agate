@@ -5,8 +5,6 @@
 #include "Drawingable.h"
 #include "Brush.h"
 
-
-
 class Spirit: public Drawingable
 {
 public:
@@ -18,10 +16,8 @@ public:
 		_Matrix._22 = 1.0f;
 		_RasterData.pipline = PipelineType::TextureColor;
 	}
-	void SetBounds(const Vector4& bounds)
-	{
-		_Bounds = bounds;
-	}
+
+	void SetBounds(const Vector4& bounds);
 
 	void SetImage(const std::shared_ptr<Image>& img);
 
@@ -29,9 +25,12 @@ public:
 
 	void SetColor(const Color clr);
 
-	void SetBlendMode(BlendMode blend);
+	void SetBlendMode(BlendMode blend)
+	{
+		_RasterData.blend = blend;
+	}
 
-	void SetTransform(const Matrix3X2 matrix);
+	void SetTransform(const Matrix3X2& matrix);
 
 	uint32_t Rasterize(DrawingContext& context) override;
 
@@ -52,18 +51,21 @@ private:
 		return (_Flags & flag) == flag;
 	}
 
-	void RasterizeNonoRotaion(Vector2* rect);
+	void RasterizeNoAntiAliasing(Vector2* rect);
 
-	void RasterizeRotaionEx();
+	void Rasterize();
 
-	void GetUV(Vector2& minUV, Vector2& maxUV);
+	void UpdateUV();
+
+	void UpdateColor();
+
 private:
 	std::shared_ptr<Image>	_Image;
 	Vector4 _Bounds;
 	Vector4 _Clip;
 	Color	_Color;
 	Matrix3X2 _Matrix;
-	RasterizeData	_RasterData;
+	RasterizeData _RasterData;
 	uint32_t	_Flags;
 };
 

@@ -24,7 +24,7 @@ public:
 
 	}
 	
-	const ImageData& GetImageData()
+	const ImageData& GetImageData() const
 	{
 		return _Data;
 	}
