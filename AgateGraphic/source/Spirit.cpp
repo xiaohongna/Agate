@@ -53,11 +53,6 @@ void Spirit::SetTransform(const Matrix3X2& matrix)
 
 uint32_t Spirit::Rasterize(DrawingContext& context)
 {
-    if (_Flags == Spirit_Flag_Rasterize)
-    {
-        return 1;
-    }
-
     if (_Image->GetTexture() == nullptr)
     {
         auto txt = context.CreateTexture(_Image.get());
@@ -67,6 +62,7 @@ uint32_t Spirit::Rasterize(DrawingContext& context)
     if (HaveFlag(Spirit_Flag_Rasterize) == false)
     {
         Rasterize();
+        AddFlag(Spirit_Flag_Rasterize);
     }
     else
     {
@@ -79,7 +75,7 @@ uint32_t Spirit::Rasterize(DrawingContext& context)
             UpdateColor();
         }
     }
-    _Flags = Spirit_Flag_Rasterize;
+    RemoveFlag(Spirit_Flag_ColorChanged | Spirit_Flag_ImageChanged);
     return 1;
 }
 

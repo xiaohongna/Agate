@@ -16,11 +16,15 @@ struct FixedBuffer
 	template<typename T1>
 	T1* Alloc(int count)
 	{
-		Reset();
 		this->count = count;
 		preSize = sizeof(T1);
-		size = count * sizeof(T1);
-		buffer = (T*)malloc(size);
+		auto sz = count * sizeof(T1);
+		if (sz != size)
+		{
+			if(buffer)
+			delete buffer;
+			buffer = (T*)malloc(size);
+		}
 		return (T1*)buffer;
 	}
 
@@ -62,6 +66,7 @@ struct RasterizeData
 
 	}
 };
+
 class DrawingContext;
 
 class Drawingable
