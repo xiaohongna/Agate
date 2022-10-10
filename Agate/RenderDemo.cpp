@@ -1,6 +1,16 @@
 #include "pch.h"
 #include "RenderDemo.h"
 
+int32_t RandLCG(int32_t seed)
+{
+	const int64_t a = 1103515245;
+	const int64_t c = 12345;
+	const int64_t m = 2147483647;
+
+	seed = (seed * a + c) & m;
+	return seed % 0x7fff;
+}
+
 RenderDemo::RenderDemo():_Scale{1.0f, 1.0f},
 _SpiritColor(0xFF0000FF)
 {
@@ -13,10 +23,10 @@ _SpiritColor(0xFF0000FF)
 
 	_Rotation = 0.0;
 	
-	Brush pureColor;
+	agate::Brush pureColor;
 	
 	{
-		Figure figure;
+		agate::Figure figure;
 		figure.StartAt(200, 200);
 		figure.LineTo({ 400, 300 });
 		_Line.SetStrokeWidth(5);
@@ -26,7 +36,7 @@ _SpiritColor(0xFF0000FF)
 	}
 
 	{
-		Figure figure;
+		agate::Figure figure;
 		figure.StartAt(156, 257);
 		figure.BezierTo({ 51, 278 }, {252, 114}, {139, 107});
 		pureColor.SetColor(0xFF00FF00);
@@ -35,29 +45,29 @@ _SpiritColor(0xFF0000FF)
 		_Bezier.AddFigure(std::move(figure));
 	}
 
-	_Rectangle.AddFigure(Figure::InitAsRectangle(Vector4(50, 20, 190, 150)));
+	_Rectangle.AddFigure(agate::Figure::InitAsRectangle(agate::Vector4(50, 20, 190, 150)));
 	pureColor.SetColor(0xFF0000FF);
 	_Rectangle.SetFillBrush(pureColor);
 
-	_RoundedRect.AddFigure(Figure::InitAsRoundedRectangle(Vector4(230.5f, 10.5f, 380.5, 180.5), 20, 20));
+	_RoundedRect.AddFigure(agate::Figure::InitAsRoundedRectangle(agate::Vector4(230.5f, 10.5f, 380.5, 180.5), 20, 20));
 	pureColor.SetColor(0x5F0000FF);
 	_RoundedRect.SetFillBrush(pureColor);
 	
-	_Ellipse.AddFigure(Figure::InitAsEllipse(150, 400, 100, 20));
+	_Ellipse.AddFigure(agate::Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
 
-	_Image = Image::CreateFromFile(path + L"Splash01.png");
+	_Image = agate::Image::CreateFromFile(path + L"Splash01.png");
 	_Spirit.SetImage(_Image);
 	auto& img = _Image->GetImageData();
-	Vector4 bounds{};
+	agate::Vector4 bounds{};
 	bounds.pos = { 200.f, 100.f };
 	bounds.size = { (float)img.width, (float)img.height };
-	_Spirit.SetClip(Vector4(0.f, 0.f, img.width, img.height));
+	_Spirit.SetClip(agate::Vector4(0.f, 0.f, img.width, img.height));
 	_Spirit.SetBounds(bounds);
 	_Spirit.SetColor(_SpiritColor);
-	_Spirit.SetBlendMode(BlendMode::Subtract);
+	_Spirit.SetBlendMode(agate::BlendMode::Subtract);
 
-	auto bk = Image::CreateFromFile(path + L"bk.jpg");
+	auto bk = agate::Image::CreateFromFile(path + L"bk.jpg");
 	auto& imgbk = bk->GetImageData();
 	_Background.SetImage(bk);
 	bounds.pos = { 0.f, 0.f };
@@ -66,7 +76,7 @@ _SpiritColor(0xFF0000FF)
 	_Background.SetBounds(bounds);
 }
 
-void RenderDemo::Render(DrawingContext& canvs)
+void RenderDemo::Render(agate::DrawingContext& canvs)
 {
 	canvs.BeginDraw(false, 0xFFFFFFFF);
 	canvs.Draw(_Background);
@@ -78,22 +88,22 @@ void RenderDemo::Render(DrawingContext& canvs)
 
 void RenderDemo::SetViewSize(uint32_t width, uint32_t height)
 {
-	Vector4 bounds{};
-	bounds.size.x = width;
-	bounds.size.y = height;
+	agate::Vector4 bounds{};
+	bounds.size.x = (float)width;
+	bounds.size.y = (float)height;
 	_Background.SetBounds(bounds);
 }
 
-void RenderDemo::RenderGeomegry(DrawingContext& canvs)
+void RenderDemo::RenderGeomegry(agate::DrawingContext& canvs)
 {
 	_Rotation = min(_Rotation + 0.02f, 3.1445f);
 	_Scale.x = min(_Scale.x + 0.01f, 2);
 	_Scale.y = min(_Scale.y + 0.02f, 2);
 	
-	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
+	auto matrix = agate::Matrix3X2::Rotation(_Rotation, agate::Vector2(300, 250));
 	_Line.SetTransform(matrix);
 	canvs.Draw(_Bezier);
-	auto matrix2 = Matrix3X2::Rotation(_Rotation, Vector2(150, 400)) * Matrix3X2::Scale(_Scale.x, _Scale.y);
+	auto matrix2 = agate::Matrix3X2::Rotation(_Rotation, agate::Vector2(150, 400)) * agate::Matrix3X2::Scale(_Scale.x, _Scale.y);
 	_Ellipse.SetTransform(matrix2);
 	canvs.Draw(_Ellipse);
 	canvs.Draw(_Rectangle);
@@ -102,7 +112,7 @@ void RenderDemo::RenderGeomegry(DrawingContext& canvs)
 	canvs.Draw(_Line);
 }
 
-void RenderDemo::RenderSpirit(DrawingContext& canvs)
+void RenderDemo::RenderSpirit(agate::DrawingContext& canvs)
 {
 	//_Rotation = min(_Rotation + 0.02f, 3.1445f);
 	//_Rotation = 0.3;
@@ -111,13 +121,14 @@ void RenderDemo::RenderSpirit(DrawingContext& canvs)
 	{
 		_Rotation = 0;
 	}
-	auto matrix = Matrix3X2::Rotation(_Rotation, Vector2(300, 250));
+	auto matrix = agate::Matrix3X2::Rotation(_Rotation, agate::Vector2(300, 250));
 	_Spirit.SetTransform(matrix);
 	canvs.Draw(_Spirit);
 }
 
-void RenderDemo::RenderSpiritColor(DrawingContext& canvs)
+void RenderDemo::RenderSpiritColor(agate::DrawingContext& canvs)
 {
+	/*
 	if (_SpiritColor.alpha > 1)
 	{
 		_SpiritColor.alpha -= 1;
@@ -126,7 +137,8 @@ void RenderDemo::RenderSpiritColor(DrawingContext& canvs)
 	{
 		_SpiritColor.alpha = 255;
 	}
-	
+	*/
+	_SpiritColor.color = RandLCG(2456);
 	_Spirit.SetColor(_SpiritColor);
 	canvs.Draw(_Spirit);
 }

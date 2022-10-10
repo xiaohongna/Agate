@@ -1,65 +1,84 @@
 #pragma once
 #include <assert.h>
 
-struct Vector2
+namespace agate
 {
-    float   x, y;
-    Vector2() : x(0.0f), y(0.0f) { }
-    Vector2(float _x, float _y) : x(_x), y(_y) { }
-
-    float operator[] (size_t idx) const
+    struct Vector2
     {
-        assert(idx <= 1); return (&x)[idx];
-    }
+        float   x, y;
+        Vector2() : x(0.0f), y(0.0f) { }
+        Vector2(float _x, float _y) : x(_x), y(_y) { }
 
-    float& operator[] (size_t idx)
-    {
-        assert(idx <= 1);
-        return (&x)[idx];
-    }
-
-    void offset(float _x, float _y)
-    {
-        x += _x;
-        y += _y;
-    }
-};
-
-struct Vector4
-{
-    union 
-    {
-        struct 
+        void offset(float _x, float _y)
         {
-            float x, y, z, w;
-        };
-        struct
+            x += _x;
+            y += _y;
+        }
+
+        float operator[] (size_t idx) const
         {
-            float left, top, right, bottom;
-        };
-        struct
+            assert(idx <= 1); return (&x)[idx];
+        }
+
+        float& operator[] (size_t idx)
         {
-            Vector2 pos;
-            Vector2 size;
-        };
+            assert(idx <= 1);
+            return (&x)[idx];
+        }
+
+        Vector2 operator*(const float scale) const
+        {
+            return Vector2(x * scale, y * scale);
+        }
+
+        Vector2 operator*(const Vector2& v2) const
+        {
+            return Vector2(x * v2.x, y * v2.y);
+        }
+
+        Vector2 operator+(const Vector2& v2) const
+        {
+            return Vector2(x + v2.x, y + v2.y);
+        }
+
+        Vector2 operator-(const Vector2& v2) const
+        {
+            return Vector2(x - v2.x, y - v2.y);
+        }
+
     };
 
-    Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
-
-    Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
-
-    bool operator != (const Vector4 v4) const
+    struct Vector4
     {
-        return x != v4.x || y != v4.y || z != v4.z || w != v4.w;
-    }
+        union
+        {
+            struct
+            {
+                float x, y, z, w;
+            };
+            struct
+            {
+                float left, top, right, bottom;
+            };
+            struct
+            {
+                Vector2 pos;
+                Vector2 size;
+            };
+        };
 
-    bool operator == (const Vector4 v4) const
-    {
-        return x == v4.x && y == v4.y && z == v4.z && w == v4.w;
-    }
-};
+        Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
 
-static inline Vector2 operator*(const Vector2& lhs, const float rhs) { return Vector2(lhs.x * rhs, lhs.y * rhs); }
-static inline float operator*(const Vector2& lhs, const Vector2& rhs) {return lhs.x* rhs.x + lhs.y * rhs.y; }
-static inline Vector2 operator+(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x + rhs.x, lhs.y + rhs.y); }
-static inline Vector2 operator-(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x - rhs.x, lhs.y - rhs.y); }
+        Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
+
+        bool operator != (const Vector4 v4) const
+        {
+            return x != v4.x || y != v4.y || z != v4.z || w != v4.w;
+        }
+
+        bool operator == (const Vector4 v4) const
+        {
+            return x == v4.x && y == v4.y && z == v4.z && w == v4.w;
+        }
+    };
+}

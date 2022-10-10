@@ -20,24 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Brush.h" />
-    <ClInclude Include="include\Drawingable.h" />
+    <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\DrawingContext.h" />
     <ClInclude Include="include\Geometry.h" />
-    <ClInclude Include="include\Image.h" />
+    <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Spirit.h" />
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="source\bezier.h" />
-    <ClInclude Include="source\GraphicMath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\bezier.cpp" />
     <ClCompile Include="source\Brush.cpp" />
     <ClCompile Include="source\DrawingContext.cpp" />
     <ClCompile Include="source\Geometry.cpp" />
-    <ClCompile Include="source\Image.cpp" />
+    <ClCompile Include="source\Texture.cpp" />
     <ClCompile Include="source\Spirit.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

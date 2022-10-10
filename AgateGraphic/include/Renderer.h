@@ -1,51 +1,96 @@
 #pragma once
 #include "Vertex.h"
-#include "Image.h"
-struct DrawCommand
-{
-	BlendMode blend;
-	uint32_t indexCount;
-	uint32_t startIndexLocation;
-	Texture2D texture;
-	uint32_t clipX;
-	uint32_t clipY;
-	uint32_t clipWidth;
-	uint32_t clipHeight;
-};
+#include "Texture.h"
 
-struct BatchDrawData
-{
-	PipelineType pipline;
-	unsigned char* vertexData;
-	uint32_t vertexCount;
-	DrawIndex* indexData;
-	uint32_t indexCount;
-	std::vector<DrawCommand> commands;
-};
-
-struct RendererConfig
+namespace agate
 {
 
-};
+	enum class PipelineType
+	{
+		Color,
+		TextureColor,
+	};
 
-class IRenderer
-{
-public:
-	virtual void BeginDraw() = 0;
+	enum class BlendMode
+	{
+		/// <summary>
+		/// Alpha 混合
+		/// </summary>
+		Blend,
+		/// <summary>
+		/// 不透明
+		/// </summary>
+		Opacity,
+		/// <summary>
+		/// 叠加
+		/// </summary>
+		Additive,
+		/// <summary>
+		/// 相减
+		/// </summary>
+		Subtract,
+		/// <summary>
+		/// 相乘
+		/// </summary>
+		Multiply
 
-	virtual void SetRenderTarget() = 0;
+	};
 
-	virtual void SetViewPort(uint32_t width, uint32_t height) = 0;
+	enum class TextureAddressMode
+	{
+		Clamp,
+		Mirror,
+		Wrap,
+	};
 
-	virtual void Clear(const Vector4& color) = 0;
+	struct DrawCommand
+	{
+		BlendMode blend;
+		uint32_t indexCount;
+		uint32_t startIndexLocation;
+		Texture2D texture;
+		TextureAddressMode addressMode;
 
-	virtual void Draw(const BatchDrawData& data)  = 0;
+		uint32_t clipX;
+		uint32_t clipY;
+		uint32_t clipWidth;
+		uint32_t clipHeight;
+	};
 
-	virtual void EndDraw(uint32_t sync) = 0;
+	struct BatchDrawData
+	{
+		PipelineType pipline;
+		unsigned char* vertexData;
+		uint32_t vertexCount;
+		DrawIndex* indexData;
+		uint32_t indexCount;
+		std::vector<DrawCommand> commands;
+	};
 
-	virtual Texture2D CreateTexture(const ImageData& data) = 0;
+	struct RendererConfig
+	{
 
-	virtual void ReleaseTexture(Texture2D texture) = 0;
+	};
 
-};
+	class IRenderer
+	{
+	public:
+		virtual void BeginDraw() = 0;
 
+		virtual void SetRenderTarget() = 0;
+
+		virtual void SetViewPort(uint32_t width, uint32_t height) = 0;
+
+		virtual void Clear(const Vector4& color) = 0;
+
+		virtual void Draw(const BatchDrawData& data) = 0;
+
+		virtual void EndDraw(uint32_t sync) = 0;
+
+		virtual Texture2D CreateTexture(const BitmapData& data) = 0;
+
+		virtual void ReleaseTexture(Texture2D texture) = 0;
+
+	};
+
+}

@@ -11,74 +11,70 @@
 #include "VideoBuffer.h"
 #include "Pipeline.h"
 
-#define NameSpace_Render_D11_Header  namespace agate { namespace render { namespace D11 {
-#define NameSpace_Render_D11_Tail  } } }
-
-//NameSpace_Render_D11_Header
-
-class GraphicContext :public IRenderer
+namespace agate
 {
-public:
-    GraphicContext() :_Width{}, 
-        _Height{}, 
-        _init{false},
-        _CurrentPipline{},
-        _CurrentBlend{BlendMode::Blend}
+    class GraphicContext :public IRenderer
     {
+    public:
+        GraphicContext() :_Width{},
+            _Height{},
+            _init{ false },
+            _CurrentPipline{},
+            _CurrentBlend{ BlendMode::Blend }
+        {
 
-    }
-    
-    bool CreateDeviceD3D(HWND hWnd);
+        }
 
-    //void* LoadTexture(const std::wstring& fileName);
+        bool CreateDeviceD3D(HWND hWnd);
 
-    void BeginDraw() override;
+        //void* LoadTexture(const std::wstring& fileName);
 
-    void SetViewPort(uint32_t width, uint32_t height) override;
+        void BeginDraw() override;
 
-    void SetRenderTarget() override;
+        void SetViewPort(uint32_t width, uint32_t height) override;
 
-    void Clear(const Vector4& color) override;
+        void SetRenderTarget() override;
 
-    void Draw(const BatchDrawData& data) override;
+        void Clear(const Vector4& color) override;
 
-    void EndDraw(uint32_t sync) override;
+        void Draw(const BatchDrawData& data) override;
 
-    Texture2D CreateTexture(const ImageData& data) override;
+        void EndDraw(uint32_t sync) override;
 
-    void ReleaseTexture(Texture2D texture) override;
+        Texture2D CreateTexture(const ImageData& data) override;
 
-private:
-    void CleanupDeviceD3D();
-    void CreateRenderTarget();
-    void CleanupRenderTarget();
-    void CreateOther();
-    void CreateBlendState();
-    void CreateSamplerState();
-    void SetupRenderState();
-    void SetBlend(BlendMode blend);
-private:
-    CComPtr<IDXGIFactory>           _Factory;
-    CComPtr<IDXGISwapChain>         _SwapChain;
-    CComPtr<ID3D11Device>           _Device;
-    CComPtr<ID3D11DeviceContext>    _DeviceContext;
-    CComPtr<ID3D11RenderTargetView> _MainRenderTargetView;
+        void ReleaseTexture(Texture2D texture) override;
 
-    VideoBuffer<float, VideoBufferType::Constant>  _VertexConstantBuffer;
-    
-    CComPtr<ID3D11RasterizerState>  _RasterizerState;
-    CComPtr<ID3D11DepthStencilState>  _DepthStencilState;
-    
-    CComPtr<ID3D11BlendState>       _BlendStates[5];
-    CComPtr<ID3D11SamplerState>     _Sampler;
-    std::unique_ptr<PipelineBase>    _Piplines[2];
+    private:
+        void CleanupDeviceD3D();
+        void CreateRenderTarget();
+        void CleanupRenderTarget();
+        void CreateOther();
+        void CreateBlendState();
+        void CreateSamplerState();
+        void SetupRenderState();
+        void SetBlend(BlendMode blend);
+    private:
+        CComPtr<IDXGIFactory>           _Factory;
+        CComPtr<IDXGISwapChain>         _SwapChain;
+        CComPtr<ID3D11Device>           _Device;
+        CComPtr<ID3D11DeviceContext>    _DeviceContext;
+        CComPtr<ID3D11RenderTargetView> _MainRenderTargetView;
 
-    PipelineBase* _CurrentPipline;
-    BlendMode   _CurrentBlend;
+        VideoBuffer<float, VideoBufferType::Constant>  _VertexConstantBuffer;
 
-    uint32_t        _Width;
-    uint32_t        _Height;
-    bool _init;
-};
+        CComPtr<ID3D11RasterizerState>  _RasterizerState;
+        CComPtr<ID3D11DepthStencilState>  _DepthStencilState;
 
-//NameSpace_Render_D11_Tail
+        CComPtr<ID3D11BlendState>       _BlendStates[5];
+        CComPtr<ID3D11SamplerState>     _Sampler;
+        std::unique_ptr<PipelineBase>    _Piplines[2];
+
+        PipelineBase* _CurrentPipline;
+        BlendMode   _CurrentBlend;
+
+        uint32_t        _Width;
+        uint32_t        _Height;
+        bool _init;
+    };
+}

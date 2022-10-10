@@ -1,66 +1,70 @@
 #pragma once
-#include "Vertex.h"
+#include <cstdint>
 
-union Color
+namespace agate
 {
-	struct 
+	union Color
 	{
-		uint8_t red;
-		uint8_t green;
-		uint8_t blue;
-		uint8_t alpha;
+		struct
+		{
+			uint8_t red;
+			uint8_t green;
+			uint8_t blue;
+			uint8_t alpha;
+		};
+		uint32_t color;
+
+		Color()
+		{
+			color = 0;
+		}
+		/// <summary>
+		/// ABGR
+		/// </summary>
+		/// <param name="uintCol">32位颜色</param>
+		Color(uint32_t uintCol)
+		{
+			color = uintCol;
+		}
+
+		Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
+		{
+			alpha = a;
+			red = r;
+			green = g;
+			blue = b;
+		}
 	};
-	uint32_t color;
-	Color()
+
+	struct BrushData
 	{
-		color = 0;
-	}
-	/// <summary>
-	/// ABGR
-	/// </summary>
-	/// <param name="uintCol">32位颜色</param>
-	Color(uint32_t uintCol)
+		Color _Color;
+	};
+
+	class Brush
 	{
-		color = uintCol;
-	}
-	Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
-	{
-		alpha = a;
-		red = r;
-		green = g;
-		blue = b;
-	}
-};
+	public:
+		Brush() :_Color{ 0xFFFFFFFF }
+		{
 
-struct BrushData
-{
-	Color _Color;
-};
+		}
 
+		Brush(Color color) :_Color{ color }
+		{
 
-class Brush
-{
-public:
-	Brush():_Color { 0xFFFFFFFF }
-	{
+		}
 
-	}
-	Brush(Color color) :_Color{ color }
-	{
+		void SetColor(Color clr)
+		{
+			_Color.color = clr.color;
+		}
 
-	}
-
-	void SetColor(Color clr)
-	{
-		_Color.color = clr.color;
-	}
-
-	Color GetColor()
-	{
-		return _Color;
-	}
-	friend class Geometry;
-private:
-	Color _Color;
-};
-
+		Color GetColor()
+		{
+			return _Color;
+		}
+		friend class Geometry;
+	private:
+		Color _Color;
+	};
+}

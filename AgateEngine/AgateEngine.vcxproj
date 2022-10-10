@@ -151,6 +151,11 @@
     <ClCompile Include="source\SpiritGenerator.cpp" />
     <ClCompile Include="source\TimelineObject.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AgateGraphic\AgateGraphic.vcxproj">
+      <Project>{e516c852-7497-4c26-b040-2e79eb3bb599}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -26,8 +26,8 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void CleanUp();
 
-std::unique_ptr<GraphicContext> D3D11Context;
-std::unique_ptr<DrawingContext> Canvas;
+std::unique_ptr<agate::GraphicContext> D3D11Context;
+std::unique_ptr<agate::DrawingContext> Canvas;
 std::unique_ptr<RenderDemo> Demo;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -138,9 +138,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   D3D11Context = std::make_unique<GraphicContext>();
+   D3D11Context = std::make_unique<agate::GraphicContext>();
    D3D11Context->CreateDeviceD3D(hWnd);
-   Canvas = std::make_unique<DrawingContext>(D3D11Context.get());
+   Canvas = std::make_unique<agate::DrawingContext>(D3D11Context.get());
    Demo = std::make_unique<RenderDemo>();
    RECT rt{};
    GetClientRect(hWnd, &rt);

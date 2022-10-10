@@ -1,6 +1,9 @@
 #include "Geometry.h"
 #include "bezier.h"
 
+namespace agate
+{ 
+
 #ifdef ENABLE_SSE
 #include <immintrin.h>
 static inline float  ImRsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
@@ -190,7 +193,7 @@ void GetArcAngle(
     float rAngle;
 
     // The points are on the unit circle, so:
-    rCosArcAngle = ptStart * ptEnd;
+    rCosArcAngle = ptStart.x * ptEnd.x + ptStart.y * ptEnd.y;
     rSinArcAngle = Determinant(ptStart, ptEnd);
 
     if (rCosArcAngle >= 0)
@@ -1042,4 +1045,5 @@ const RasterizeData& Geometry::GetRasterizeData(uint32_t index)
         assert(HaveFlag(Geometry_Flag_Stroke_RS));
         return _StrokeData;
     }
+}
 }

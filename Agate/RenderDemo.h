@@ -7,24 +7,24 @@ class RenderDemo
 {
 public:
 	RenderDemo();
-	void Render(DrawingContext& canvs);
+	void Render(agate::DrawingContext& canvs);
 	void SetViewSize(uint32_t width, uint32_t height);
 private:
-	void RenderGeomegry(DrawingContext& canvs);
-	void RenderSpirit(DrawingContext& canvs);
-	void RenderSpiritColor(DrawingContext& canvs);
+	void RenderGeomegry(agate::DrawingContext& canvs);
+	void RenderSpirit(agate::DrawingContext& canvs);
+	void RenderSpiritColor(agate::DrawingContext& canvs);
 private:
-	Geometry  _Line;
-	Geometry  _Bezier;
-	Geometry  _Rectangle;
-	Geometry  _RoundedRect;
-	Geometry  _Ellipse;
+	agate::Geometry  _Line;
+	agate::Geometry  _Bezier;
+	agate::Geometry  _Rectangle;
+	agate::Geometry  _RoundedRect;
+	agate::Geometry  _Ellipse;
 	float _Rotation;
-	Vector2 _Scale;
-	Color   _SpiritColor;
-	std::shared_ptr<Image> _Image;
-	Spirit	_Spirit;
-	Spirit	_Background;
+	agate::Vector2 _Scale;
+	agate::Color   _SpiritColor;
+	std::shared_ptr<agate::Image> _Image;
+	agate::Spirit	_Spirit;
+	agate::Spirit	_Background;
 };
 
 
