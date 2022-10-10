@@ -56,9 +56,9 @@ _SpiritColor(0xFF0000FF)
 	_Ellipse.AddFigure(agate::Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
 
-	_Image = agate::Image::CreateFromFile(path + L"Splash01.png");
-	_Spirit.SetImage(_Image);
-	auto& img = _Image->GetImageData();
+	_Texture = agate::Texture::CreateFromFile(path + L"Splash01.png");
+	_Spirit.SetTexture(_Texture);
+	auto& img = _Texture->GetImageData();
 	agate::Vector4 bounds{};
 	bounds.pos = { 200.f, 100.f };
 	bounds.size = { (float)img.width, (float)img.height };
@@ -67,9 +67,9 @@ _SpiritColor(0xFF0000FF)
 	_Spirit.SetColor(_SpiritColor);
 	_Spirit.SetBlendMode(agate::BlendMode::Subtract);
 
-	auto bk = agate::Image::CreateFromFile(path + L"bk.jpg");
+	auto bk = agate::Texture::CreateFromFile(path + L"bk.jpg");
 	auto& imgbk = bk->GetImageData();
-	_Background.SetImage(bk);
+	_Background.SetTexture(bk);
 	bounds.pos = { 0.f, 0.f };
 	bounds.size = { (float)imgbk.width, (float)imgbk.height };
 	_Background.SetClip(bounds);

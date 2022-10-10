@@ -17,7 +17,7 @@ namespace agate
 
 		void Draw(Drawable& drawing);
 
-		Texture2D CreateTexture(Texture* img);
+		TextureHandle CreateTexture(Texture* img);
 
 		void ReleaseTexture(Texture* img);
 

@@ -6,7 +6,7 @@
 
 namespace agate
 {
-	typedef void* Texture2D;
+	typedef void* TextureHandle;
 
 	struct BitmapData
 	{
@@ -31,11 +31,11 @@ namespace agate
 			return _Data;
 		}
 
-		Texture2D GetTexture()
+		TextureHandle GetTexture()
 		{
 			return _Texture;
 		}
-		void SetTexture(Texture2D texture)
+		void SetTexture(TextureHandle texture)
 		{
 			_Texture = texture;
 		}
@@ -52,7 +52,7 @@ namespace agate
 		}
 	private:
 		BitmapData	_Data;
-		Texture2D	_Texture;
+		TextureHandle	_Texture;
 
 		static std::map<std::wstring, std::weak_ptr<Texture>> g_BitmapStorage;
 

@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "Drawingable.h"
+#include "Drawable.h"
 #include "Renderer.h"
 #include "VideoBuffer.h"
 #include "Pipeline.h"
@@ -41,9 +41,9 @@ namespace agate
 
         void EndDraw(uint32_t sync) override;
 
-        Texture2D CreateTexture(const ImageData& data) override;
+        TextureHandle CreateTexture(const BitmapData& data) override;
 
-        void ReleaseTexture(Texture2D texture) override;
+        void ReleaseTexture(TextureHandle texture) override;
 
     private:
         void CleanupDeviceD3D();

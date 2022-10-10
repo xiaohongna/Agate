@@ -10,7 +10,10 @@
 #include "D3D11/GraphicContext.h"
 #include "DrawingContext.h"
 #include "RenderDemo.h"
+#include "ProgramDemo.h"
 #include <crtdbg.h> 
+
+
 
 #define MAX_LOADSTRING 100
 
@@ -29,6 +32,8 @@ void CleanUp();
 std::unique_ptr<agate::GraphicContext> D3D11Context;
 std::unique_ptr<agate::DrawingContext> Canvas;
 std::unique_ptr<RenderDemo> Demo;
+std::unique_ptr<ProgramDemo> Program;
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -73,7 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            Demo->Render(*Canvas);
+            Program->Render(*Canvas);
+            //Demo->Render(*Canvas);
         }
     }
     CleanUp();
@@ -85,6 +91,7 @@ void CleanUp()
     D3D11Context.reset();
     Canvas.reset();
     Demo.reset();
+    Program.reset();
     _CrtDumpMemoryLeaks();
 }
 
@@ -142,6 +149,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    D3D11Context->CreateDeviceD3D(hWnd);
    Canvas = std::make_unique<agate::DrawingContext>(D3D11Context.get());
    Demo = std::make_unique<RenderDemo>();
+   Program = std::make_unique<ProgramDemo>();
    RECT rt{};
    GetClientRect(hWnd, &rt);
    Canvas->SetViewSize(rt.right - rt.left, rt.bottom - rt.top);

@@ -63,7 +63,7 @@ namespace agate
 		}
 	}
 
-	Texture2D DrawingContext::CreateTexture(Texture* img)
+	TextureHandle DrawingContext::CreateTexture(Texture* img)
 	{
 		auto& data = img->GetImageData();
 		return _Renderer->CreateTexture(data);

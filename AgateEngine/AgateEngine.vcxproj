@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)AgateGraphic\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)AgateGraphic\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,12 +144,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\SpiritGenerator.h" />
-    <ClInclude Include="include\TimelineObject.h" />
+    <ClInclude Include="include\Program.h" />
+    <ClInclude Include="include\RotationParameter.h" />
+    <ClInclude Include="include\Spirit.h" />
+    <ClInclude Include="include\SpiritComposition.h" />
+    <ClInclude Include="include\SpiritBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\SpiritGenerator.cpp" />
-    <ClCompile Include="source\TimelineObject.cpp" />
+    <ClCompile Include="source\Program.cpp" />
+    <ClCompile Include="source\RotationParameter.cpp" />
+    <ClCompile Include="source\Spirit.cpp" />
+    <ClCompile Include="source\SpiritComposition.cpp" />
+    <ClCompile Include="source\SpiritBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgateGraphic\AgateGraphic.vcxproj">

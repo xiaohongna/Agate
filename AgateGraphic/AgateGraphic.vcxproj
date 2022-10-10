@@ -26,7 +26,7 @@
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\Renderer.h" />
-    <ClInclude Include="include\Spirit.h" />
+    <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="source\bezier.h" />
@@ -37,7 +37,7 @@
     <ClCompile Include="source\DrawingContext.cpp" />
     <ClCompile Include="source\Geometry.cpp" />
     <ClCompile Include="source\Texture.cpp" />
-    <ClCompile Include="source\Spirit.cpp" />
+    <ClCompile Include="source\Image.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

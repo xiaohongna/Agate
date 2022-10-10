@@ -163,7 +163,7 @@ namespace agate
         HRESULT hr = _SwapChain->Present(1, 0);
     }
 
-    Texture2D GraphicContext::CreateTexture(const ImageData& data)
+    TextureHandle GraphicContext::CreateTexture(const BitmapData& data)
     {
         D3D11_TEXTURE2D_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
@@ -197,7 +197,7 @@ namespace agate
         return resourceView;
     }
 
-    void GraphicContext::ReleaseTexture(Texture2D texture)
+    void GraphicContext::ReleaseTexture(TextureHandle texture)
     {
         ID3D11ShaderResourceView* view = (ID3D11ShaderResourceView*)texture;
         view->Release();

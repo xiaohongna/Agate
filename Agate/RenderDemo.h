@@ -1,6 +1,6 @@
 #pragma once
 #include "DrawingContext.h"
-#include "Spirit.h"
+#include "Image.h"
 #include "Geometry.h"
 
 class RenderDemo
@@ -22,9 +22,9 @@ private:
 	float _Rotation;
 	agate::Vector2 _Scale;
 	agate::Color   _SpiritColor;
-	std::shared_ptr<agate::Image> _Image;
-	agate::Spirit	_Spirit;
-	agate::Spirit	_Background;
+	std::shared_ptr<agate::Texture> _Texture;
+	agate::Image	_Spirit;
+	agate::Image	_Background;
 };
 
 

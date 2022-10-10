@@ -127,7 +127,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)AgateGraphic\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)AgateGraphic\include;$(SolutionDir)AgateEngine\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +162,7 @@
     <ClInclude Include="D3D11\VideoBuffer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ProgramDemo.h" />
     <ClInclude Include="RenderDemo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -176,6 +177,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ProgramDemo.cpp" />
     <ClCompile Include="RenderDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +188,9 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AgateEngine\AgateEngine.vcxproj">
+      <Project>{dc8e61b8-eae6-4fdc-880a-5dc89772f561}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\AgateGraphic\AgateGraphic.vcxproj">
       <Project>{e516c852-7497-4c26-b040-2e79eb3bb599}</Project>
     </ProjectReference>

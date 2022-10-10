@@ -1,4 +1,4 @@
-#include "Spirit.h"
+#include "Image.h"
 #include "DrawingContext.h"
 
 namespace agate
@@ -6,7 +6,20 @@ namespace agate
     constexpr uint32_t Spirit_Flag_Rasterize = 1;
     constexpr uint32_t Spirit_Flag_ImageChanged = 1 << 1;
     constexpr uint32_t Spirit_Flag_ColorChanged = 1 << 2;
+    constexpr uint32_t Spirit_Flag_Antialiasing = 1 << 3;
 
+    void Image::SetAntialiasing(bool enable)
+    {
+        if (enable)
+        {
+            AddFlag(Spirit_Flag_Antialiasing);
+        }
+        else
+        {
+            RemoveFlag(Spirit_Flag_Antialiasing);
+        }
+        RemoveFlag(Spirit_Flag_Rasterize);
+    }
 
     void Image::SetBounds(const Vector4& bounds)
     {
@@ -17,7 +30,7 @@ namespace agate
         }
     }
 
-    void Image::SetImage(const std::shared_ptr<Texture>& img)
+    void Image::SetTexture(const std::shared_ptr<Texture>& img)
     {
         if (_Image != img)
         {
@@ -121,7 +134,7 @@ namespace agate
         }
     }
 
-    inline bool IsAntiAliasing(Vector2* rect)
+    inline bool NeedAntiAliasing(Vector2* rect)
     {
         for (int i = 1; i < 5; i++)
         {
@@ -151,7 +164,7 @@ namespace agate
         rect[3].y = posMax.y;
         _Matrix.TransformPoint(rect, 4);
         rect[4] = rect[0];
-        if (IsAntiAliasing(rect) == false)
+        if (!HaveFlag(Spirit_Flag_Antialiasing) || !NeedAntiAliasing(rect))
         {
             RasterizeNoAntiAliasing(rect);
             return;

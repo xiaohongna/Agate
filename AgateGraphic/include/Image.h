@@ -18,9 +18,11 @@ namespace agate
 			_RasterData.pipline = PipelineType::TextureColor;
 		}
 
+		void SetAntialiasing(bool enable);
+
 		void SetBounds(const Vector4& bounds);
 
-		void SetImage(const std::shared_ptr<Texture>& img);
+		void SetTexture(const std::shared_ptr<Texture>& img);
 
 		void SetClip(const Vector4& clip);
 

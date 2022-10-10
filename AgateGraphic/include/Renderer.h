@@ -48,7 +48,7 @@ namespace agate
 		BlendMode blend;
 		uint32_t indexCount;
 		uint32_t startIndexLocation;
-		Texture2D texture;
+		TextureHandle texture;
 		TextureAddressMode addressMode;
 
 		uint32_t clipX;
@@ -87,9 +87,9 @@ namespace agate
 
 		virtual void EndDraw(uint32_t sync) = 0;
 
-		virtual Texture2D CreateTexture(const BitmapData& data) = 0;
+		virtual TextureHandle CreateTexture(const BitmapData& data) = 0;
 
-		virtual void ReleaseTexture(Texture2D texture) = 0;
+		virtual void ReleaseTexture(TextureHandle texture) = 0;
 
 	};
 

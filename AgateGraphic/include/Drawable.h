@@ -62,7 +62,7 @@ namespace agate
 		BlendMode   blend;
 		FixedBuffer<char> vertex;
 		FixedBuffer<DrawIndex> index;
-		Texture2D	texture;
+		TextureHandle	texture;
 		RasterizeData() :pipline{ PipelineType::Color },
 			blend{ BlendMode::Blend },
 			texture{}

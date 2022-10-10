@@ -42,7 +42,7 @@
     <ClInclude Include="include\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Spirit.h">
+    <ClInclude Include="include\Image.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawable.h">
@@ -65,7 +65,7 @@
     <ClCompile Include="source\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Spirit.cpp">
+    <ClCompile Include="source\Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
