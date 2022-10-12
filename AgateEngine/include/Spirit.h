@@ -34,7 +34,7 @@ namespace agate
 
 		void SetColor(const ColorAnimationParameter& color);
 
-		bool Update(int64_t time) override;
+		int Update(int64_t time) override;
 
 		void Draw(DrawingContext& context) override;
 

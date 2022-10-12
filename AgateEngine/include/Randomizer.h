@@ -38,7 +38,12 @@ namespace agate
 
 		float GetRand(float min_, float max_)
 		{
-			return GetRand() * (max_ - min_) + min_;
+			auto dis = max_ - min_;
+			if (dis < 0.0001 && dis > -0.0001)
+			{
+				return max_;
+			}
+			return GetRand() * dis + min_;
 		}
 	private:
 		int32_t _Seed;

@@ -43,7 +43,7 @@ void ProgramDemo::Render(agate::DrawingContext& canvs)
 	canvs.EndDraw(1);
 	if (nowTick > 10000)
 	{
-		_BeginTime = now;
+		//_BeginTime = now;
 	}
 }
 
@@ -165,7 +165,7 @@ void ProgramDemo::AddParticle()
 		particle->SetColor(color);
 
 		particle->SetTexture(resPath + L"Particle01.png");
-		_Program.AddSpirit(particle);
+		//_Program.AddSpirit(particle);
 	}
 
 	//scale ¾«Áé
@@ -195,17 +195,18 @@ void ProgramDemo::AddParticle()
 		particle->SetScaling(scale);
 
 		particle->SetTexture(resPath + L"Particle01.png");
-		_Program.AddSpirit(particle);
+		//_Program.AddSpirit(particle);
 	}
 
 	{
 		auto particle = std::make_shared<agate::Particles>();
 		agate::ParticleParameter params;
-		params.particleCount = 20;
-		params.generateInterval.min = 30;
-		params.generateInterval.max = 100;
-		params.particleLife.min = 4000;
-		params.particleLife.max = 8000;
+		params.particleCount = 400;
+		params.infinite = false;
+		params.generateInterval.min = 200;
+		params.generateInterval.max = 300;
+		params.particleLife.min = 2000;
+		params.particleLife.max = 3000;
 		particle->SetParams(params);
 
 		agate::ParticleTranslateParameter translate;

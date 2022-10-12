@@ -39,13 +39,13 @@ namespace agate
 			_Color = param;
 		}
 		
-		bool Update(int64_t time) override;
+		int Update(int64_t time) override;
 
 		void Draw(DrawingContext& context) override;
 
 		void SetTexture(const std::wstring& file);
 	private:
-		void GenerateInstances();
+		void GenerateInstances(int64_t time);
 		void AssignTranslate(Spirit* spirit);
 		void AssignScaling(Spirit* spirit);
 		void AssignRotation(Spirit* spirit);
@@ -55,6 +55,8 @@ namespace agate
 		std::vector<Spirit*> _ShowingParticles;
 		std::wstring _Texture;
 
+		uint32_t _ParticleCount;
+		int64_t _LastParticleBeginning;
 		Randomizer _Random;
 		ParticleParameter	_Params;
 		ParticleTranslateParameter _Translate;

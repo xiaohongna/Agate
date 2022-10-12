@@ -48,15 +48,12 @@ namespace agate
 		return (to - from) * step + from;
 	}
 
-	bool Spirit::Update(int64_t time)
+	int Spirit::Update(int64_t time)
 	{
-		if (time < _Begin)
+		auto ret = SpiritBase::Update(time);
+		if (ret > 0)
 		{
-			return false;
-		}
-		else if (time > _End)
-		{
-			return false;
+			return ret;
 		}
 		time -= _Begin;
 		float angle = 0.0f;
@@ -68,12 +65,13 @@ namespace agate
 			agate::Matrix3X2::Scale(scale.x, scale.y, _Size) * agate::Matrix3X2::Translation(trans.x, trans.y);
 		_Image.SetTransform(matrix);
 		UpdateColor(time);
-		return true;
+		return 0;
 	}
 
 	void Spirit::Draw(DrawingContext& context)
 	{
 		context.Draw(_Image);
+		SpiritBase::Draw(context);
 	}
 
 	void Spirit::UpdateRotation(int64_t time, float& angle, Vector2& center)

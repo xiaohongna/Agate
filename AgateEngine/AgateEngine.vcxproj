@@ -153,7 +153,6 @@
     <ClInclude Include="include\RotationParameter.h" />
     <ClInclude Include="include\ScalingParameter.h" />
     <ClInclude Include="include\Spirit.h" />
-    <ClInclude Include="include\SpiritComposition.h" />
     <ClInclude Include="include\SpiritBase.h" />
     <ClInclude Include="include\TranslateParameter.h" />
   </ItemGroup>
@@ -165,7 +164,6 @@
     <ClCompile Include="source\RotationParameter.cpp" />
     <ClCompile Include="source\ScalingParameter.cpp" />
     <ClCompile Include="source\Spirit.cpp" />
-    <ClCompile Include="source\SpiritComposition.cpp" />
     <ClCompile Include="source\SpiritBase.cpp" />
     <ClCompile Include="source\TranslateParameter.cpp" />
   </ItemGroup>

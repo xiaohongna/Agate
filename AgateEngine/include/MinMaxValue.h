@@ -25,6 +25,10 @@ namespace agate
 
 		uint32_t Random(Randomizer& random)
 		{
+			if (max == min)
+			{
+				return max;
+			}
 			return uint32_t(random.GetRand() * (max - min)) + min;;
 		}
 	};
@@ -37,6 +41,10 @@ namespace agate
 
 		int64_t Random(Randomizer& random)
 		{
+			if (max == min)
+			{
+				return max;
+			}
 			return int64_t(random.GetRand() * (max - min)) + min;;
 		}
 	};
@@ -74,10 +82,10 @@ namespace agate
 		Color Random(Randomizer& random)
 		{
 			return { 
-				(uint8_t)random.GetRand(min.red, max.red), 
-				(uint8_t)random.GetRand(min.green, max.green),
-				(uint8_t)random.GetRand(min.blue, max.blue) ,
-				(uint8_t)random.GetRand(min.alpha, max.alpha)
+				(uint8_t)(random.GetRand(min.red, max.red) + 0.5f), 
+				(uint8_t)(random.GetRand(min.green, max.green) + 0.5f),
+				(uint8_t)(random.GetRand(min.blue, max.blue) + 0.5f),
+				(uint8_t)(random.GetRand(min.alpha, max.alpha) + 0.5f)
 			};
 		}
 	};

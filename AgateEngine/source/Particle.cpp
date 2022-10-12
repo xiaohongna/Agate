@@ -4,6 +4,8 @@ namespace agate
 {
     Particles::Particles()
     {
+        _ParticleCount = 0;
+        _LastParticleBeginning = 0;
         _Params.generateInterval.min = 10;
         _Params.generateInterval.max = 1000;
         _Params.particleCount = 100;
@@ -23,22 +25,38 @@ namespace agate
         _Translate = param;
     }
 
-    bool agate::Particles::Update(int64_t time)
+    int agate::Particles::Update(int64_t time)
     {
         if (time < _Begin)
         {
-            return false;
-        }
-        GenerateInstances();
+            return -1;
+        } 
+        GenerateInstances(time);
         _ShowingParticles.clear();
-        for (auto& spirite : _Particles)
+        auto spirite = _Particles.begin();
+        while (spirite != _Particles.end())
         {
-            if (spirite->Update(time))
+            int ret = (*spirite)->Update(time);
+            if (ret > 0)
             {
-                _ShowingParticles.push_back(spirite.get());
+               spirite = _Particles.erase(spirite);
+            }
+            else if(ret == 0)
+            {
+                _ShowingParticles.push_back(spirite->get());
+                spirite++;
+            }
+            else
+            {
+                break;
             }
         }
-        return true;
+        auto ret = SpiritBase::Update(time);
+        if (_ShowingParticles.empty() == false)   //有正在渲染的精灵
+        {
+            return 0; 
+        }
+        return ret;
     }
 
     void agate::Particles::Draw(DrawingContext& context)
@@ -54,21 +72,24 @@ namespace agate
         _Texture = file;
     }
 
-    void Particles::GenerateInstances()
+    void Particles::GenerateInstances(int64_t time)
     {
-        uint32_t begin = 0;
-        while (_Particles.size() < _Params.particleCount)
+        //最后的元素已经大于当前时间，没必要更多精灵
+        while (_LastParticleBeginning < time && (_Params.infinite || _ParticleCount < _Params.particleCount))
         {
+            _LastParticleBeginning += _Params.generateInterval.Random(_Random);
+            _End = _LastParticleBeginning + _Params.particleLife.Random(_Random);
             auto spirite = std::make_shared<Spirit>();
             spirite->SetSource(_Texture);
             spirite->SetBlendMode(BlendMode::Additive);
-            begin += _Params.generateInterval.Random(_Random);
-            spirite->Range(begin, begin + _Params.particleLife.Random(_Random));
+            spirite->Range(time, _End);
             AssignTranslate(spirite.get());
             AssignScaling(spirite.get());
             AssignRotation(spirite.get());
             AssignColor(spirite.get());
             _Particles.emplace_back(spirite);
+            assert(_Particles.size() < 1000);
+            _ParticleCount++;
         }
     }
 
