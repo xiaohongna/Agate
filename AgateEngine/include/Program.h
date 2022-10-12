@@ -1,6 +1,7 @@
 #pragma once
 #include "SpiritBase.h"
 #include <vector>
+#include "Randomizer.h"
 namespace agate
 {
     class Program :
@@ -15,6 +16,7 @@ namespace agate
 
         void AddSpirit(std::shared_ptr<SpiritBase>&& spirit);
     private:
+        Randomizer  _Random;
         std::vector<std::shared_ptr<SpiritBase>> _Spirits;
         std::vector<SpiritBase*> _DrawingSpirits;
     };

@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include "MinMaxValue.h"
 namespace agate
 {
 	class RotationParameter
@@ -13,6 +14,10 @@ namespace agate
 		/// </summary>
 		Fixed,
 		/// <summary>
+		/// 随机值
+		/// </summary>
+		Random,
+		/// <summary>
 		/// 从A到B
 		/// </summary>
 		FromTo,
@@ -20,6 +25,27 @@ namespace agate
 		/// 速度加速度
 		/// </summary>
 		PVA,
+	};
+	struct ParticleRotationParameter
+	{
+		RotationAnimationType type;
+		union
+		{
+			float fixed;
+			MinMax<float> random;
+			struct
+			{
+				MinMax<float> from;
+				MinMax<float> to;
+			};
+			struct
+			{
+				MinMax<float> base;
+				MinMax<float> velocity;
+				MinMax<float> acceleration;
+			};
+		} Params;
+		Vector2  center;
 	};
 
 	struct RotationAnimationParameter
@@ -39,8 +65,8 @@ namespace agate
 				float velocity;
 				float acceleration;
 			};
-		} Params;
-		Vector2  pointer;
+		} params;
+		Vector2  center;
 	};
 }
 

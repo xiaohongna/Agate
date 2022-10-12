@@ -144,18 +144,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\ColorParameter.h" />
+    <ClInclude Include="include\MinMaxValue.h" />
+    <ClInclude Include="include\Particle.h" />
+    <ClInclude Include="include\ParticlesParameter.h" />
     <ClInclude Include="include\Program.h" />
+    <ClInclude Include="include\Randomizer.h" />
     <ClInclude Include="include\RotationParameter.h" />
+    <ClInclude Include="include\ScalingParameter.h" />
     <ClInclude Include="include\Spirit.h" />
     <ClInclude Include="include\SpiritComposition.h" />
     <ClInclude Include="include\SpiritBase.h" />
+    <ClInclude Include="include\TranslateParameter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\ColorParameter.cpp" />
+    <ClCompile Include="source\Particle.cpp" />
+    <ClCompile Include="source\ParticlesParameter.cpp" />
     <ClCompile Include="source\Program.cpp" />
     <ClCompile Include="source\RotationParameter.cpp" />
+    <ClCompile Include="source\ScalingParameter.cpp" />
     <ClCompile Include="source\Spirit.cpp" />
     <ClCompile Include="source\SpiritComposition.cpp" />
     <ClCompile Include="source\SpiritBase.cpp" />
+    <ClCompile Include="source\TranslateParameter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgateGraphic\AgateGraphic.vcxproj">

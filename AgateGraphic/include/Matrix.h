@@ -56,6 +56,17 @@ namespace agate
             return scale;
         }
 
+        static Matrix3X2 Scale(float x, float y, const Vector2& center)
+        {
+            Matrix3X2 scale;
+            scale._11 = x; scale._12 = 0.0;
+            scale._21 = 0.0; scale._22 = x;
+            scale._31 = center.x - x * center.x;
+            scale._32 = center.y - y * center.y;
+
+            return scale;
+        }
+
         static Matrix3X2 Rotation(float angle)
         {
             float cs = cosf(angle), sn = sinf(angle);

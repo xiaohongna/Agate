@@ -10,7 +10,7 @@
 #include "Renderer.h"
 #include "VideoBuffer.h"
 #include "Pipeline.h"
-
+#include "Brush.h"
 namespace agate
 {
     class GraphicContext :public IRenderer
@@ -35,7 +35,7 @@ namespace agate
 
         void SetRenderTarget() override;
 
-        void Clear(const Vector4& color) override;
+        void Clear(Color color) override;
 
         void Draw(const BatchDrawData& data) override;
 

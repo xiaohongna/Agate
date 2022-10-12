@@ -66,7 +66,7 @@
       <Filter>头文件</Filter>
     </ClCompile>
     <ClCompile Include="ProgramDemo.cpp">
-      <Filter>源文件</Filter>
+      <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

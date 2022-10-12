@@ -1,4 +1,5 @@
 #pragma once
+#include "Brush.h"
 #include "Drawable.h"
 #include "Renderer.h"
 
@@ -13,7 +14,7 @@ namespace agate
 
 		void SetClip(const Vector4& clip);
 
-		void BeginDraw(bool clear, uint32_t clearColor);
+		void BeginDraw(bool clear, Color clearColor);
 
 		void Draw(Drawable& drawing);
 

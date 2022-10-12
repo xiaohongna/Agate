@@ -1,7 +1,7 @@
 #pragma once
 #include "Vertex.h"
 #include "Texture.h"
-
+#include "Brush.h"
 namespace agate
 {
 
@@ -81,7 +81,7 @@ namespace agate
 
 		virtual void SetViewPort(uint32_t width, uint32_t height) = 0;
 
-		virtual void Clear(const Vector4& color) = 0;
+		virtual void Clear(Color color) = 0;
 
 		virtual void Draw(const BatchDrawData& data) = 0;
 

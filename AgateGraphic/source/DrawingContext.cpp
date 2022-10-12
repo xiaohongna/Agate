@@ -42,14 +42,13 @@ namespace agate
 		_ClipChanged = true;
 	}
 
-	void DrawingContext::BeginDraw(bool clear, uint32_t clearColor)
+	void DrawingContext::BeginDraw(bool clear, Color clearColor)
 	{
 		_Renderer->BeginDraw();
 		_Renderer->SetRenderTarget();
 		if (clear)
 		{
-			Vector4 clr(1.0f, 1.0f, 1.0f, 1.0f);
-			_Renderer->Clear(clr);
+			_Renderer->Clear(clearColor);
 		}
 	}
 

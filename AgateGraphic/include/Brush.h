@@ -34,6 +34,7 @@ namespace agate
 			green = g;
 			blue = b;
 		}
+		
 	};
 
 	struct BrushData

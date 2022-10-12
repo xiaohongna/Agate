@@ -119,9 +119,10 @@ namespace agate
         _DeviceContext->OMSetRenderTargets(1, &_MainRenderTargetView.p, NULL);
     }
 
-    void GraphicContext::Clear(const Vector4& color)
+    void GraphicContext::Clear(Color color)
     {
-        _DeviceContext->ClearRenderTargetView(_MainRenderTargetView, (float*)&color);
+        float fColor[4] { color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f };
+        _DeviceContext->ClearRenderTargetView(_MainRenderTargetView, fColor);
     }
 
     void GraphicContext::Draw(const BatchDrawData& data)
