@@ -4,6 +4,7 @@ namespace agate
 {
 	Program::Program()
 	{
+
 	}
 
 	bool Program::IsStoped()

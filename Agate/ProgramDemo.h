@@ -14,6 +14,8 @@ private:
 	void AddSpirit();
 
 	void AddParticle();
+
+	void AddTextureParticle();
 private:
 	agate::Program _Program;
 	agate::Image	_Background;

@@ -11,7 +11,9 @@ namespace agate
 	public:
 		Image() :_Matrix{},
 			_Flags{ 0 },
-			_Color{ 0xFFFFFFFF }
+			_Color{ 0xFFFFFFFF },
+			_NormalUV{true},
+			_Clip{0.0f, 0.0f, 1.0f, 1.0f}
 		{
 			_Matrix._11 = 1.0f;
 			_Matrix._22 = 1.0f;
@@ -24,7 +26,7 @@ namespace agate
 
 		void SetTexture(const std::shared_ptr<Texture>& img);
 
-		void SetClip(const Vector4& clip);
+		void SetClip(const Vector4& clip, bool normal = false);
 
 		void SetColor(const Color clr);
 
@@ -66,6 +68,7 @@ namespace agate
 		std::shared_ptr<Texture>	_Image;
 		Vector4 _Bounds;
 		Vector4 _Clip;
+		bool _NormalUV;
 		Color	_Color;
 		Matrix3X2 _Matrix;
 		RasterizeData _RasterData;

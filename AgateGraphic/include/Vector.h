@@ -71,6 +71,14 @@ namespace agate
 
         Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
 
+        float Width() const
+        {
+            return right - left;
+        }
+        float Height() const
+        {
+            return bottom - top;
+        }
         bool operator != (const Vector4 v4) const
         {
             return x != v4.x || y != v4.y || z != v4.z || w != v4.w;

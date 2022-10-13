@@ -19,6 +19,8 @@ namespace agate
         _Rotation.Params.fixed = 0.0f;
         _Color.type = ColorAnimationType::Fixed;
         _Color.params.fixed = { 0xFFFFFFFF };
+        _Texture.type = TextureAnimationType::Fixed;
+        _Texture.UVFrame = {0.0f, 0.0f, 1.0f, 1.0f};
     }
     void Particles::SetTranslate(const ParticleTranslateParameter& param)
     {
@@ -67,11 +69,6 @@ namespace agate
         }
     }
 
-    void Particles::SetTexture(const std::wstring& file)
-    {
-        _Texture = file;
-    }
-
     void Particles::GenerateInstances(int64_t time)
     {
         //最后的元素已经大于当前时间，没必要更多精灵
@@ -80,13 +77,13 @@ namespace agate
             _LastParticleBeginning += _Params.generateInterval.Random(_Random);
             _End = _LastParticleBeginning + _Params.particleLife.Random(_Random);
             auto spirite = std::make_shared<Spirit>();
-            spirite->SetSource(_Texture);
-            spirite->SetBlendMode(BlendMode::Additive);
+            spirite->SetRenderParams(_RenderParams);
             spirite->Range(time, _End);
             AssignTranslate(spirite.get());
             AssignScaling(spirite.get());
             AssignRotation(spirite.get());
             AssignColor(spirite.get());
+            AssignTexture(spirite.get());
             _Particles.emplace_back(spirite);
             assert(_Particles.size() < 1000);
             _ParticleCount++;
@@ -234,6 +231,23 @@ namespace agate
             break;
         }
         spirit->SetColor(color);
+    }
+
+    void Particles::AssignTexture(Spirit* spirit)
+    {
+        TextureAnimationParameter texture = _Texture;
+        if (_Texture.type == TextureAnimationType::FrameRandom)
+        {
+            texture.type = TextureAnimationType::Fixed;
+            int frameIndex = _Random.GetRand(0.0f, _Texture.params.frameCount);
+            int x = (frameIndex % _Texture.params.lineFrameCount) * _Texture.UVFrame.Width();
+            int y = frameIndex / _Texture.params.lineFrameCount * _Texture.UVFrame.Height();
+            texture.UVFrame.x += x;
+            texture.UVFrame.y += y;
+            texture.UVFrame.right += x;
+            texture.UVFrame.bottom += y;
+        }
+        spirit->SetTexture(texture);
     }
     
 

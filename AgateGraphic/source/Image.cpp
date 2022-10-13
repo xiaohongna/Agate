@@ -39,11 +39,12 @@ namespace agate
         }
     }
 
-    void Image::SetClip(const Vector4& clip)
+    void Image::SetClip(const Vector4& clip, bool normal)
     {
         if (clip != _Clip)
         {
             _Clip = clip;
+            _NormalUV = normal;
             AddFlag(Spirit_Flag_ImageChanged);
         }
     }
@@ -220,9 +221,17 @@ namespace agate
 
     void Image::UpdateUV()
     {
-        auto& img = _Image->GetImageData();
-        Vector2 minUV(Clamp(_Clip.x / img.width), Clamp(_Clip.y / img.height));
-        Vector2 maxUV(Clamp(_Clip.right / img.width), Clamp(_Clip.bottom / img.height));
+        if (!_NormalUV)
+        {
+            auto& img = _Image->GetImageData();
+            _Clip.x = _Clip.x / img.width;
+            _Clip.y = _Clip.y / img.height;
+            _Clip.right = _Clip.right / img.width;
+            _Clip.bottom = _Clip.bottom / img.height;
+            _NormalUV = true;
+        }
+        Vector2 minUV(_Clip.x, _Clip.y);
+        Vector2 maxUV(_Clip.right, _Clip.bottom);
         auto vertex = _RasterData.vertex.As<VertexXYUVColor>();
         if (_RasterData.vertex.count == 12)
         {

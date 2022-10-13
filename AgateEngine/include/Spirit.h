@@ -5,7 +5,8 @@
 #include "ScalingParameter.h"
 #include "TranslateParameter.h"
 #include "ColorParameter.h"
-
+#include "TextureParameter.h"
+#include "RenderParameter.h"
 namespace agate
 {
 	class Spirit:
@@ -22,9 +23,9 @@ namespace agate
 			_TranslateParam.params.fixed = { 0.0f, 0.0f };
 			_ColorParam.type = ColorAnimationType::Fixed;
 			_ColorParam.params.fixed.color = 0xFFFFFFFF;
+			_TextureParam.type = TextureAnimationType::Fixed;
+			_TextureParam.UVFrame = { 0.0f, 0.0f, 1.0f, 1.0f };
 		}
-
-		void SetSource(const std::wstring& file);
 
 		void SetRotation(const RotationAnimationParameter& param);
 
@@ -33,6 +34,10 @@ namespace agate
 		void SetTranslate(const TranslateAnimationParameter& param);
 
 		void SetColor(const ColorAnimationParameter& color);
+
+		void SetTexture(const TextureAnimationParameter& texture);
+
+		void SetRenderParams(const RenderParameter& param);
 
 		int Update(int64_t time) override;
 
@@ -50,6 +55,8 @@ namespace agate
 		void UpdateTranslate(int64_t time, Vector2& trans);
 
 		void UpdateColor(int64_t time);
+
+		void UpdateTexture(int64_t time);
 	protected:
 		Image  _Image;
 		Vector2	_Size;
@@ -57,6 +64,7 @@ namespace agate
 		ScalingAnimationParameter _ScalingParam;
 		TranslateAnimationParameter _TranslateParam;
 		ColorAnimationParameter _ColorParam;
+		TextureAnimationParameter _TextureParam;
 	};
 }
 

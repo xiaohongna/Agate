@@ -9,6 +9,10 @@ namespace agate
 	class SpiritBase: public std::enable_shared_from_this<SpiritBase>
 	{
 	public:
+		SpiritBase() :_Begin{ 0 }, _End{0} 
+		{
+
+		}
 		void Range(int64_t b, int64_t e)
 		{
 			_Begin = b;

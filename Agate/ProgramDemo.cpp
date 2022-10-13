@@ -30,6 +30,7 @@ ProgramDemo::ProgramDemo()
 	_BeginTime = std::chrono::steady_clock::now();
 	//AddSpirit();
 	AddParticle();
+	AddTextureParticle();
 }
 
 void ProgramDemo::Render(agate::DrawingContext& canvs)
@@ -53,7 +54,9 @@ void ProgramDemo::AddSpirit()
 	//from_to 动画
 	{
 		auto spirit = std::make_shared<agate::Spirit>();
-		spirit->SetSource(resPath + L"R.jpg");
+		agate::RenderParameter render;
+		render.filePath = resPath + L"R.jpg";
+		spirit->SetRenderParams(render);
 		agate::RotationAnimationParameter rotation{};
 		rotation.type = agate::RotationAnimationType::FromTo;
 		rotation.params.from = 0.f;
@@ -74,7 +77,10 @@ void ProgramDemo::AddSpirit()
 	//速度，加速动画
 	{
 		auto spirit = std::make_shared<agate::Spirit>();
-		spirit->SetSource(resPath + L"Wind01.png");
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Wind01.png";
+		spirit->SetRenderParams(render);
+
 		agate::RotationAnimationParameter rotation{};
 		rotation.type = agate::RotationAnimationType::PVA;
 		rotation.params.base = 0.2f;
@@ -99,8 +105,9 @@ void ProgramDemo::AddSpirit()
 	//移动
 	{
 		auto spirit = std::make_shared<agate::Spirit>();
-		spirit->SetSource(resPath + L"Wind01.png");
-
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Wind01.png";
+		spirit->SetRenderParams(render);
 		agate::TranslateAnimationParameter translate;
 		translate.type = agate::TranslateAnimationType::PVA;
 		translate.params.base = { 100.f, 100.f };
@@ -117,7 +124,9 @@ void ProgramDemo::AddSpirit()
 
 	{
 		auto spirit = std::make_shared<agate::Spirit>();
-		spirit->SetSource(resPath + L"Wind01.png");
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Wind01.png";
+		spirit->SetRenderParams(render);
 
 		agate::ColorAnimationParameter color;
 		color.type = agate::ColorAnimationType::FromTo;
@@ -159,13 +168,18 @@ void ProgramDemo::AddParticle()
 		particle->SetScaling(scaling);
 
 		agate::ParticlColorParameter color;
-		color.type = agate::ColorAnimationType::Random;
-		color.params.random.min = { 0xFFFF00FF };
-		color.params.random.max = { 0xFF00FF00 };
+		color.type = agate::ColorAnimationType::FromTo;
+		color.params.from.min = { 0xFFFF00FF };
+		color.params.from.max = { 0xFF00FF00 };
+		color.params.to.min = { 0x00000000 };
+		color.params.to.max = { 0x00000000 };
 		particle->SetColor(color);
 
-		particle->SetTexture(resPath + L"Particle01.png");
-		//_Program.AddSpirit(particle);
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Particle01.png";
+		render.blend = agate::BlendMode::Additive;
+		particle->SetRenderParams(render);
+		_Program.AddSpirit(particle);
 	}
 
 	//scale 精灵
@@ -194,8 +208,11 @@ void ProgramDemo::AddParticle()
 		scale.params.uniformAcceleration.max = 3.2f;
 		particle->SetScaling(scale);
 
-		particle->SetTexture(resPath + L"Particle01.png");
-		//_Program.AddSpirit(particle);
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Particle01.png";
+		render.blend = agate::BlendMode::Additive;
+		particle->SetRenderParams(render);
+		_Program.AddSpirit(particle);
 	}
 
 	{
@@ -230,7 +247,59 @@ void ProgramDemo::AddParticle()
 		color.params.random.max = { 0xFF00FF00 };
 		particle->SetColor(color);
 
-		particle->SetTexture(resPath + L"Particle01.png");
+		agate::RenderParameter render;
+		render.filePath = resPath + L"Particle01.png";
+		render.blend = agate::BlendMode::Additive;
+		particle->SetRenderParams(render);
+		_Program.AddSpirit(particle);
+	}
+}
+
+void ProgramDemo::AddTextureParticle()
+{
+	auto resPath = GetModulePath();
+	{
+		auto particle = std::make_shared<agate::Particles>();
+		agate::ParticleParameter params;
+		params.particleCount = 1;
+		params.infinite = false;
+		params.generateInterval.min = 10;
+		params.generateInterval.max = 10;
+		params.particleLife.min = 100000;
+		params.particleLife.max = 100000;
+		particle->SetParams(params);
+
+		agate::ParticleTranslateParameter translate;
+		translate.type = agate::TranslateAnimationType::Fixed;
+		translate.params.fixed = { 400, 400 };
+		particle->SetTranslate(translate);
+
+		agate::ParticleScalingParameter scaling;
+		scaling.type = agate::ScalingAnimationType::Fixed;
+		scaling.params.fixed = { 1.0f, 1.0f };
+		particle->SetScaling(scaling);
+
+		agate::ParticlColorParameter color;
+		color.type = agate::ColorAnimationType::Random;
+		color.params.random.min = { 0xFFFF00FF };
+		color.params.random.max = { 0xFF00FF00 };
+		//particle->SetColor(color);
+
+		agate::RenderParameter render;
+		render.filePath = resPath + L"man.png";
+		render.blend = agate::BlendMode::Blend;
+		render.size = { 150.f, 291.0f };
+		particle->SetRenderParams(render);
+
+		agate::ParticleTextureParameter texture;
+		texture.type = agate::TextureAnimationType::FramebyFrame;
+		texture.UVFrame = {0.0f, 0.0f, 150.0f / 1055.0f, 291.0f / 582.0f};
+		texture.params.frameCount = 14;
+		texture.params.lineFrameCount = 7;
+		texture.params.stepX = 150.f / 1055.0f;
+		texture.params.stepY = 291.0f / 582.0f;
+		texture.params.frameRate = 3;
+		particle->SetTexture(texture);
 		_Program.AddSpirit(particle);
 	}
 }

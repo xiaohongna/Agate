@@ -6,6 +6,8 @@
 #include "ScalingParameter.h"
 #include "RotationParameter.h"
 #include "ColorParameter.h"
+#include "TextureParameter.h"
+#include "RenderParameter.h"
 
 #include <list>
 
@@ -39,21 +41,30 @@ namespace agate
 			_Color = param;
 		}
 		
+		void SetTexture(const ParticleTextureParameter& param)
+		{
+			_Texture = param;
+		}
+
+		void SetRenderParams(const RenderParameter& param)
+		{
+			_RenderParams = param;
+		}
+
 		int Update(int64_t time) override;
 
 		void Draw(DrawingContext& context) override;
 
-		void SetTexture(const std::wstring& file);
 	private:
 		void GenerateInstances(int64_t time);
 		void AssignTranslate(Spirit* spirit);
 		void AssignScaling(Spirit* spirit);
 		void AssignRotation(Spirit* spirit);
 		void AssignColor(Spirit* spirit);
+		void AssignTexture(Spirit* spirit);
 	protected:
 		std::list<std::shared_ptr<Spirit>> _Particles;
 		std::vector<Spirit*> _ShowingParticles;
-		std::wstring _Texture;
 
 		uint32_t _ParticleCount;
 		int64_t _LastParticleBeginning;
@@ -63,6 +74,8 @@ namespace agate
 		ParticleScalingParameter  _Scaling;
 		ParticleRotationParameter _Rotation;
 		ParticlColorParameter	_Color;
+		ParticleTextureParameter  _Texture;
+		RenderParameter		_RenderParams;
 	};
 
 }
