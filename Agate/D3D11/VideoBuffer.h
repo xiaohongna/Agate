@@ -77,13 +77,13 @@ namespace agate
 
         void Bind(ID3D11DeviceContext* context, UINT StartSlot = 0)
         {
-            if (bufferType == VideoBufferType::Vertex)
+            if constexpr (bufferType == VideoBufferType::Vertex)
             {
                 unsigned int stride = sizeof(T);
                 unsigned int offset = 0;
                 context->IASetVertexBuffers(StartSlot, 1, &_Buffer.p, &stride, &offset);
             }
-            else if (bufferType == VideoBufferType::Constant)
+            else if constexpr (bufferType == VideoBufferType::Constant)
             {
                 context->VSSetConstantBuffers(StartSlot, 1, &_Buffer.p);
             }

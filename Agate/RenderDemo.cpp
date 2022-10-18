@@ -96,9 +96,9 @@ void RenderDemo::SetViewSize(uint32_t width, uint32_t height)
 
 void RenderDemo::RenderGeomegry(agate::DrawingContext& canvs)
 {
-	_Rotation = min(_Rotation + 0.02f, 3.1445f);
-	_Scale.x = min(_Scale.x + 0.01f, 2);
-	_Scale.y = min(_Scale.y + 0.02f, 2);
+	_Rotation = std::min(_Rotation + 0.02f, 3.1445f);
+	_Scale.x = std::min(_Scale.x + 0.01f, 2.0f);
+	_Scale.y = std::min(_Scale.y + 0.02f, 2.0f);
 	
 	auto matrix = agate::Matrix3X2::Rotation(_Rotation, agate::Vector2(300, 250));
 	_Line.SetTransform(matrix);
