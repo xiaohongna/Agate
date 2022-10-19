@@ -2,6 +2,7 @@
 #include "Brush.h"
 #include "Vector.h"
 #include "Randomizer.h"
+#include <bitserializer/bit_serializer.h>
 
 namespace agate
 {
@@ -14,6 +15,13 @@ namespace agate
 		T Random(Randomizer& random)
 		{
 			return min;
+		}
+
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min", min);
+			archive << BitSerializer::MakeAutoKeyValue("Max", max);
 		}
 	};
 
@@ -31,6 +39,13 @@ namespace agate
 			}
 			return uint32_t(random.GetRand() * (max - min)) + min;;
 		}
+
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min", min);
+			archive << BitSerializer::MakeAutoKeyValue("Max", max);
+		}
 	};
 
 	template<>
@@ -47,6 +62,13 @@ namespace agate
 			}
 			return int64_t(random.GetRand() * (max - min)) + min;;
 		}
+
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min", min);
+			archive << BitSerializer::MakeAutoKeyValue("Max", max);
+		}
 	};
 
 	template<>
@@ -59,6 +81,13 @@ namespace agate
 		{
 			return random.GetRand(min, max);
 		}
+		
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min", min);
+			archive << BitSerializer::MakeAutoKeyValue("Max", max);
+		}
 	};
 
 	template<>
@@ -70,6 +99,15 @@ namespace agate
 		Vector2 Random(Randomizer& random)
 		{
 			return { random.GetRand(min.x, max.x), random.GetRand(min.y, max.y) };
+		}
+
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min_x", min.x);
+			archive << BitSerializer::MakeAutoKeyValue("Min_y", min.y);
+			archive << BitSerializer::MakeAutoKeyValue("Max_x", max.x);
+			archive << BitSerializer::MakeAutoKeyValue("Max_y", max.y);
 		}
 	};
 
@@ -87,6 +125,13 @@ namespace agate
 				(uint8_t)(random.GetRand(min.blue, max.blue) + 0.5f),
 				(uint8_t)(random.GetRand(min.alpha, max.alpha) + 0.5f)
 			};
+		}
+
+		template <class TArchive>
+		void Serialize(TArchive& archive)
+		{
+			archive << BitSerializer::MakeAutoKeyValue("Min", min.color);
+			archive << BitSerializer::MakeAutoKeyValue("Max", max.color);
 		}
 	};
 
