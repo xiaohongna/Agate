@@ -79,6 +79,7 @@ namespace agate
             auto spirite = std::make_shared<Spirit>();
             spirite->SetRenderParams(_RenderParams);
             spirite->Range(time, _End);
+            //spirite->AddSpirit();
             AssignTranslate(spirite.get());
             AssignScaling(spirite.get());
             AssignRotation(spirite.get());

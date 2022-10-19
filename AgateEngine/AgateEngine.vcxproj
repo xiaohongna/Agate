@@ -150,6 +150,7 @@
     <ClInclude Include="include\Particle.h" />
     <ClInclude Include="include\ParticlesParameter.h" />
     <ClInclude Include="include\Program.h" />
+    <ClInclude Include="include\ProgramDocument.h" />
     <ClInclude Include="include\Randomizer.h" />
     <ClInclude Include="include\RenderParameter.h" />
     <ClInclude Include="include\RotationParameter.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="source\Particle.cpp" />
     <ClCompile Include="source\ParticlesParameter.cpp" />
     <ClCompile Include="source\Program.cpp" />
+    <ClCompile Include="source\ProgramDocument.cpp" />
     <ClCompile Include="source\RenderParameter.cpp" />
     <ClCompile Include="source\RotationParameter.cpp" />
     <ClCompile Include="source\ScalingParameter.cpp" />

@@ -2,11 +2,6 @@
 #include "SpiritBase.h"
 #include <vector>
 #include "Randomizer.h"
-#include <bitserializer/bit_serializer.h>
-#include <bitserializer/rapidjson_archive.h>
-
-using namespace BitSerializer;
-using JsonArchive = BitSerializer::Json::RapidJson::JsonArchive;
 
 namespace agate
 {
