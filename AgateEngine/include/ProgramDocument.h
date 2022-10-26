@@ -3,6 +3,7 @@
 #include "ParticlesParameter.h"
 #include <bitserializer/bit_serializer.h>
 #include <bitserializer/rapidjson_archive.h>
+#include <rapidjson/document.h>
 
 using namespace BitSerializer;
 using JsonArchive = BitSerializer::Json::RapidJson::JsonArchive;
@@ -19,8 +20,8 @@ namespace agate
             _Parameter.infinite = true;
             _Parameter.generateInterval.min = 10;
             _Parameter.generateInterval.max = 50;
-            _Parameter.size.max = { 100, 10 };
-            _Parameter.size.min = { 11, 12 };
+            rapidjson::Document document;
+            auto v = document["1"].GetObject();
         }
 
         void SetValue(int x, int y)

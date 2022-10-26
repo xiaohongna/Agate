@@ -61,34 +61,33 @@ namespace agate
 		return (to - from) * step + from;
 	}
 
-	int Spirit::Update(int64_t time)
+	float Spirit::Update(int64_t time)
 	{
-		auto ret = SpiritBase::Update(time);
-		if (ret > 0)
+		auto progress = (float)(time - _Beginning) / (_Ending - _Beginning);
+		if (progress < 0.0f || progress > 1.0f)
 		{
-			return ret;
+			return progress;
 		}
-		time -= _Begin;
+		auto const absTime = (time - _Beginning) / 1000.0f;
 		float angle = 0.0f;
 		Vector2 center, scale{1.0f, 1.0f}, trans;
-		UpdateRotation(time, angle, center);
-		UpdateScaling(time, scale);
-		UpdateTranslate(time, trans);
+		UpdateRotation(absTime, progress, angle, center);
+		UpdateScaling(absTime, progress, scale);
+		UpdateTranslate(absTime, progress, trans);
 		auto matrix = agate::Matrix3X2::Rotation(angle, _RotationParam.center) * 
 			agate::Matrix3X2::Scale(scale.x, scale.y, _Size) * agate::Matrix3X2::Translation(trans.x, trans.y);
 		_Image.SetTransform(matrix);
-		UpdateColor(time);
-		UpdateTexture(time);
+		UpdateColor(absTime, progress);
+		UpdateTexture(absTime, progress);
 		return 0;
 	}
 
 	void Spirit::Draw(DrawingContext& context)
 	{
 		context.Draw(_Image);
-		SpiritBase::Draw(context);
 	}
 
-	void Spirit::UpdateRotation(int64_t time, float& angle, Vector2& center)
+	void Spirit::UpdateRotation(float absTime, float progress, float& angle, Vector2& center)
 	{
 		switch (_RotationParam.type)
 		{
@@ -97,15 +96,13 @@ namespace agate
 			break;
 		case RotationAnimationType::FromTo:
 		{
-			float progress = time / (float)(_End - _Begin);
 			angle = Step(progress, _RotationParam.params.from, _RotationParam.params.to);
 		}
 		break;
 		case RotationAnimationType::PVA:
 		{
-			float fTime = time / 1000.0f;
-			angle = _RotationParam.params.base + (_RotationParam.params.velocity * fTime) +
-				(_RotationParam.params.acceleration * fTime * fTime * 0.5f);
+			angle = _RotationParam.params.base + (_RotationParam.params.velocity * absTime) +
+				(_RotationParam.params.acceleration * absTime * absTime * 0.5f);
 		}
 		break;
 		default:
@@ -115,7 +112,7 @@ namespace agate
 		center = _RotationParam.center;
 	}
 
-	void Spirit::UpdateScaling(int64_t time, Vector2& scal)
+	void Spirit::UpdateScaling(float absTime, float progress, Vector2& scal)
 	{
 		switch (_ScalingParam.type)
 		{
@@ -124,28 +121,24 @@ namespace agate
 			break;
 		case ScalingAnimationType::UniformFromTo:
 		{
-			float progress = time / (float)(_End - _Begin);
 			scal.x = scal.y = Step(progress, _ScalingParam.params.uniformFrom, _ScalingParam.params.uniformTo);
 		}
 			break;
 		case ScalingAnimationType::UniformPVA:
 		{
-			float fTime = time / 1000.0f;
-			scal.x = scal.y = _ScalingParam.params.uniformBase + (_ScalingParam.params.uniformVelocity * fTime) +
-				(_ScalingParam.params.uniformAcceleration * fTime * fTime * 0.5f);
+			scal.x = scal.y = _ScalingParam.params.uniformBase + (_ScalingParam.params.uniformVelocity * absTime) +
+				(_ScalingParam.params.uniformAcceleration * absTime * absTime * 0.5f);
 		}
 			break;
 		case ScalingAnimationType::FromTo:
 		{
-			float progress = time / (float)(_End - _Begin);
 			scal = Step(progress, _ScalingParam.params.from, _ScalingParam.params.to);
 		}
 		break;
 		case ScalingAnimationType::PVA:
 		{
-			float fTime = time / 1000.0f;
-			scal = _ScalingParam.params.base + (_ScalingParam.params.velocity * fTime) +
-				(_ScalingParam.params.acceleration * fTime * fTime * 0.5f);
+			scal = _ScalingParam.params.base + (_ScalingParam.params.velocity * absTime) +
+				(_ScalingParam.params.acceleration * absTime * absTime * 0.5f);
 		}
 		break;
 		default:
@@ -154,7 +147,7 @@ namespace agate
 		}
 	}
 	
-	void Spirit::UpdateTranslate(int64_t time, Vector2& trans)
+	void Spirit::UpdateTranslate(float absTime, float progress, Vector2& trans)
 	{
 		switch (_TranslateParam.type)
 		{
@@ -163,15 +156,13 @@ namespace agate
 			break;
 		case TranslateAnimationType::FromTo:
 		{
-			float progress = time / (float)(_End - _Begin);
 			trans = Step(progress, _TranslateParam.params.from, _TranslateParam.params.to);
 		}
 		break;
 		case TranslateAnimationType::PVA:
 		{
-			float fTime = time / 1000.0f;
-			trans = _TranslateParam.params.base + (_TranslateParam.params.velocity * fTime) +
-				(_TranslateParam.params.acceleration * fTime * fTime * 0.5f);
+			trans = _TranslateParam.params.base + (_TranslateParam.params.velocity * absTime) +
+				(_TranslateParam.params.acceleration * absTime * absTime * 0.5f);
 		}
 		break;
 		default:
@@ -195,7 +186,7 @@ namespace agate
 		};
 	}
 
-	void Spirit::UpdateColor(int64_t time)
+	void Spirit::UpdateColor(float absTime, float progress)
 	{
 		switch (_ColorParam.type)
 		{
@@ -204,7 +195,6 @@ namespace agate
 			break;
 		case (ColorAnimationType::FromTo):
 		{
-			float progress = time / (float)(_End - _Begin);
 			_Image.SetColor(GradientColor(progress, _ColorParam.params.from, _ColorParam.params.to));
 		}
 			break;
@@ -213,7 +203,7 @@ namespace agate
 		}
 	}
 
-	void Spirit::UpdateTexture(int64_t time)
+	void Spirit::UpdateTexture(float absTime, float progress)
 	{
 		switch (_TextureParam.type)
 		{
@@ -222,21 +212,21 @@ namespace agate
 			break;
 		case(TextureAnimationType::VerticalScroll):
 		{
-			float yoffset = time / 1000.f * _TextureParam.params.scallSpeed;
+			float yoffset = absTime * _TextureParam.params.scallSpeed;
 			_Image.SetClip({ _TextureParam.UVFrame.x, _TextureParam.UVFrame.y + yoffset, 
 				_TextureParam.UVFrame.right, _TextureParam.UVFrame.bottom + yoffset}, true);
 		}
 			break;
 		case(TextureAnimationType::HorizontalScroll):
 		{
-			float xoffset = time / 1000.f * _TextureParam.params.scallSpeed;
+			float xoffset = absTime * _TextureParam.params.scallSpeed;
 			_Image.SetClip({ _TextureParam.UVFrame.x + xoffset, _TextureParam.UVFrame.y,
 				_TextureParam.UVFrame.right + xoffset, _TextureParam.UVFrame.bottom }, true);
 		}
 			break;
 		case(TextureAnimationType::FramebyFrame):
 		{
-			int frameIndex = (int)(time / 1000.0f * _TextureParam.params.frameRate + 0.5f) % _TextureParam.params.frameCount;
+			int frameIndex = (int)(absTime * _TextureParam.params.frameRate + 0.5f) % _TextureParam.params.frameCount;
 			float x = (frameIndex % _TextureParam.params.lineFrameCount) * _TextureParam.UVFrame.Width();
 			float y = frameIndex / _TextureParam.params.lineFrameCount * _TextureParam.UVFrame.Height();
 			_Image.SetClip({ _TextureParam.UVFrame.x + x, _TextureParam.UVFrame.y + y,

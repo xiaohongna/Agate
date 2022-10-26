@@ -24,7 +24,10 @@ namespace agate
 			_Params = param;
 		}
 
-		void SetTranslate(const ParticleTranslateParameter& param);
+		void SetTranslate(const ParticleTranslateParameter& param)
+		{
+			_Translate = param;
+		}
 
 		void SetScaling(const ParticleScalingParameter& param)
 		{

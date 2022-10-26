@@ -1,4 +1,4 @@
-#include "Particle.h"
+#include "Particles.h"
 
 namespace agate
 {
@@ -21,10 +21,6 @@ namespace agate
         _Color.params.fixed = { 0xFFFFFFFF };
         _Texture.type = TextureAnimationType::Fixed;
         _Texture.UVFrame = {0.0f, 0.0f, 1.0f, 1.0f};
-    }
-    void Particles::SetTranslate(const ParticleTranslateParameter& param)
-    {
-        _Translate = param;
     }
 
     int agate::Particles::Update(int64_t time)
@@ -78,7 +74,7 @@ namespace agate
             _End = _LastParticleBeginning + _Params.particleLife.Random(_Random);
             auto spirite = std::make_shared<Spirit>();
             spirite->SetRenderParams(_RenderParams);
-            spirite->Range(time, _End);
+            //spirite->Range(time, _End);
             //spirite->AddSpirit();
             AssignTranslate(spirite.get());
             AssignScaling(spirite.get());

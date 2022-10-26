@@ -23,6 +23,14 @@ namespace agate
 		/// 粒子生命周期
 		/// </summary>
 		MinMax<uint64_t> particleLife;
+		/// <summary>
+		/// 是否和父粒子有绑定关系
+		/// </summary>
+		bool bindParent;
+		/// <summary>
+		/// 当父粒子的生命周期达到该值以后触发
+		/// </summary>
+		MinMax<float> generateTrigger;
 
 		template <class TArchive>
 		void Serialize(TArchive& archive)

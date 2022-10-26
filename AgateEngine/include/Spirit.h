@@ -9,12 +9,13 @@
 #include "RenderParameter.h"
 namespace agate
 {
-	class Spirit:
-		public SpiritBase
+	class Spirit
 	{
 	public:
-		Spirit()
+		Spirit(int64_t beginning, int64_t ending)
 		{
+			_Beginning = beginning;
+			_Ending = ending;
 			_RotationParam.type = RotationAnimationType::Fixed;
 			_RotationParam.params.fixed = 0.0f;
 			_ScalingParam.type = ScalingAnimationType::Fixed;
@@ -39,25 +40,28 @@ namespace agate
 
 		void SetRenderParams(const RenderParameter& param);
 
-		int Update(int64_t time) override;
+		float Update(int64_t time);
 
-		void Draw(DrawingContext& context) override;
+		void Draw(DrawingContext& context);
 
 		void SetBlendMode(BlendMode mode)
 		{
 			_Image.SetBlendMode(mode);
 		}
 	private:
-		void UpdateRotation(int64_t time, float& angle, Vector2& center);
+		void UpdateRotation(float absTime, float progress, float& angle, Vector2& center);
 
-		void UpdateScaling(int64_t time, Vector2& scal);
+		void UpdateScaling(float absTime, float progress, Vector2& scal);
 
-		void UpdateTranslate(int64_t time, Vector2& trans);
+		void UpdateTranslate(float absTime, float progress, Vector2& trans);
 
-		void UpdateColor(int64_t time);
+		void UpdateColor(float absTime, float progress);
 
-		void UpdateTexture(int64_t time);
-	protected:
+		void UpdateTexture(float absTime, float progress);
+	protected:		
+		int64_t _Beginning;   
+		int64_t _Ending;
+		std::weak_ptr<Spirit>  _Parent;
 		Image  _Image;
 		Vector2	_Size;
 		RotationAnimationParameter _RotationParam;
