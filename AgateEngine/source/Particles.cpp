@@ -72,7 +72,7 @@ namespace agate
         {
             _LastParticleBeginning += _Params.generateInterval.Random(_Random);
             _End = _LastParticleBeginning + _Params.particleLife.Random(_Random);
-            auto spirite = std::make_shared<Spirit>();
+            auto spirite = std::make_shared<Spirit>(_LastParticleBeginning, _End);
             spirite->SetRenderParams(_RenderParams);
             //spirite->Range(time, _End);
             //spirite->AddSpirit();

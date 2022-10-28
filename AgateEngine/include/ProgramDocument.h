@@ -1,12 +1,9 @@
 #pragma once
 #include <vector>
 #include "ParticlesParameter.h"
-#include <bitserializer/bit_serializer.h>
-#include <bitserializer/rapidjson_archive.h>
 #include <rapidjson/document.h>
 
 using namespace BitSerializer;
-using JsonArchive = BitSerializer::Json::RapidJson::JsonArchive;
 
 namespace agate
 {
@@ -20,8 +17,8 @@ namespace agate
             _Parameter.infinite = true;
             _Parameter.generateInterval.min = 10;
             _Parameter.generateInterval.max = 50;
-            rapidjson::Document document;
-            auto v = document["1"].GetObject();
+            //rapidjson::Document document;
+            //auto v = document["1"].GetObject();
         }
 
         void SetValue(int x, int y)
@@ -40,13 +37,13 @@ namespace agate
 
         void SavetoFile()
         {
-            BitSerializer::SaveObjectToFile<JsonArchive>(*this, LR"(D:\test_obj.json)");
+            //BitSerializer::SaveObjectToFile<JsonArchive>(*this, LR"(D:\test_obj.json)");
            // BitSerializer::LoadObjectFromFile<JsonArchive>()
         }
 
         void LoadFromFile()
         {
-            BitSerializer::LoadObjectFromFile<JsonArchive>(*this, LR"(D:\test_obj.json)");
+           // BitSerializer::LoadObjectFromFile<JsonArchive>(*this, LR"(D:\test_obj.json)");
         }
 
         

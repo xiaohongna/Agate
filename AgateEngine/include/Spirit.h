@@ -9,6 +9,13 @@
 #include "RenderParameter.h"
 namespace agate
 {
+	enum class UpdateTrigger: uint32_t
+	{
+		None,
+		Birth = 1 << 1,
+		Die = 1 << 2,
+	};
+
 	class Spirit
 	{
 	public:

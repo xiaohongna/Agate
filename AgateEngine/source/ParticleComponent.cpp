@@ -4,8 +4,64 @@ namespace agate
 {
 	ParticleComponent::ParticleComponent()
 	{
+        _ParticleCount = 0;
+        _LastParticleBeginning = 0;
+        _Params.generateInterval.min = 10;
+        _Params.generateInterval.max = 1000;
+        _Params.particleCount = 100;
+        _Params.particleLife.min = 1000;
+        _Params.particleLife.max = 2000;
+        _Translate.type = TranslateAnimationType::Fixed;
+        _Translate.params.fixed = { 0.0f, 0.0f };
+        _Scaling.type = ScalingAnimationType::Fixed;
+        _Scaling.params.fixed = { 1.0f, 1.0f };
+        _Rotation.type = RotationAnimationType::Fixed;
+        _Rotation.Params.fixed = 0.0f;
+        _Color.type = ColorAnimationType::Fixed;
+        _Color.params.fixed = { 0xFFFFFFFF };
+        _Texture.type = TextureAnimationType::Fixed;
+        _Texture.UVFrame = { 0.0f, 0.0f, 1.0f, 1.0f };
 	}
-	void ParticleComponent::GenerateInstances(int64_t time)
+    int ParticleComponent::Update(int64_t time)
+    {
+        GenerateInstances(time);
+        _ShowingParticles.clear();
+        auto spirite = _Particles.begin();
+        while (spirite != _Particles.end())
+        {
+            auto progress = (*spirite)->Update(time);
+            if (progress > 1.0f)
+            {
+                spirite = _Particles.erase(spirite);
+            }
+            else if(progress > 0.0f)
+            {
+                _ShowingParticles.push_back(spirite->get());
+                spirite++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        return _ShowingParticles.size();
+    }
+    void ParticleComponent::Draw(DrawingContext& context)
+    {
+        for (auto& spirite : _ShowingParticles)
+        {
+            spirite->Draw(context);
+        }
+        for (auto& child : _Children)
+        {
+            child->Draw(context);
+        }
+    }
+    void ParticleComponent::UpdateChildren(Spirit* spirit, float progress, int64_t time)
+    {
+
+    }
+    void ParticleComponent::GenerateInstances(int64_t time)
 	{
         //最后的元素已经大于当前时间，没必要更多精灵
         while (_LastParticleBeginning < time && (_Params.infinite || _ParticleCount < _Params.particleCount))

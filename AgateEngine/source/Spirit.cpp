@@ -79,7 +79,7 @@ namespace agate
 		_Image.SetTransform(matrix);
 		UpdateColor(absTime, progress);
 		UpdateTexture(absTime, progress);
-		return 0;
+		return progress;
 	}
 
 	void Spirit::Draw(DrawingContext& context)

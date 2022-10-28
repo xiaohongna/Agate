@@ -58,6 +58,7 @@ namespace agate
 
 		void Draw(DrawingContext& context);
 	protected:
+		void UpdateChildren(Spirit* spirit, float progress, int64_t time);
 		void GenerateInstances(int64_t time);
 		void AssignTranslate(Spirit* spirit);
 		void AssignScaling(Spirit* spirit);
