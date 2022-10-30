@@ -72,7 +72,7 @@ namespace agate
         {
             _LastParticleBeginning += _Params.generateInterval.Random(_Random);
             _End = _LastParticleBeginning + _Params.particleLife.Random(_Random);
-            auto spirite = std::make_shared<Spirit>(_LastParticleBeginning, _End);
+            auto spirite = std::make_shared<Sprite>(_LastParticleBeginning, _End);
             spirite->SetRenderParams(_RenderParams);
             //spirite->Range(time, _End);
             //spirite->AddSpirit();
@@ -87,7 +87,7 @@ namespace agate
         }
     }
 
-    void Particles::AssignTranslate(Spirit* spirit)
+    void Particles::AssignTranslate(Sprite* spirit)
     {
         TranslateAnimationParameter translate;
         translate.type = _Translate.type;
@@ -134,7 +134,7 @@ namespace agate
         spirit->SetTranslate(translate);
     }
 
-    void Particles::AssignScaling(Spirit* spirit)
+    void Particles::AssignScaling(Sprite* spirit)
     {
         ScalingAnimationParameter scal;
         scal.type = _Scaling.type;
@@ -176,7 +176,7 @@ namespace agate
         spirit->SetScaling(scal);
     }
 
-    void Particles::AssignRotation(Spirit* spirit)
+    void Particles::AssignRotation(Sprite* spirit)
     {
         RotationAnimationParameter rotation;
         rotation.type = _Rotation.type;
@@ -205,7 +205,7 @@ namespace agate
         spirit->SetRotation(rotation);
     }
 
-    void Particles::AssignColor(Spirit* spirit)
+    void Particles::AssignColor(Sprite* spirit)
     {
         ColorAnimationParameter color;
         switch (_Color.type)
@@ -230,7 +230,7 @@ namespace agate
         spirit->SetColor(color);
     }
 
-    void Particles::AssignTexture(Spirit* spirit)
+    void Particles::AssignTexture(Sprite* spirit)
     {
         TextureAnimationParameter texture = _Texture;
         if (_Texture.type == TextureAnimationType::FrameRandom)

@@ -1,8 +1,8 @@
 #include "Spirit.h"
-
+#include "ParticleComponent.h"
 namespace agate
 {
-	void Spirit::SetRotation(const RotationAnimationParameter& param)
+	void Sprite::SetRotation(const RotationAnimationParameter& param)
 	{
 		_RotationParam = param;
 		if (_RotationParam.type == RotationAnimationType::Fixed)
@@ -11,27 +11,27 @@ namespace agate
 		}
 	}
 
-	void Spirit::SetScaling(const ScalingAnimationParameter& param)
+	void Sprite::SetScaling(const ScalingAnimationParameter& param)
 	{
 		_ScalingParam = param;
 	}
 
-	void Spirit::SetTranslate(const TranslateAnimationParameter& param)
+	void Sprite::SetTranslate(const TranslateAnimationParameter& param)
 	{
 		_TranslateParam = param;
 	}
 
-	void Spirit::SetColor(const ColorAnimationParameter& color)
+	void Sprite::SetColor(const ColorAnimationParameter& color)
 	{
 		_ColorParam = color;
 	}
 
-	void Spirit::SetTexture(const TextureAnimationParameter& texture)
+	void Sprite::SetTexture(const TextureAnimationParameter& texture)
 	{
 		_TextureParam = texture;
 	}
 
-	void Spirit::SetRenderParams(const RenderParameter& param)
+	void Sprite::SetRenderParams(const RenderParameter& param)
 	{
 		_Image.SetBlendMode(param.blend);
 		_Image.SetAntialiasing(param.antialiasing);
@@ -40,13 +40,12 @@ namespace agate
 		if (param.size.x < 0.0001 || param.size.y < 0.0001)
 		{
 			auto& img = texture->GetImageData();
-			_Size.x = (float)img.width / 2.0f;
-			_Size.y = (float)img.height / 2.0f;
+			_Info.scaleCenter = { (float)img.width, (float)img.height };
 			_Image.SetBounds({ 0.0f, 0.0f, (float)img.width, (float)img.height });
 		}
 		else
 		{
-			_Size = param.size * 0.5f;
+			_Info.scaleCenter = param.size * 0.5f;
 			_Image.SetBounds({ 0.0f, 0.0f, param.size.x, param.size.y });
 		}
 	}
@@ -61,33 +60,54 @@ namespace agate
 		return (to - from) * step + from;
 	}
 
-	float Spirit::Update(int64_t time)
+	float Sprite::Update(int64_t time)
 	{
-		auto progress = (float)(time - _Beginning) / (_Ending - _Beginning);
-		if (progress < 0.0f || progress > 1.0f)
+		time -= _Beginning;
+		if (time < 0)
 		{
-			return progress;
+			return -1.0f;
 		}
-		auto const absTime = (time - _Beginning) / 1000.0f;
-		float angle = 0.0f;
-		Vector2 center, scale{1.0f, 1.0f}, trans;
-		UpdateRotation(absTime, progress, angle, center);
-		UpdateScaling(absTime, progress, scale);
-		UpdateTranslate(absTime, progress, trans);
-		auto matrix = agate::Matrix3X2::Rotation(angle, _RotationParam.center) * 
-			agate::Matrix3X2::Scale(scale.x, scale.y, _Size) * agate::Matrix3X2::Translation(trans.x, trans.y);
+		if (time > _Ending)
+		{
+			return 1.1f;
+		}
+		auto progress = (float)(time) / (_Ending - _Beginning);
+		auto const absTime = time / 1000.0f;
+		UpdateRotation(absTime, progress, _Info.rotation,  _Info.rotationCenter);
+		UpdateScaling(absTime, progress, _Info.scale);
+		UpdateTranslate(absTime, progress, _Info.translate);
+		UpdataInherite();
+		auto matrix = _Info.GetMatrix();
 		_Image.SetTransform(matrix);
 		UpdateColor(absTime, progress);
 		UpdateTexture(absTime, progress);
+		if (_ChildParticle)
+		{
+			auto sharedSelf = shared_from_this();
+			_ChildParticle->Update(sharedSelf, time);
+		}
 		return progress;
 	}
 
-	void Spirit::Draw(DrawingContext& context)
+	void Sprite::Draw(DrawingContext& context)
 	{
 		context.Draw(_Image);
 	}
 
-	void Spirit::UpdateRotation(float absTime, float progress, float& angle, Vector2& center)
+	void Sprite::DrawChild(DrawingContext& context)
+	{
+		if (_ChildParticle)
+		{
+			_ChildParticle->Draw(context);
+		}
+	}
+
+	void Sprite::AddComponent(std::shared_ptr<ParticleComponent>&& particle)
+	{
+		_ChildParticle = particle;
+	}
+
+	void Sprite::UpdateRotation(float absTime, float progress, float& angle, Vector2& center)
 	{
 		switch (_RotationParam.type)
 		{
@@ -112,7 +132,7 @@ namespace agate
 		center = _RotationParam.center;
 	}
 
-	void Spirit::UpdateScaling(float absTime, float progress, Vector2& scal)
+	void Sprite::UpdateScaling(float absTime, float progress, Vector2& scal)
 	{
 		switch (_ScalingParam.type)
 		{
@@ -147,7 +167,7 @@ namespace agate
 		}
 	}
 	
-	void Spirit::UpdateTranslate(float absTime, float progress, Vector2& trans)
+	void Sprite::UpdateTranslate(float absTime, float progress, Vector2& trans)
 	{
 		switch (_TranslateParam.type)
 		{
@@ -186,7 +206,7 @@ namespace agate
 		};
 	}
 
-	void Spirit::UpdateColor(float absTime, float progress)
+	void Sprite::UpdateColor(float absTime, float progress)
 	{
 		switch (_ColorParam.type)
 		{
@@ -203,7 +223,7 @@ namespace agate
 		}
 	}
 
-	void Spirit::UpdateTexture(float absTime, float progress)
+	void Sprite::UpdateTexture(float absTime, float progress)
 	{
 		switch (_TextureParam.type)
 		{
@@ -236,6 +256,24 @@ namespace agate
 		default:
 			assert(false);
 				break;
+		}
+	}
+
+	void Sprite::UpdataInherite()
+	{
+		if (_Inherite == InheriteBehavior::Never)
+		{
+			return;
+		}
+		auto parent = _Parent.lock();
+		if (parent == nullptr)
+		{
+			return;
+		}
+		auto& parentInfo = parent->GetInfo();
+		if (_Inherite & InheriteBehavior::PositionAlways)
+		{
+			_Info.translate = _Info.translate + parentInfo.translate;
 		}
 	}
 }

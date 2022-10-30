@@ -29,6 +29,16 @@ namespace agate
             return identity;
         }
 
+        static Matrix3X2 Translation(const Vector2& v2)
+        {
+            Matrix3X2 identity{};
+            identity._11 = 1.0f;
+            identity._22 = 1.0f;
+            identity._31 = v2.x;
+            identity._32 = v2.y;
+            return identity;
+        }
+
         static Matrix3X2 Scale(float value)
         {
             Matrix3X2 scale{};

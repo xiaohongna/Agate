@@ -225,85 +225,95 @@ void ProgramDemo::BuildComponent()
 {
 	auto resPath = GetModulePath();
 	{
-		agate::ParticleParameter params;
-		params.particleCount = 1;
-		params.generateInterval.min = 50;
-		params.generateInterval.max = 200;
-		params.particleLife.min = 6000;
-		params.particleLife.max = 6000;
-		params.infinite = false;
-		_Particle.SetParams(params);
+		
+		auto params = std::make_shared<agate::ParticleParameter>();
+		params->particleCount = 1;
+		params->generateInterval.min = 50;
+		params->generateInterval.max = 200;
+		params->particleLife.min = 6000;
+		params->particleLife.max = 6000;
+		params->infinite = false;
+		params->inherite = agate::InheriteBehavior::Never;
 
-		agate::ParticleTranslateParameter translate;
+		params->rotation.type = agate::RotationAnimationType::Fixed;
+		params->rotation.Params.fixed = 0.0f;
+
+		agate::ParticleTranslateParameter& translate = params->translate;
 		translate.type = agate::TranslateAnimationType::FromTo;
 		translate.params.from.min = { 0.0f, 0.0f };
-		translate.params.from.max = { 800.0f, 0.0f };
-		translate.params.to.min = { 0.0f, 400.0f };
-		translate.params.to.max = { 800.0f, 400.0f };
-		_Particle.SetTranslate(translate);
+		translate.params.from.max = { 0.f, 0.0f };
+		translate.params.to.min = { 800.0f, 0.0f };
+		translate.params.to.max = { 800.0f, 0.0f };
 
-		agate::ParticleScalingParameter scaling;
+		agate::ParticleScalingParameter& scaling = params->scaling;
 		scaling.type = agate::ScalingAnimationType::UniformRandom;
 		scaling.params.uniformRandom.min = 0.4f;
 		scaling.params.uniformRandom.max = 0.5f;
-		_Particle.SetScaling(scaling);
 
-		agate::ParticlColorParameter color;
+		agate::ParticlColorParameter& color = params->color;
 		color.type = agate::ColorAnimationType::Random;
-		/*
+		
 		color.params.from.min = { 0xFFFF00FF };
 		color.params.from.max = { 0xFF00FF00 };
-		color.params.to.min = { 0x00000000 };
-		color.params.to.max = { 0x00000000 };
-		*/
-		_Particle.SetColor(color);
+		color.params.to.min = { 0xFFFF00FF };
+		color.params.to.max = { 0xFF00FF00 };
+		
+		agate::ParticleTextureParameter& texture = params->texture;
+		texture.type = agate::TextureAnimationType::Fixed;
+		texture.UVFrame = {0.0f, 0.0f, 1.0f, 1.0f};
 
-		agate::RenderParameter render;
+		agate::RenderParameter& render = params->render;
 		render.filePath = resPath + L"Particle01.png";
 		render.blend = agate::BlendMode::Additive;
-		_Particle.SetRenderParams(render);
+		_Particle.SetParams(params);
 	}
 	//всаёвс
 	{
-		auto particle = std::make_shared<agate::ParticleComponent>();
-		agate::ParticleParameter params;
-		params.particleCount = 1;
-		params.generateInterval.min = 50;
-		params.generateInterval.max = 200;
-		params.particleLife.min = 6000;
-		params.particleLife.max = 6000;
-		params.infinite = false;
-		params.bindParent = false;
-		particle->SetParams(params);
+		auto params = std::make_shared<agate::ParticleParameter>();
+		auto particle = std::make_shared<agate::ParticleComponent>(params);
+		
+		params->particleCount = 1;
+		params->generateInterval.min = 50;
+		params->generateInterval.max = 200;
+		params->particleLife.min = 1000;
+		params->particleLife.max = 2000;
+		params->infinite = true;
+		params->bindParent = true;
+		params->inherite = agate::InheriteBehavior::PositionAlways;
 
-		agate::ParticleTranslateParameter translate;
+		params->rotation.type = agate::RotationAnimationType::Fixed;
+		params->rotation.Params.fixed = 0.0f;
+
+		agate::ParticleTranslateParameter& translate = params->translate;
 		translate.type = agate::TranslateAnimationType::FromTo;
 		translate.params.from.min = { 0.0f, 0.0f };
-		translate.params.from.max = { 800.0f, 0.0f };
+		translate.params.from.max = { 0.0f, 0.0f };
 		translate.params.to.min = { 0.0f, 400.0f };
-		translate.params.to.max = { 800.0f, 400.0f };
-		_Particle.SetTranslate(translate);
+		translate.params.to.max = { 0.0f, 400.0f };
 
-		agate::ParticleScalingParameter scaling;
+		agate::ParticleScalingParameter& scaling = params->scaling;
 		scaling.type = agate::ScalingAnimationType::UniformRandom;
-		scaling.params.uniformRandom.min = 0.4f;
-		scaling.params.uniformRandom.max = 0.5f;
-		_Particle.SetScaling(scaling);
+		scaling.params.uniformRandom.min = 0.2f;
+		scaling.params.uniformRandom.max = 0.3f;
 
-		agate::ParticlColorParameter color;
-		color.type = agate::ColorAnimationType::Random;
+		agate::ParticlColorParameter& color = params->color;
+		color.type = agate::ColorAnimationType::Fixed;
+		color.params.fixed = { 0xFFFF0000 };
 		/*
 		color.params.from.min = { 0xFFFF00FF };
 		color.params.from.max = { 0xFF00FF00 };
 		color.params.to.min = { 0x00000000 };
 		color.params.to.max = { 0x00000000 };
 		*/
-		_Particle.SetColor(color);
 
-		agate::RenderParameter render;
+		agate::ParticleTextureParameter& texture = params->texture;
+		texture.type = agate::TextureAnimationType::Fixed;
+		texture.UVFrame = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+		agate::RenderParameter& render = params->render;
 		render.filePath = resPath + L"Particle01.png";
 		render.blend = agate::BlendMode::Additive;
-		_Particle.SetRenderParams(render);
+		_Particle.AddChild(std::move(particle));
 	}
 }
 

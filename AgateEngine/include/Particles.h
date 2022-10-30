@@ -58,16 +58,17 @@ namespace agate
 
 		void Draw(DrawingContext& context) override;
 
+
 	private:
 		void GenerateInstances(int64_t time);
-		void AssignTranslate(Spirit* spirit);
-		void AssignScaling(Spirit* spirit);
-		void AssignRotation(Spirit* spirit);
-		void AssignColor(Spirit* spirit);
-		void AssignTexture(Spirit* spirit);
+		void AssignTranslate(Sprite* spirit);
+		void AssignScaling(Sprite* spirit);
+		void AssignRotation(Sprite* spirit);
+		void AssignColor(Sprite* spirit);
+		void AssignTexture(Sprite* spirit);
 	protected:
-		std::list<std::shared_ptr<Spirit>> _Particles;
-		std::vector<Spirit*> _ShowingParticles;
+		std::list<std::shared_ptr<Sprite>> _Particles;
+		std::vector<Sprite*> _ShowingParticles;
 
 		uint32_t _ParticleCount;
 		int64_t _LastParticleBeginning;
