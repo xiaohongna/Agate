@@ -53,7 +53,7 @@ namespace agate
 			struct
 			{
 				MinMax<Vector2> base;
-				MinMax<float> direction;
+				MinMax<float> direction;  ///½Ç¶È 360¡ã
 				MinMax<float> dir_velocity;
 				MinMax<float> dir_acceleration;
 			};

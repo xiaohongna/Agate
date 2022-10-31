@@ -60,31 +60,40 @@ namespace agate
 		return (to - from) * step + from;
 	}
 
-	float Sprite::Update(int64_t time)
+	UpdateResult Sprite::Update(int64_t time)
 	{
 		time -= _Beginning;
 		if (time < 0)
 		{
-			return -1.0f;
+			return UpdateResult::Nothing;
 		}
-		if (time > _Ending)
-		{
-			return 1.1f;
-		}
+		auto result = UpdateResult::Nothing;
 		auto progress = (float)(time) / (_Ending - _Beginning);
 		auto const absTime = time / 1000.0f;
-		UpdateRotation(absTime, progress, _Info.rotation,  _Info.rotationCenter);
-		UpdateScaling(absTime, progress, _Info.scale);
-		UpdateTranslate(absTime, progress, _Info.translate);
-		UpdataInherite();
-		auto matrix = _Info.GetMatrix();
-		_Image.SetTransform(matrix);
-		UpdateColor(absTime, progress);
-		UpdateTexture(absTime, progress);
-		if (_ChildParticle)
+		if (progress <= 1.0f)
+		{
+			UpdateRotation(absTime, progress, _Info.rotation, _Info.rotationCenter);
+			UpdateScaling(absTime, progress, _Info.scale);
+			UpdateTranslate(absTime, progress, _Info.translate);
+			UpdataInherite();
+			auto matrix = _Info.GetMatrix();
+			_Image.SetTransform(matrix);
+			UpdateColor(absTime, progress);
+			UpdateTexture(absTime, progress);
+			result = UpdateResult::NeedRender;
+		}
+		else
+		{
+			result = UpdateResult::Destroyable;
+		}
+
+		if (_ChildParticle.empty() == false)
 		{
 			auto sharedSelf = shared_from_this();
-			_ChildParticle->Update(sharedSelf, time);
+			for (auto& child : _ChildParticle)
+			{
+				child->Update(sharedSelf, time);
+			}
 		}
 		return progress;
 	}
@@ -96,15 +105,15 @@ namespace agate
 
 	void Sprite::DrawChild(DrawingContext& context)
 	{
-		if (_ChildParticle)
+		for (auto& child : _ChildParticle)
 		{
-			_ChildParticle->Draw(context);
+			child->Draw(context);
 		}
 	}
 
 	void Sprite::AddComponent(std::shared_ptr<ParticleComponent>&& particle)
 	{
-		_ChildParticle = particle;
+		_ChildParticle.emplace_back(particle);
 	}
 
 	void Sprite::UpdateRotation(float absTime, float progress, float& angle, Vector2& center)

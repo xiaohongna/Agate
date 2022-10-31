@@ -3,7 +3,7 @@
 #include <stdlib.h>
 namespace agate
 {
-	class Randomizer
+	class Randomizer final
 	{
 	public:
 		Randomizer()
@@ -36,14 +36,13 @@ namespace agate
 			return (float)ret / (float)(0x7FFF - 1);
 		}
 
-		float GetRand(float min_, float max_)
+		float GetRand(float min, float max)
 		{
-			auto dis = max_ - min_;
-			if (dis < 0.0001 && dis > -0.0001)
+			if (min == max)
 			{
-				return max_;
+				return min;
 			}
-			return GetRand() * dis + min_;
+			return GetRand() * (max - min) + min;
 		}
 	private:
 		int32_t _Seed;

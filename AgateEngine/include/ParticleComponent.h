@@ -20,9 +20,9 @@ namespace agate
 			_Params = param;
 		}
 
-		int Update(int64_t time);
+		UpdateResult Update(int64_t time);
 
-		int Update(std::shared_ptr<Sprite>& sprite, int64_t time);
+		UpdateResult Update(std::shared_ptr<Sprite>& sprite, int64_t time);
 
 		void Draw(DrawingContext& context);
 
@@ -33,7 +33,7 @@ namespace agate
 
 		std::shared_ptr<ParticleComponent> ReferenceClone();
 	protected:
-		void UpdateChildren(int64_t time);
+		UpdateResult UpdateChildren(int64_t time);
 		void GenerateInstances(std::shared_ptr<Sprite>& parent, int64_t time);
 		void AssignTranslate(Sprite* spirit);
 		void AssignScaling(Sprite* spirit);

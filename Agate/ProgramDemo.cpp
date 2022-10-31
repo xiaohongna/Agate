@@ -64,7 +64,7 @@ void ProgramDemo::BuildComponent()
 		params->inherite = agate::InheriteBehavior::Never;
 
 		params->rotation.type = agate::RotationAnimationType::Fixed;
-		params->rotation.Params.fixed = 0.0f;
+		params->rotation.params.fixed = 0.0f;
 
 		agate::ParticleTranslateParameter& translate = params->translate;
 		translate.type = agate::TranslateAnimationType::FromTo;
@@ -101,8 +101,8 @@ void ProgramDemo::BuildComponent()
 		auto particle = std::make_shared<agate::ParticleComponent>(params);
 		
 		params->particleCount = 1;
-		params->generateInterval.min = 50;
-		params->generateInterval.max = 200;
+		params->generateInterval.min = 30;
+		params->generateInterval.max = 100;
 		params->particleLife.min = 1000;
 		params->particleLife.max = 2000;
 		params->infinite = true;
@@ -110,14 +110,16 @@ void ProgramDemo::BuildComponent()
 		params->inherite = agate::InheriteBehavior::PositionAlways;
 
 		params->rotation.type = agate::RotationAnimationType::Fixed;
-		params->rotation.Params.fixed = 0.0f;
+		params->rotation.params.fixed = 0.0f;
 
 		agate::ParticleTranslateParameter& translate = params->translate;
-		translate.type = agate::TranslateAnimationType::FromTo;
-		translate.params.from.min = { 0.0f, 0.0f };
-		translate.params.from.max = { 0.0f, 0.0f };
-		translate.params.to.min = { 0.0f, 400.0f };
-		translate.params.to.max = { 0.0f, 400.0f };
+		translate.type = agate::TranslateAnimationType::DirectionPVA;
+		translate.params.direction.min = 0.0f;
+		translate.params.direction.max = 360.f;
+		translate.params.dir_velocity.min = 1000.f;
+		translate.params.dir_velocity.max = 2000.f;
+		translate.params.dir_acceleration.min = 1000.0f;
+		translate.params.dir_acceleration.min = 2000.0f;
 
 		agate::ParticleScalingParameter& scaling = params->scaling;
 		scaling.type = agate::ScalingAnimationType::UniformRandom;
@@ -125,14 +127,12 @@ void ProgramDemo::BuildComponent()
 		scaling.params.uniformRandom.max = 0.3f;
 
 		agate::ParticlColorParameter& color = params->color;
-		color.type = agate::ColorAnimationType::Fixed;
-		color.params.fixed = { 0xFFFF0000 };
-		/*
+		color.type = agate::ColorAnimationType::FromTo;
 		color.params.from.min = { 0xFFFF00FF };
 		color.params.from.max = { 0xFF00FF00 };
-		color.params.to.min = { 0x00000000 };
-		color.params.to.max = { 0x00000000 };
-		*/
+		color.params.to.min = { 0xFF000000 };
+		color.params.to.max = { 0xFFFFFFFF };
+		
 
 		agate::ParticleTextureParameter& texture = params->texture;
 		texture.type = agate::TextureAnimationType::Fixed;

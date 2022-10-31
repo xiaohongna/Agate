@@ -29,7 +29,7 @@ namespace agate
 	struct ParticleRotationParameter
 	{
 		RotationAnimationType type;
-		union
+		union Params
 		{
 			float fixed;
 			MinMax<float> random;
@@ -44,7 +44,11 @@ namespace agate
 				MinMax<float> velocity;
 				MinMax<float> acceleration;
 			};
-		} Params;
+			Params() :base{}, velocity{}, acceleration{}
+			{
+
+			};
+		} params;
 		Vector2  center;
 	};
 

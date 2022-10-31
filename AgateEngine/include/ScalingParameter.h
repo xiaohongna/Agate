@@ -64,7 +64,7 @@ namespace agate
 				MinMax<float> uniformVelocity;
 				MinMax<float> uniformAcceleration;
 			};
-			Params() : base{  }, velocity{ }, acceleration{ }
+			Params() : base{ {1.f, 1.f}, {1.f, 1.f} }, velocity{ }, acceleration{ }
 			{
 
 			}

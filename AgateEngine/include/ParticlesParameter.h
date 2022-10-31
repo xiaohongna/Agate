@@ -37,6 +37,25 @@ namespace agate
 
 	struct ParticleParameter
 	{
+		ParticleParameter()
+		{
+			particleCount = 10;
+			infinite = false;
+			initialDelay.max = initialDelay.min = 0;
+			generateInterval.max = generateInterval.min = 16;
+			particleLife.max = particleLife.min = 1000;
+			bindParent = false;
+			inherite = InheriteBehavior::Never;
+			translate.type = TranslateAnimationType::Fixed;
+			scaling.type = ScalingAnimationType::Fixed;
+			rotation.type = RotationAnimationType::Fixed;
+			color.type = ColorAnimationType::Fixed;
+			color.params.fixed.color = 0xFFFFFFFF;
+			texture.type = TextureAnimationType::Fixed;
+			texture.UVFrame = { 0.f, 0.f, 1.f, 1.f };
+			render.antialiasing = false;
+			render.blend = BlendMode::Blend;
+		};
 		/// <summary>
 		/// Á£×ÓÊýÁ¿
 		/// </summary>

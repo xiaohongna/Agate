@@ -8,7 +8,6 @@ public:
 	ProgramDemo();
 
 	void Render(agate::DrawingContext& canvs);
-
 private:
 	void BuildComponent();
 private:

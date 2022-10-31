@@ -3,13 +3,21 @@
 #include "ParticlesParameter.h"
 namespace agate
 {
-	enum class UpdateTrigger: uint32_t
+	enum class UpdateResult
 	{
-		None,
-		Birth = 1 << 1,
-		Die = 1 << 2,
+		/// <summary>
+		/// 什么都没有，不需要渲染
+		/// </summary>
+		Nothing,
+		/// <summary>
+		/// 需要渲染
+		/// </summary>
+		NeedRender,
+		/// <summary>
+		/// 可以释放
+		/// </summary>
+		Destroyable,
 	};
-
 	struct SpriteInfo
 	{
 		float rotation = 0.0f;
@@ -58,7 +66,7 @@ namespace agate
 
 		void SetRenderParams(const RenderParameter& param);
 
-		float Update(int64_t time);
+		UpdateResult Update(int64_t time);
 
 		void Draw(DrawingContext& context);
 
@@ -106,7 +114,7 @@ namespace agate
 		int64_t _Beginning;   
 		int64_t _Ending;
 		std::weak_ptr<Sprite>  _Parent;
-		std::shared_ptr<ParticleComponent> _ChildParticle;
+		std::vector<std::shared_ptr<ParticleComponent>> _ChildParticle;
 		Image  _Image;
 		SpriteInfo  _Info;
 		InheriteBehavior _Inherite;

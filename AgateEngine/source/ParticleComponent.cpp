@@ -16,36 +16,38 @@ namespace agate
         _Params = param;
     }
 
-    int ParticleComponent::Update(std::shared_ptr<Sprite>& sprite, int64_t time)
+    UpdateResult ParticleComponent::Update(std::shared_ptr<Sprite>& parent, int64_t time)
     {
-        GenerateInstances(sprite, time);
+        GenerateInstances(parent, time);
         _ShowingParticles.clear();
-        auto spirite = _Particles.begin();
-        while (spirite != _Particles.end())
+        auto sprite = _Particles.begin();
+        while (sprite != _Particles.end())
         {
-            auto progress = (*spirite)->Update(time);
-            if (progress > 1.0f)
+            auto result = (*sprite)->Update(time);
+            switch (result)
             {
-                spirite = _Particles.erase(spirite);
-            }
-            else if(progress > 0.0f)
-            {
-                _ShowingParticles.push_back(spirite->get());
-                spirite++;
-            }
-            else
-            {
+            case agate::UpdateResult::Nothing:
+                sprite++;
+                break;
+            case agate::UpdateResult::NeedRender:
+                _ShowingParticles.push_back(sprite->get());
+                sprite++;
+                break;
+            case agate::UpdateResult::Destroyable:
+                sprite = _Particles.erase(sprite);
+                break;
+            default:
                 break;
             }
         }
-        UpdateChildren(time);
-        return _ShowingParticles.size();
+        auto childResult = UpdateChildren(time);
+        return  _Particles.empty() ? childResult : UpdateResult::NeedRender;
     }
-    int ParticleComponent::Update(int64_t time)
+
+    UpdateResult ParticleComponent::Update(int64_t time)
     {
         auto parent = std::shared_ptr<Sprite>();
-        Update(parent, time);
-        return 1;
+        return Update(parent, time);
     }
     void ParticleComponent::Draw(DrawingContext& context)
     {
@@ -65,18 +67,28 @@ namespace agate
 
     std::shared_ptr<ParticleComponent> ParticleComponent::ReferenceClone()
     {
-        return std::make_shared<ParticleComponent>(_Params);
+        auto instance = std::make_shared<ParticleComponent>(_Params);
+        for (auto& child : _Children)
+        {
+            instance->AddChild(std::move(child->ReferenceClone()));
+        }
+        return instance;
     }
 
-    void ParticleComponent::UpdateChildren(int64_t time)
+    UpdateResult ParticleComponent::UpdateChildren(int64_t time)
     {
+        UpdateResult result = UpdateResult::Destroyable;
         for (auto& child : _Children)
         {
             if (child.get()->_Params->bindParent == false)
             {
-                child->Update(time);
+                if (child->Update(time) == UpdateResult::NeedRender)
+                {
+                    result = UpdateResult::NeedRender;
+                }
             }
         }
+        return result;
     }
     void ParticleComponent::GenerateInstances(std::shared_ptr<Sprite>& parent, int64_t time)
 	{
@@ -87,7 +99,7 @@ namespace agate
             auto ending = _LastParticleBeginning + _Params->particleLife.Random(_Random);
             auto sprite = std::make_shared<Sprite>(_LastParticleBeginning, ending);
             sprite->SetRenderParams(_Params->render);
-            if (_Params->bindParent && parent != nullptr)
+            if (_Params->bindParent && _Params->inherite != InheriteBehavior::Never && parent != nullptr)
             {
                 sprite->SetParent(parent);
                 sprite->SetInheriteBehavior(_Params->inherite);
@@ -212,20 +224,20 @@ namespace agate
         switch (PRotation.type)
         {
         case(RotationAnimationType::Fixed):
-            rotation.params.fixed = PRotation.Params.fixed;
+            rotation.params.fixed = PRotation.params.fixed;
             break;
         case(RotationAnimationType::Random):
             rotation.type = RotationAnimationType::Fixed;
-            rotation.params.fixed = PRotation.Params.random.Random(_Random);
+            rotation.params.fixed = PRotation.params.random.Random(_Random);
             break;
         case(RotationAnimationType::FromTo):
-            rotation.params.from = PRotation.Params.from.Random(_Random);
-            rotation.params.to = PRotation.Params.to.Random(_Random);
+            rotation.params.from = PRotation.params.from.Random(_Random);
+            rotation.params.to = PRotation.params.to.Random(_Random);
             break;
         case(RotationAnimationType::PVA):
-            rotation.params.base = PRotation.Params.base.Random(_Random);
-            rotation.params.velocity = PRotation.Params.velocity.Random(_Random);
-            rotation.params.acceleration = PRotation.Params.acceleration.Random(_Random);
+            rotation.params.base = PRotation.params.base.Random(_Random);
+            rotation.params.velocity = PRotation.params.velocity.Random(_Random);
+            rotation.params.acceleration = PRotation.params.acceleration.Random(_Random);
             break;
         default:
             assert(false);
