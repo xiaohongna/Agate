@@ -1,13 +1,6 @@
 #pragma once
-#include "SpiritBase.h"
 #include "Image.h"
-#include "RotationParameter.h"
-#include "ScalingParameter.h"
 #include "ParticlesParameter.h"
-#include "TranslateParameter.h"
-#include "ColorParameter.h"
-#include "TextureParameter.h"
-#include "RenderParameter.h"
 namespace agate
 {
 	enum class UpdateTrigger: uint32_t

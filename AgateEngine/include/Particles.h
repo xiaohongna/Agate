@@ -1,6 +1,5 @@
 #pragma once
 #include "Spirit.h"
-#include "SpiritBase.h"
 #include "ParticlesParameter.h"
 #include "TranslateParameter.h"
 #include "ScalingParameter.h"
