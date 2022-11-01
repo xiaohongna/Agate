@@ -84,6 +84,7 @@ namespace agate
 		}
 		else
 		{
+			_Hidden = true;
 			result = UpdateResult::Destroyable;
 		}
 
@@ -95,13 +96,13 @@ namespace agate
 				result = result | child->Update(sharedSelf, time);
 			}
 		}
-		if (result == UpdateResult::Nothing)
-		{
-			return  result;
-		}
-		else if((result & UpdateResult::NeedRender) == UpdateResult::NeedRender)
+		if (result & UpdateResult::NeedRender)
 		{
 			return UpdateResult::NeedRender;
+		}
+		else if (result & UpdateResult::Nothing)
+		{
+			return  UpdateResult::Nothing;
 		}
 		else
 		{
@@ -111,7 +112,10 @@ namespace agate
 
 	void Sprite::Draw(DrawingContext& context)
 	{
-		context.Draw(_Image);
+		if (!_Hidden)
+		{
+			context.Draw(_Image);
+		}
 	}
 
 	void Sprite::DrawChild(DrawingContext& context)

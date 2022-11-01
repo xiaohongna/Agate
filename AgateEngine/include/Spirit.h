@@ -8,15 +8,15 @@ namespace agate
 		/// <summary>
 		/// 什么都没有，不需要渲染
 		/// </summary>
-		Nothing = 0,
+		Nothing = 1,
 		/// <summary>
 		/// 需要渲染
 		/// </summary>
-		NeedRender = 1,
+		NeedRender = 2,
 		/// <summary>
 		/// 可以释放
 		/// </summary>
-		Destroyable = 2,
+		Destroyable = 4,
 	};
 
 	static UpdateResult operator | (UpdateResult left, UpdateResult right)
@@ -24,9 +24,9 @@ namespace agate
 		return  UpdateResult((uint32_t)left | (uint32_t)right);
 	}
 
-	static UpdateResult operator & (UpdateResult left, UpdateResult right)
+	static bool operator & (UpdateResult left, UpdateResult right)
 	{
-		return  UpdateResult((uint32_t)left & (uint32_t)right);
+		return  ((uint32_t)left & (uint32_t)right) != 0;
 	}
 
 	struct SpriteInfo
@@ -52,6 +52,7 @@ namespace agate
 		{
 			_Beginning = beginning;
 			_Ending = ending;
+			_Hidden = false;
 			_RotationParam.type = RotationAnimationType::Fixed;
 			_RotationParam.params.fixed = 0.0f;
 			_ScalingParam.type = ScalingAnimationType::Fixed;
@@ -128,6 +129,7 @@ namespace agate
 		std::vector<std::shared_ptr<ParticleComponent>> _ChildParticle;
 		Image  _Image;
 		SpriteInfo  _Info;
+		bool _Hidden;
 		InheriteBehavior _Inherite;
 		RotationAnimationParameter _RotationParam;
 		ScalingAnimationParameter _ScalingParam;

@@ -45,7 +45,7 @@ namespace agate
             }
         }
         auto childResult = UpdateChildren(time);
-        if (_ShowingParticles.empty() == false || childResult == UpdateResult::NeedRender)
+        if (_ShowingParticles.empty() == false || (childResult & UpdateResult::NeedRender))
         {
             return UpdateResult::NeedRender;
         }
@@ -117,13 +117,13 @@ namespace agate
                 result = result | child->Update(time);
             }
         }
-        if (result == UpdateResult::Nothing)
-        {
-            return result;
-        }
-        else if ((result & UpdateResult::NeedRender) == UpdateResult::NeedRender)
+        if (result & UpdateResult::NeedRender)
         {
             return UpdateResult::NeedRender;
+        }
+        else if (result & UpdateResult::Nothing)
+        {
+            return UpdateResult::Nothing;
         }
         else
         {

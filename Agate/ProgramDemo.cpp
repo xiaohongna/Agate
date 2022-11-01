@@ -193,6 +193,10 @@ void ProgramDemo::LifecycleTest()
 		scaling.params.uniformRandom.min = 0.2f;
 		scaling.params.uniformRandom.max = 0.3f;
 
+		agate::ParticleTranslateParameter& translate = params->translate;
+		translate.type = agate::TranslateAnimationType::Fixed;
+		translate.params.fixed = { 100, 100 };
+
 		agate::RenderParameter& render = params->render;
 		render.filePath = resPath + L"Particle01.png";
 		_Particle.AddChild(std::move(particle));
