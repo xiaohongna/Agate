@@ -3,21 +3,32 @@
 #include "ParticlesParameter.h"
 namespace agate
 {
-	enum class UpdateResult
+	enum class UpdateResult: uint32_t
 	{
 		/// <summary>
 		/// 什么都没有，不需要渲染
 		/// </summary>
-		Nothing,
+		Nothing = 0,
 		/// <summary>
 		/// 需要渲染
 		/// </summary>
-		NeedRender,
+		NeedRender = 1,
 		/// <summary>
 		/// 可以释放
 		/// </summary>
-		Destroyable,
+		Destroyable = 2,
 	};
+
+	static UpdateResult operator | (UpdateResult left, UpdateResult right)
+	{
+		return  UpdateResult((uint32_t)left | (uint32_t)right);
+	}
+
+	static UpdateResult operator & (UpdateResult left, UpdateResult right)
+	{
+		return  UpdateResult((uint32_t)left & (uint32_t)right);
+	}
+
 	struct SpriteInfo
 	{
 		float rotation = 0.0f;

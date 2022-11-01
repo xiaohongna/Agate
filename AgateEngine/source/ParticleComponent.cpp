@@ -18,6 +18,10 @@ namespace agate
 
     UpdateResult ParticleComponent::Update(std::shared_ptr<Sprite>& parent, int64_t time)
     {
+        if (time < _Params->initialDelay)
+        {
+            return UpdateResult::Nothing;
+        }
         GenerateInstances(parent, time);
         _ShowingParticles.clear();
         auto sprite = _Particles.begin();
@@ -41,7 +45,18 @@ namespace agate
             }
         }
         auto childResult = UpdateChildren(time);
-        return  _Particles.empty() ? childResult : UpdateResult::NeedRender;
+        if (_ShowingParticles.empty() == false || childResult == UpdateResult::NeedRender)
+        {
+            return UpdateResult::NeedRender;
+        }
+        else if (_Particles.empty() == false)
+        {
+            return UpdateResult::Nothing;
+        }
+        else
+        {
+            return UpdateResult::Destroyable;
+        }
     }
 
     UpdateResult ParticleComponent::Update(int64_t time)
@@ -75,20 +90,45 @@ namespace agate
         return instance;
     }
 
+    void ParticleComponent::Reset()
+    {
+        _Particles.clear();
+        _ShowingParticles.clear();
+        _ParticleCount = 0;
+        _LastParticleBeginning = 0;
+        for (auto& item : _Children)
+        {
+            item->Reset();
+        }
+    }
+
     UpdateResult ParticleComponent::UpdateChildren(int64_t time)
     {
-        UpdateResult result = UpdateResult::Destroyable;
+        if (_Children.empty())
+        {
+            return UpdateResult::Destroyable;
+        }
+
+        UpdateResult result = UpdateResult::Nothing;
         for (auto& child : _Children)
         {
             if (child.get()->_Params->bindParent == false)
             {
-                if (child->Update(time) == UpdateResult::NeedRender)
-                {
-                    result = UpdateResult::NeedRender;
-                }
+                result = result | child->Update(time);
             }
         }
-        return result;
+        if (result == UpdateResult::Nothing)
+        {
+            return result;
+        }
+        else if ((result & UpdateResult::NeedRender) == UpdateResult::NeedRender)
+        {
+            return UpdateResult::NeedRender;
+        }
+        else
+        {
+            return UpdateResult::Destroyable;
+        }
     }
     void ParticleComponent::GenerateInstances(std::shared_ptr<Sprite>& parent, int64_t time)
 	{
@@ -99,7 +139,7 @@ namespace agate
             auto ending = _LastParticleBeginning + _Params->particleLife.Random(_Random);
             auto sprite = std::make_shared<Sprite>(_LastParticleBeginning, ending);
             sprite->SetRenderParams(_Params->render);
-            if (_Params->bindParent && _Params->inherite != InheriteBehavior::Never && parent != nullptr)
+            if (_Params->bindParent && parent != nullptr)
             {
                 sprite->SetParent(parent);
                 sprite->SetInheriteBehavior(_Params->inherite);
