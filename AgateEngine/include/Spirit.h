@@ -6,6 +6,10 @@ namespace agate
 	enum class UpdateResult: uint32_t
 	{
 		/// <summary>
+		/// 可以释放
+		/// </summary>
+		Destroyable = 0,
+		/// <summary>
 		/// 什么都没有，不需要渲染
 		/// </summary>
 		Nothing = 1,
@@ -13,10 +17,7 @@ namespace agate
 		/// 需要渲染
 		/// </summary>
 		NeedRender = 2,
-		/// <summary>
-		/// 可以释放
-		/// </summary>
-		Destroyable = 4,
+
 	};
 
 	static UpdateResult operator | (UpdateResult left, UpdateResult right)

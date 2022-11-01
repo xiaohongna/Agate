@@ -8,7 +8,7 @@ namespace agate
 	public:
 		Randomizer()
 		{
-			srand(85);
+			//srand(85);
 			_Seed = rand();
 		}
 

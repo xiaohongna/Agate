@@ -22,6 +22,7 @@ namespace agate
         {
             return UpdateResult::Nothing;
         }
+        time -= _Params->initialDelay;
         GenerateInstances(parent, time);
         _ShowingParticles.clear();
         auto sprite = _Particles.begin();
