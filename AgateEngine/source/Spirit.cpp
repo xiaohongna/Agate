@@ -92,10 +92,21 @@ namespace agate
 			auto sharedSelf = shared_from_this();
 			for (auto& child : _ChildParticle)
 			{
-				child->Update(sharedSelf, time);
+				result = result | child->Update(sharedSelf, time);
 			}
 		}
-		return progress;
+		if (result == UpdateResult::Nothing)
+		{
+			return  result;
+		}
+		else if((result & UpdateResult::NeedRender) == UpdateResult::NeedRender)
+		{
+			return UpdateResult::NeedRender;
+		}
+		else
+		{
+			return UpdateResult::Destroyable;
+		}
 	}
 
 	void Sprite::Draw(DrawingContext& context)

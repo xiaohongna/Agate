@@ -10,6 +10,7 @@ public:
 	void Render(agate::DrawingContext& canvs);
 private:
 	void BuildComponent();
+	void LifecycleTest();
 private:
 	agate::ParticleComponent _Particle;
 	agate::Image	_Background;

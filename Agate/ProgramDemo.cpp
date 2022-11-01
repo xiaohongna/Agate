@@ -26,27 +26,40 @@ ProgramDemo::ProgramDemo()
 	_Background.SetBounds(bounds);
 
 	_BeginTime = std::chrono::steady_clock::now();
-	//AddSpirit();
-	//AddParticle();
-	//AddTextureParticle();
-	BuildComponent();
+	//BuildComponent();
+	LifecycleTest();
 }
-
+static uint64_t begin = 0;
 void ProgramDemo::Render(agate::DrawingContext& canvs)
 {
+	if (_Particle.Validate() == false)
+	{
+		return;
+	}
 	auto now = std::chrono::steady_clock::now();
-	auto nowTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - _BeginTime).count();
+	//auto nowTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - _BeginTime).count();
+	begin += 16;
 	canvs.BeginDraw(true, 0xFF000000);
 	//canvs.Draw(_Background);
 	//_Program.Update(nowTick);
 	//_Program.Draw(canvs);
-	_Particle.Update(nowTick);
-	_Particle.Draw(canvs);
-	canvs.EndDraw(1);
-	if (nowTick > 10000)
+	auto result = _Particle.Update(begin);
+	switch (result)
 	{
-		//_BeginTime = now;
+	case agate::UpdateResult::Nothing:
+		break;
+	case agate::UpdateResult::NeedRender:
+		_Particle.Draw(canvs);
+		break;
+	case agate::UpdateResult::Destroyable:
+		_Particle.Reset();
+		_BeginTime = now;
+		begin = 0;
+		break;
+	default:
+		break;
 	}
+	canvs.EndDraw(1);
 }
 
 void ProgramDemo::BuildComponent()
@@ -141,6 +154,47 @@ void ProgramDemo::BuildComponent()
 		agate::RenderParameter& render = params->render;
 		render.filePath = resPath + L"Particle01.png";
 		render.blend = agate::BlendMode::Additive;
+		_Particle.AddChild(std::move(particle));
+	}
+}
+
+void ProgramDemo::LifecycleTest()
+{
+	auto resPath = GetModulePath();
+	{
+		auto params = std::make_shared<agate::ParticleParameter>();
+		params->particleCount = 10;
+		params->generateInterval.min = 1000;
+		params->generateInterval.max = 1000;
+		params->particleLife.min = 200;
+		params->particleLife.max = 200;
+		params->infinite = false;
+		params->inherite = agate::InheriteBehavior::Never;
+
+		agate::RenderParameter& render = params->render;
+		render.filePath = resPath + L"Particle01.png";
+		_Particle.SetParams(params);
+	}
+	{
+		auto params = std::make_shared<agate::ParticleParameter>();
+		auto particle = std::make_shared<agate::ParticleComponent>(params);
+		
+		params->particleCount = 1;
+		params->generateInterval.min = 300;
+		params->generateInterval.max = 300;
+		params->particleLife.min = 200;
+		params->particleLife.max = 200;
+		params->infinite = false;
+		params->bindParent = true;
+		params->inherite = agate::InheriteBehavior::Never;
+
+		agate::ParticleScalingParameter& scaling = params->scaling;
+		scaling.type = agate::ScalingAnimationType::UniformRandom;
+		scaling.params.uniformRandom.min = 0.2f;
+		scaling.params.uniformRandom.max = 0.3f;
+
+		agate::RenderParameter& render = params->render;
+		render.filePath = resPath + L"Particle01.png";
 		_Particle.AddChild(std::move(particle));
 	}
 }

@@ -32,6 +32,13 @@ namespace agate
 		}
 
 		std::shared_ptr<ParticleComponent> ReferenceClone();
+
+		void Reset();
+
+		bool Validate()
+		{
+			return _Params != nullptr;
+		}
 	protected:
 		UpdateResult UpdateChildren(int64_t time);
 		void GenerateInstances(std::shared_ptr<Sprite>& parent, int64_t time);

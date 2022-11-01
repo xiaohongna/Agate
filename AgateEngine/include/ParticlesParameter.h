@@ -41,7 +41,7 @@ namespace agate
 		{
 			particleCount = 10;
 			infinite = false;
-			initialDelay.max = initialDelay.min = 0;
+			initialDelay = 0;
 			generateInterval.max = generateInterval.min = 16;
 			particleLife.max = particleLife.min = 1000;
 			bindParent = false;
@@ -67,7 +67,7 @@ namespace agate
 		/// <summary>
 		/// 初始化延时
 		/// </summary>
-		MinMax<uint32_t> initialDelay;
+		uint32_t initialDelay;
 		/// <summary>
 		/// 粒子生成间隔
 		/// </summary>
