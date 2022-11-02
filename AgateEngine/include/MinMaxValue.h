@@ -14,6 +14,7 @@ namespace agate
 
 		T Random(Randomizer& random)
 		{
+			assert(false);
 			return min;
 		}
 

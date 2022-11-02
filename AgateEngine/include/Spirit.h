@@ -32,6 +32,8 @@ namespace agate
 
 	struct SpriteInfo
 	{
+		int64_t beginning = 0;
+		int64_t duration = 16;
 		float rotation = 0.0f;
 		Vector2 rotationCenter;
 		Vector2 scale; 
@@ -55,10 +57,10 @@ namespace agate
 	class Sprite: public std::enable_shared_from_this<Sprite>
 	{
 	public:
-		Sprite(int64_t beginning, int64_t ending)
+		Sprite(int64_t beginning, int64_t duration)
 		{
-			_Beginning = beginning;
-			_Ending = ending;
+			_Info.beginning = beginning;
+			_Info.duration = duration;
 			_Hidden = false;
 			_RotationParam.type = RotationAnimationType::Fixed;
 			_RotationParam.params.fixed = 0.0f;
@@ -131,8 +133,6 @@ namespace agate
 
 		void LoadParentProperty();
 	protected:		
-		int64_t _Beginning;   
-		int64_t _Ending;
 		std::weak_ptr<Sprite>  _Parent;
 		std::vector<std::shared_ptr<ParticleComponent>> _ChildParticle;
 		Image  _Image;

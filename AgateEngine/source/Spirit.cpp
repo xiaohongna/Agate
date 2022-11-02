@@ -62,13 +62,13 @@ namespace agate
 
 	UpdateResult Sprite::Update(int64_t time)
 	{
-		time -= _Beginning;
+		time -= _Info.beginning;
 		if (time < 0)
 		{
 			return UpdateResult::Nothing;
 		}
 		auto result = UpdateResult::Nothing;
-		auto progress = (float)(time) / (_Ending - _Beginning);
+		auto progress = (float)(time) / _Info.duration;
 		auto const absTime = time / 1000.0f;
 		if (progress <= 1.0f)
 		{
@@ -219,6 +219,10 @@ namespace agate
 		break;
 		case TranslateAnimationType::PVA:
 		{
+			if (_TranslateParam.params.maxDuration > 0 && absTime > _TranslateParam.params.maxDuration)
+			{
+				absTime = _TranslateParam.params.maxDuration;
+			}
 			trans = _TranslateParam.params.base + (_TranslateParam.params.velocity * absTime) +
 				(_TranslateParam.params.acceleration * absTime * absTime * 0.5f);
 		}

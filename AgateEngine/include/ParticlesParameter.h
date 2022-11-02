@@ -28,12 +28,19 @@ namespace agate
 		RotationOnCreate = 1 << 4,
 
 		RotationAlways = 1 << 5,
+
 	};
 
 	static bool operator& (InheriteBehavior left, InheriteBehavior right)
 	{
 		return ((uint32_t)left & (uint32_t)right) != 0;
 	}
+
+	enum class SpawnStartTrigger
+	{
+		Normal,
+		ParentEnding,
+	};
 
 	struct ParticleParameter
 	{
@@ -55,6 +62,7 @@ namespace agate
 			texture.UVFrame = { 0.f, 0.f, 1.f, 1.f };
 			render.antialiasing = false;
 			render.blend = BlendMode::Blend;
+			startTigger = SpawnStartTrigger::Normal;
 		};
 		/// <summary>
 		/// 粒子数量
@@ -75,7 +83,7 @@ namespace agate
 		/// <summary>
 		/// 粒子生命周期
 		/// </summary>
-		MinMax<uint64_t> particleLife;
+		MinMax<int64_t> particleLife;
 		/// <summary>
 		/// 是否和父粒子有绑定关系
 		/// </summary>
@@ -84,6 +92,8 @@ namespace agate
 		/// 绑定父节点时属性继承方式
 		/// </summary>
 		InheriteBehavior  inherite;
+
+		SpawnStartTrigger startTigger;
 
 		ParticleTranslateParameter translate;
 		ParticleScalingParameter  scaling;

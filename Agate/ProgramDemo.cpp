@@ -163,39 +163,41 @@ void ProgramDemo::LifecycleTest()
 	auto resPath = GetModulePath();
 	{
 		auto params = std::make_shared<agate::ParticleParameter>();
-		params->particleCount = 10;
+		params->particleCount = 3;
 		params->generateInterval.min = 200;
 		params->generateInterval.max = 500;
-		params->particleLife.min = 400;
-		params->particleLife.max = 400;
+		params->particleLife.min = 300;
+		params->particleLife.max = 800;
 		params->infinite = false;
 		params->inherite = agate::InheriteBehavior::Never;
 
 		agate::ParticleTranslateParameter& translate = params->translate;
 		translate.type = agate::TranslateAnimationType::PVA;
-		translate.params.base.min = {400, 650};
-		translate.params.base.max = { 400, 650 };
+		translate.params.base.min = {400, 850};
+		translate.params.base.max = { 400, 850 };
 		translate.params.velocity.min = {-10, -1000};
 		translate.params.velocity.max = { 10, -1300 };
-		translate.params.acceleration.max = { 0, 1000 };
-		translate.params.acceleration.min = { 0, 1000 };
+		translate.params.acceleration.max = { 0, 1300 };
+		translate.params.acceleration.min = { 0, 1300 };
 
 		agate::RenderParameter& render = params->render;
 		render.filePath = resPath + L"Particle01.png";
+		render.blend = agate::BlendMode::Additive;
 		_Particle.SetParams(params);
 	}
 	{
 		auto params = std::make_shared<agate::ParticleParameter>();
 		auto particle = std::make_shared<agate::ParticleComponent>(params);
 		
-		params->particleCount = 40;
-		params->initialDelay = 400;
+		params->particleCount = 80;
+		params->initialDelay = 0;
 		params->generateInterval.min = 0;
 		params->generateInterval.max = 0;
-		params->particleLife.min = 500;
-		params->particleLife.max = 500;
+		params->particleLife.min = 600;
+		params->particleLife.max = 800;
 		params->infinite = false;
 		params->bindParent = true;
+		params->startTigger = agate::SpawnStartTrigger::ParentEnding;
 		params->inherite = agate::InheriteBehavior::PositionOnCreate;
 
 		agate::ParticleScalingParameter& scaling = params->scaling;
@@ -205,14 +207,14 @@ void ProgramDemo::LifecycleTest()
 
 		agate::ParticleTranslateParameter& translate = params->translate;
 		translate.type = agate::TranslateAnimationType::DirectionPVA;
-		translate.params.base.max = {0, 0};
-		translate.params.base.min = { 0, 0 };
+		translate.params.base.max = {-20, -20};
+		translate.params.base.min = { -20, -20 };
 		translate.params.direction.min = 0.0f;
 		translate.params.direction.max = 360.f;
 		translate.params.dir_velocity.min = 400.f;
-		translate.params.dir_velocity.max = 1000.f;
-		translate.params.dir_acceleration.min = -600.0f;
-		translate.params.dir_acceleration.min = -1200.0f;
+		translate.params.dir_velocity.max = 800.f;
+		translate.params.dir_acceleration.min = -400.0f;
+		translate.params.dir_acceleration.min = -800.0f;
 
 		agate::ParticlColorParameter& color = params->color;
 		color.type = agate::ColorAnimationType::FromTo;

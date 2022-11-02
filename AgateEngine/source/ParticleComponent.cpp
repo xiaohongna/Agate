@@ -18,6 +18,11 @@ namespace agate
 
     UpdateResult ParticleComponent::Update(std::shared_ptr<Sprite>& parent, int64_t time)
     {
+        if (parent && _Params->startTigger == SpawnStartTrigger::ParentEnding)
+        {
+            time -= parent->GetInfo().duration;  //父粒子消失时才开始
+        }
+
         if (time < _Params->initialDelay)
         {
             return UpdateResult::Nothing;
@@ -137,8 +142,8 @@ namespace agate
         while (_LastParticleBeginning < time && (_Params->infinite || _ParticleCount < _Params->particleCount))
         {
             _LastParticleBeginning += _Params->generateInterval.Random(_Random);
-            auto ending = _LastParticleBeginning + _Params->particleLife.Random(_Random);
-            auto sprite = std::make_shared<Sprite>(_LastParticleBeginning, ending);
+            auto duraion = _Params->particleLife.Random(_Random);
+            auto sprite = std::make_shared<Sprite>(_LastParticleBeginning, duraion);
             sprite->SetRenderParams(_Params->render);
             AssignTranslate(sprite.get());
             AssignScaling(sprite.get());
@@ -184,6 +189,7 @@ namespace agate
             translate.params.base = PTranslate.params.base.Random(_Random) + _BasePosition;
             translate.params.velocity = PTranslate.params.velocity.Random(_Random);
             translate.params.acceleration = PTranslate.params.acceleration.Random(_Random);
+            translate.params.maxDuration = 0;
             break;
         case(TranslateAnimationType::DirectionPVA):
         {
@@ -199,6 +205,7 @@ namespace agate
             float x = cosf(angle);
             float velocity = PTranslate.params.dir_velocity.Random(_Random);
             float accele = PTranslate.params.dir_acceleration.Random(_Random);
+            translate.params.maxDuration = - velocity / accele; 
             translate.params.velocity = { velocity * x, velocity * y };
             translate.params.acceleration = { accele * x, accele * y };
         }

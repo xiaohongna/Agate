@@ -26,7 +26,7 @@ namespace agate
 		/// </summary>
 		PVA,
 		/// <summary>
-		/// 指定方向速度加速度
+		/// 指定方向速度加速度,一般用作发射效果，保证速度不会小于0
 		/// </summary>
 		DirectionPVA,
 	};
@@ -80,6 +80,7 @@ namespace agate
 				Vector2 base;
 				Vector2 velocity;
 				Vector2 acceleration;
+				float maxDuration;   //控制速度不能小于0
 			};
 			Params() : base{ 0.0f, 0.0f }, velocity{ 0.0f, 0.0f }, acceleration{ 0.0f, 0.0f }
 			{
