@@ -131,6 +131,20 @@ namespace agate
 		_ChildParticle.emplace_back(particle);
 	}
 
+	void Sprite::Notify(SpriteNotification notification)
+	{
+		switch (notification)
+		{
+		case SpriteNotification::Created:
+			LoadParentProperty();
+			break;
+		case SpriteNotification::Destroy:
+			break;
+		default:
+			break;
+		}
+	}
+
 	void Sprite::UpdateRotation(float absTime, float progress, float& angle, Vector2& center)
 	{
 		switch (_RotationParam.type)
@@ -298,6 +312,43 @@ namespace agate
 		if (_Inherite & InheriteBehavior::PositionAlways)
 		{
 			_Info.translate = _Info.translate + parentInfo.translate;
+		}
+		if (_Inherite & InheriteBehavior::ScalingAlways)
+		{
+			_Info.scale = _Info.scale * parentInfo.scale;
+		}
+		if (_Inherite & InheriteBehavior::RotationAlways)
+		{
+			_Info.rotation = _Info.rotation + parentInfo.rotation;
+		}
+	}
+	void Sprite::LoadParentProperty()
+	{
+		if (_Inherite == InheriteBehavior::Never)
+		{
+			return;
+		}
+		auto parent = _Parent.lock();
+		if (parent == nullptr)
+		{
+			return;
+		}
+		auto& parentInfo = parent->GetInfo();
+		if (_Inherite & InheriteBehavior::PositionOnCreate)
+		{
+			_TranslateParam.params.base = _TranslateParam.params.base +  parentInfo.translate;
+			if (_TranslateParam.type == TranslateAnimationType::FromTo)
+			{
+				_TranslateParam.params.to = _TranslateParam.params.to + parentInfo.translate;
+			}
+		}
+		if (_Inherite & InheriteBehavior::ScalingAlways)
+		{
+			_Info.scale = _Info.scale * parentInfo.scale;
+		}
+		if (_Inherite & InheriteBehavior::RotationAlways)
+		{
+			_Info.rotation = _Info.rotation + parentInfo.rotation;
 		}
 	}
 }

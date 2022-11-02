@@ -44,6 +44,12 @@ namespace agate
 		}
 	};
 
+	enum class SpriteNotification
+	{
+		Created,
+		Destroy,
+	};
+
 	class ParticleComponent;
 
 	class Sprite: public std::enable_shared_from_this<Sprite>
@@ -90,9 +96,10 @@ namespace agate
 			_Image.SetBlendMode(mode);
 		}
 
-		void SetParent(std::weak_ptr<Sprite>&& parent)
+		void SetParent(std::weak_ptr<Sprite>&& parent, InheriteBehavior inherite)
 		{
 			_Parent = parent;
+			_Inherite = inherite;
 		}
 
 		std::shared_ptr<Sprite> GetParent()
@@ -107,10 +114,8 @@ namespace agate
 			return _Info;
 		}
 
-		void SetInheriteBehavior(InheriteBehavior inherite)
-		{
-			_Inherite = inherite;
-		}
+		void Notify(SpriteNotification notification);
+
 	private:
 		void UpdateRotation(float absTime, float progress, float& angle, Vector2& center);
 
@@ -123,6 +128,8 @@ namespace agate
 		void UpdateTexture(float absTime, float progress);
 
 		void UpdataInherite();
+
+		void LoadParentProperty();
 	protected:		
 		int64_t _Beginning;   
 		int64_t _Ending;

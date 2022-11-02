@@ -67,13 +67,13 @@ namespace agate
     }
     void ParticleComponent::Draw(DrawingContext& context)
     {
-        for (auto& spirite : _ShowingParticles)
+        for (auto& sprite : _ShowingParticles)
         {
-            spirite->Draw(context);
+            sprite->Draw(context);
         }
-        for (auto& spirite : _ShowingParticles)
+        for (auto& sprite : _ShowingParticles)
         {
-            spirite->DrawChild(context);
+            sprite->DrawChild(context);
         }
         for (auto& child : _Children)
         {
@@ -140,16 +140,15 @@ namespace agate
             auto ending = _LastParticleBeginning + _Params->particleLife.Random(_Random);
             auto sprite = std::make_shared<Sprite>(_LastParticleBeginning, ending);
             sprite->SetRenderParams(_Params->render);
-            if (_Params->bindParent && parent != nullptr)
-            {
-                sprite->SetParent(parent);
-                sprite->SetInheriteBehavior(_Params->inherite);
-            }
             AssignTranslate(sprite.get());
             AssignScaling(sprite.get());
             AssignRotation(sprite.get());
             AssignColor(sprite.get());
             AssignTexture(sprite.get());
+            if (_Params->bindParent && parent != nullptr)
+            {
+                sprite->SetParent(parent, _Params->inherite);
+            }
             for (auto& child : _Children)
             {
                 if (child->_Params->bindParent)
@@ -157,6 +156,7 @@ namespace agate
                     sprite->AddComponent(child->ReferenceClone());
                 }
             }
+            sprite->Notify(SpriteNotification::Created);
             _Particles.emplace_back(std::move(sprite));
             assert(_Particles.size() < 1000);
             _ParticleCount++;
@@ -164,37 +164,31 @@ namespace agate
 	}
     void ParticleComponent::AssignTranslate(Sprite* sprite)
     {
-        Vector2 base = _BasePosition;
-        if (_Params->bindParent && (_Params->inherite & InheriteBehavior::PositionOnCreate))
-        {
-            assert(sprite->GetParent() != nullptr);
-            base = base + sprite->GetParent()->GetInfo().translate;
-        }
         TranslateAnimationParameter translate;
         ParticleTranslateParameter& PTranslate = _Params->translate;
         translate.type = PTranslate.type;
         switch (PTranslate.type)
         {
         case(TranslateAnimationType::Fixed):
-            translate.params.fixed = PTranslate.params.fixed + base;
+            translate.params.fixed = PTranslate.params.fixed + _BasePosition;
             break;
         case(TranslateAnimationType::Random):
             translate.type = TranslateAnimationType::Fixed;
-            translate.params.fixed = PTranslate.params.random.Random(_Random) + base;
+            translate.params.fixed = PTranslate.params.random.Random(_Random) + _BasePosition;
             break;
         case(TranslateAnimationType::FromTo):
-            translate.params.from = PTranslate.params.from.Random(_Random) + base;
-            translate.params.to = PTranslate.params.to.Random(_Random) + base;
+            translate.params.from = PTranslate.params.from.Random(_Random) + _BasePosition;
+            translate.params.to = PTranslate.params.to.Random(_Random) + _BasePosition;
             break;
         case(TranslateAnimationType::PVA):
-            translate.params.base = PTranslate.params.base.Random(_Random) + base;
-            translate.params.velocity = PTranslate.params.velocity.Random(_Random) + base;
-            translate.params.acceleration = PTranslate.params.acceleration.Random(_Random) + base;
+            translate.params.base = PTranslate.params.base.Random(_Random) + _BasePosition;
+            translate.params.velocity = PTranslate.params.velocity.Random(_Random);
+            translate.params.acceleration = PTranslate.params.acceleration.Random(_Random);
             break;
         case(TranslateAnimationType::DirectionPVA):
         {
             translate.type = TranslateAnimationType::PVA;
-            translate.params.base = PTranslate.params.base.Random(_Random) + base;
+            translate.params.base = PTranslate.params.base.Random(_Random) + _BasePosition;
             MinMax<float> direct = PTranslate.params.direction;
             if (direct.max < direct.min)
             {
