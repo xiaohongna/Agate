@@ -24,7 +24,7 @@ namespace agate
 
 		void SetBounds(const Vector4& bounds);
 
-		void SetTexture(const std::shared_ptr<Texture>& img);
+		void SetTexture(const std::shared_ptr<ImageAsset>& img);
 
 		void SetClip(const Vector4& clip, bool normal = false);
 
@@ -65,7 +65,7 @@ namespace agate
 		void UpdateColor();
 
 	private:
-		std::shared_ptr<Texture>	_Image;
+		std::shared_ptr<ImageAsset>	_Image;
 		Vector4 _Bounds;
 		Vector4 _Clip;
 		bool _NormalUV;

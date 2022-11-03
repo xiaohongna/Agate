@@ -18,10 +18,6 @@ namespace agate
 
 		void Draw(Drawable& drawing);
 
-		TextureHandle CreateTexture(Texture* img);
-
-		void ReleaseTexture(Texture* img);
-
 		void EndDraw(uint32_t sync);
 	private:
 		void Draw(const RasterizeData& data);

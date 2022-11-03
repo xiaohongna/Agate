@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AssetManager.h" />
     <ClInclude Include="include\Brush.h" />
     <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\DrawingContext.h" />
     <ClInclude Include="include\Geometry.h" />
-    <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Matrix.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Image.h" />
@@ -32,11 +32,11 @@
     <ClInclude Include="source\bezier.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\AssetManager.cpp" />
     <ClCompile Include="source\bezier.cpp" />
     <ClCompile Include="source\Brush.cpp" />
     <ClCompile Include="source\DrawingContext.cpp" />
     <ClCompile Include="source\Geometry.cpp" />
-    <ClCompile Include="source\Texture.cpp" />
     <ClCompile Include="source\Image.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

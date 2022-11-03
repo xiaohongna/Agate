@@ -1,6 +1,6 @@
 #pragma once
 #include "Vertex.h"
-#include "Texture.h"
+#include "AssetManager.h"
 #include "Brush.h"
 namespace agate
 {
@@ -86,10 +86,6 @@ namespace agate
 		virtual void Draw(const BatchDrawData& data) = 0;
 
 		virtual void EndDraw(uint32_t sync) = 0;
-
-		virtual TextureHandle CreateTexture(const BitmapData& data) = 0;
-
-		virtual void ReleaseTexture(TextureHandle texture) = 0;
 
 	};
 

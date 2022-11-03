@@ -39,13 +39,13 @@
     <ClInclude Include="include\Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Texture.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Image.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AssetManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,10 +62,10 @@
     <ClCompile Include="source\DrawingContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Texture.cpp">
+    <ClCompile Include="source\Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Image.cpp">
+    <ClCompile Include="source\AssetManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -35,13 +35,12 @@ namespace agate
 	{
 		_Image.SetBlendMode(param.blend);
 		_Image.SetAntialiasing(param.antialiasing);
-		auto texture = agate::Texture::CreateFromFile(param.filePath);
+		auto texture = agate::AssetManager::SharedInstance().LoadImage(param.filePath);
 		_Image.SetTexture(texture);
 		if (param.size.x < 0.0001 || param.size.y < 0.0001)
 		{
-			auto& img = texture->GetImageData();
-			_Info.scaleCenter = { (float)img.width, (float)img.height };
-			_Image.SetBounds({ 0.0f, 0.0f, (float)img.width, (float)img.height });
+			_Info.scaleCenter = { (float)texture->GetWidth(), (float)texture->GetHeight()};
+			_Image.SetBounds({ 0.0f, 0.0f, (float)texture->GetWidth(), (float)texture->GetHeight() });
 		}
 		else
 		{

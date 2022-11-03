@@ -24,7 +24,7 @@ namespace agate
 			auto sz = count * sizeof(T1);
 			if (sz != size)
 			{
-				size = sz;
+				size = (uint32_t)sz;
 				if (buffer)
 					delete buffer;
 				buffer = (T*)malloc(size);

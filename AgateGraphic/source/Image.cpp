@@ -30,7 +30,7 @@ namespace agate
         }
     }
 
-    void Image::SetTexture(const std::shared_ptr<Texture>& img)
+    void Image::SetTexture(const std::shared_ptr<ImageAsset>& img)
     {
         if (_Image != img)
         {
@@ -69,11 +69,6 @@ namespace agate
 
     uint32_t Image::Rasterize(DrawingContext& context)
     {
-        if (_Image->GetTexture() == nullptr)
-        {
-            auto txt = context.CreateTexture(_Image.get());
-            _Image->SetTexture(txt);
-        }
         _RasterData.texture = _Image->GetTexture();
         if (HaveFlag(Spirit_Flag_Rasterize) == false)
         {
@@ -223,11 +218,10 @@ namespace agate
     {
         if (!_NormalUV)
         {
-            auto& img = _Image->GetImageData();
-            _Clip.x = _Clip.x / img.width;
-            _Clip.y = _Clip.y / img.height;
-            _Clip.right = _Clip.right / img.width;
-            _Clip.bottom = _Clip.bottom / img.height;
+            _Clip.x = _Clip.x / _Image->GetWidth();
+            _Clip.y = _Clip.y / _Image->GetHeight();
+            _Clip.right = _Clip.right / _Image->GetWidth();
+            _Clip.bottom = _Clip.bottom / _Image->GetHeight();
             _NormalUV = true;
         }
         Vector2 minUV(_Clip.x, _Clip.y);

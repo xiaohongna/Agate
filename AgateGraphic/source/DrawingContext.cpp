@@ -62,17 +62,6 @@ namespace agate
 		}
 	}
 
-	TextureHandle DrawingContext::CreateTexture(Texture* img)
-	{
-		auto& data = img->GetImageData();
-		return _Renderer->CreateTexture(data);
-	}
-
-	void DrawingContext::ReleaseTexture(Texture* img)
-	{
-
-	}
-
 	void DrawingContext::EndDraw(uint32_t sync)
 	{
 		Flush();
