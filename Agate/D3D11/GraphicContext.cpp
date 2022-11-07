@@ -10,8 +10,6 @@
 namespace agate
 {
 
-#define Safe_Release(obj) if(obj) { obj->Release(); obj = nullptr;}
-
     struct VERTEX_CONSTANT_BUFFER
     {
         float   mvp[4][4];
@@ -49,7 +47,6 @@ namespace agate
         const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
         if (D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &_SwapChain, &_Device, &featureLevel, &_DeviceContext) != S_OK)
             return false;
-
         CreateRenderTarget();
         CreateOther();
         CreateBlendState();

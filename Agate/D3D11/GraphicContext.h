@@ -31,7 +31,7 @@ namespace agate
 
         void BeginDraw() override;
 
-        void SetViewPort(uint32_t width, uint32_t height) override;
+        void SetViewPort(uint32_t width, uint32_t height);
 
         void SetRenderTarget() override;
 
@@ -40,10 +40,6 @@ namespace agate
         void Draw(const BatchDrawData& data) override;
 
         void EndDraw(uint32_t sync) override;
-
-        TextureHandle CreateTexture(const BitmapData& data) override;
-
-        void ReleaseTexture(TextureHandle texture) override;
 
     private:
         void CleanupDeviceD3D();

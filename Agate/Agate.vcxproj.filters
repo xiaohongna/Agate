@@ -48,6 +48,12 @@
     <ClInclude Include="ProgramDemo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11\D3DDevice.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11\WindowGraphicContext.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agate.cpp">
@@ -67,6 +73,12 @@
     </ClCompile>
     <ClCompile Include="ProgramDemo.cpp">
       <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11\D3DDevice.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11\WindowGraphicContext.cpp">
+      <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

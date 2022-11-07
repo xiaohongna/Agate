@@ -157,9 +157,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Agate.h" />
+    <ClInclude Include="D3D11\D3DDevice.h" />
     <ClInclude Include="D3D11\GraphicContext.h" />
     <ClInclude Include="D3D11\Pipeline.h" />
     <ClInclude Include="D3D11\VideoBuffer.h" />
+    <ClInclude Include="D3D11\WindowGraphicContext.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ProgramDemo.h" />
@@ -169,8 +171,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agate.cpp" />
+    <ClCompile Include="D3D11\D3DDevice.cpp" />
     <ClCompile Include="D3D11\GraphicContext.cpp" />
     <ClCompile Include="D3D11\Pipeline.cpp" />
+    <ClCompile Include="D3D11\WindowGraphicContext.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -67,19 +67,12 @@ namespace agate
 		std::vector<DrawCommand> commands;
 	};
 
-	struct RendererConfig
-	{
-
-	};
-
 	class IRenderer
 	{
 	public:
 		virtual void BeginDraw() = 0;
 
 		virtual void SetRenderTarget() = 0;
-
-		virtual void SetViewPort(uint32_t width, uint32_t height) = 0;
 
 		virtual void Clear(Color color) = 0;
 
