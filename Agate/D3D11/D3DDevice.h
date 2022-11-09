@@ -15,6 +15,11 @@
 
 namespace agate
 {
+	class RenderTarget
+	{
+
+	};
+
 	class  D3DDevice: public IAssetManagerDelegate 
 	{
 	public:
@@ -28,6 +33,11 @@ namespace agate
 
 		HRESULT CreateRenderTarget(IDXGISwapChain* swapChain, ID3D11RenderTargetView** rootView);
 
+		void ResetState();
+
+		void SetBlend(BlendMode blend);
+
+		void SetRenderTarget(ID3D11RenderTargetView* targetView, uint32_t width, uint32_t height);
 #pragma region IAssetManagerDelegate
 		const AssetManagerConfig& GetConfig() override;
 

@@ -12,7 +12,6 @@ namespace agate
 			_SwapChain->GetDesc(&desc);
 			_Width = desc.BufferDesc.Width;
 			_Height = desc.BufferDesc.Height;
-
 		}
 	}
 	void WindowGraphicContext::OnResize(uint32_t width, uint32_t height)
@@ -30,14 +29,18 @@ namespace agate
 
 	void WindowGraphicContext::BeginDraw()
 	{
-
+		auto& device = D3DDevice::ShareInstance();
+		device.ResetState();
+		device.SetRenderTarget(_MainRenderTargetView, _Width, _Height);
 	}
 
 	void WindowGraphicContext::SetRenderTarget()
 	{
+
 	}
 	void WindowGraphicContext::Clear(Color color)
 	{
+
 	}
 	void WindowGraphicContext::Draw(const BatchDrawData& data)
 	{

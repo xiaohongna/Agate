@@ -48,6 +48,39 @@ namespace agate
             _Device->CreateRenderTargetView(backBuffer, NULL, rootView);
         }
     }
+
+    void D3DDevice::ResetState()
+    {
+        _DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        _VertexConstantBuffer.Bind(_DeviceContext, 0);
+        _DeviceContext->GSSetShader(NULL, NULL, 0);
+        _DeviceContext->HSSetShader(NULL, NULL, 0);
+        _DeviceContext->DSSetShader(NULL, NULL, 0);
+        _DeviceContext->CSSetShader(NULL, NULL, 0);
+        _DeviceContext->OMSetDepthStencilState(_DepthStencilState, 0);
+        _DeviceContext->PSSetSamplers(0, 1, (ID3D11SamplerState**)&_Sampler.p);
+        _DeviceContext->RSSetState(_RasterizerState);
+        SetBlend(BlendMode::Blend);
+    }
+
+    void D3DDevice::SetBlend(BlendMode blend)
+    {
+        constexpr float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
+        _DeviceContext->OMSetBlendState(_BlendStates[(int)blend], blend_factor, 0xffffffff);
+        _CurrentBlend = blend;
+    }
+
+    void D3DDevice::SetRenderTarget(ID3D11RenderTargetView* targetView, uint32_t width, uint32_t height)
+    {
+        D3D11_VIEWPORT vp{};
+        vp.Width = (float)width;
+        vp.Height = (float)height;
+        vp.MaxDepth = 1.0f;
+        _DeviceContext->RSSetViewports(1, &vp);
+        const D3D11_RECT r = { (LONG)0, (LONG)0, (LONG)width, (LONG)height};
+        _DeviceContext->RSSetScissorRects(1, &r);
+        _DeviceContext->OMSetRenderTargets(1, &targetView, nullptr);
+    }
 	
     const AssetManagerConfig& D3DDevice::GetConfig()
 	{
