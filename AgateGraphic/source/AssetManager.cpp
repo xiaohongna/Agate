@@ -71,4 +71,12 @@ namespace agate
 
     }
 
+    std::shared_ptr<ImageAsset> AssetManager::CreateImage(uint32_t width, uint32_t height)
+    {
+        auto image = std::make_shared<ImageAsset>();
+        image->_Width = width;
+        image->_Height = height;
+        return image;
+    }
+
 }

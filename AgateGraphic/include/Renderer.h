@@ -70,9 +70,13 @@ namespace agate
 	class IRenderer
 	{
 	public:
+		virtual void GetViewSize(uint32_t& width, uint32_t& height) = 0;
+
+		virtual void SetViewSize(uint32_t& width, uint32_t& height) = 0;
+
 		virtual void BeginDraw() = 0;
 
-		virtual void SetRenderTarget() = 0;
+		virtual void SetRenderTarget(TextureHandle handle) = 0;
 
 		virtual void Clear(Color color) = 0;
 

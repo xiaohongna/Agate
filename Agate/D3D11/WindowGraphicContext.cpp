@@ -34,18 +34,49 @@ namespace agate
 		device.SetRenderTarget(_MainRenderTargetView, _Width, _Height);
 	}
 
-	void WindowGraphicContext::SetRenderTarget()
+	void WindowGraphicContext::GetViewSize(uint32_t& width, uint32_t& height)
 	{
-
+		width = _Width;
+		height = _Height;
 	}
+
+	void WindowGraphicContext::SetViewSize(uint32_t& width, uint32_t& height)
+	{
+		if (width == _Width && height == _Height)
+		{
+			return;
+		}
+		_Width = width;
+		_Height = height;
+		_MainRenderTargetView.Release();
+		_SwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+		D3DDevice::ShareInstance().CreateRenderTarget(_SwapChain, &_MainRenderTargetView);
+	}
+
+	void WindowGraphicContext::SetRenderTarget(TextureHandle handle)
+	{
+		if (handle == nullptr)
+		{
+			D3DDevice::ShareInstance().SetRenderTarget(_MainRenderTargetView, _Width, _Height);
+		}
+		else
+		{
+			assert(false);
+		}
+	}
+
 	void WindowGraphicContext::Clear(Color color)
 	{
-
+		D3DDevice::ShareInstance().Clear(color);
 	}
+
 	void WindowGraphicContext::Draw(const BatchDrawData& data)
 	{
+
 	}
+
 	void WindowGraphicContext::EndDraw(uint32_t sync)
 	{
+		HRESULT hr = _SwapChain->Present(1, 0);
 	}
 }

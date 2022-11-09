@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "D3DDevice.h"
-
+#include <DirectXMath.h>
 namespace agate
 {
 	HRESULT D3DDevice::CreateSwapChain(HWND hwnd, IDXGISwapChain** swapChain)
@@ -72,6 +72,13 @@ namespace agate
 
     void D3DDevice::SetRenderTarget(ID3D11RenderTargetView* targetView, uint32_t width, uint32_t height)
     {
+        if (_CurRenderTarget == targetView)
+        {
+            return;
+        }
+        _CurRenderTarget = targetView;  //不用增加引用
+        auto matrix = DirectX::XMMatrixScaling(2.f / width, -2.f / height, 0) * DirectX::XMMatrixTranslation(-1, 1, 0.7f);
+        _VertexConstantBuffer.Update(_DeviceContext, (float*) & (matrix.r[0]), 16);
         D3D11_VIEWPORT vp{};
         vp.Width = (float)width;
         vp.Height = (float)height;
@@ -81,16 +88,19 @@ namespace agate
         _DeviceContext->RSSetScissorRects(1, &r);
         _DeviceContext->OMSetRenderTargets(1, &targetView, nullptr);
     }
+
+    void D3DDevice::Clear(Color color)
+    {
+        float fColor[4]{ color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f };
+        _DeviceContext->ClearRenderTargetView(_CurRenderTarget, fColor);
+    }
 	
     const AssetManagerConfig& D3DDevice::GetConfig()
 	{
         static AssetManagerConfig g_Config{ 1024 * 1024 * 300, false }; 
         return  g_Config;
 	}
-	TextureHandle D3DDevice::CreateRenderTarget()
-	{
-        return nullptr;
-	}
+
 	TextureHandle D3DDevice::CreateTexture(uint32_t width, uint32_t height, void* sysMem)
 	{
         D3D11_TEXTURE2D_DESC desc{};

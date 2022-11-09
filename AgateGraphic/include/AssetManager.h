@@ -20,7 +20,7 @@ namespace agate
 	public:
 		virtual const AssetManagerConfig& GetConfig() = 0;
 
-		virtual TextureHandle CreateRenderTarget() = 0;
+		virtual TextureHandle CreateRenderTarget(uint32_t width, uint32_t height) = 0;
 		/// <summary>
 		/// 创建纹理资源，格式为R8G8B8A8_UNORM
 		/// </summary>
@@ -97,6 +97,8 @@ namespace agate
 		void Invalidate();
 
 		std::shared_ptr<ImageAsset> LoadImage(std::wstring filePath);
+
+		std::shared_ptr<ImageAsset> CreateImage(uint32_t width, uint32_t height);
 
 		friend ImageAsset;
 	private:

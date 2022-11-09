@@ -38,17 +38,20 @@ namespace agate
 		void SetBlend(BlendMode blend);
 
 		void SetRenderTarget(ID3D11RenderTargetView* targetView, uint32_t width, uint32_t height);
+
+		void Clear(Color color);
+
 #pragma region IAssetManagerDelegate
 		const AssetManagerConfig& GetConfig() override;
 
-		TextureHandle CreateRenderTarget() override;
+		TextureHandle CreateRenderTarget(uint32_t width, uint32_t height) override;
 
 		TextureHandle CreateTexture(uint32_t width, uint32_t height, void* sysMem) override;
 
 		void ReleaseTexture(TextureHandle handle) override; 
 #pragma endregion
 	private:
-		D3DDevice()
+		D3DDevice() :_CurRenderTarget{}
 		{
 
 		}
@@ -61,6 +64,7 @@ namespace agate
 		CComPtr<IDXGIFactory>           _Factory;
 		CComPtr<ID3D11Device>           _Device;
 		CComPtr<ID3D11DeviceContext>    _DeviceContext;
+		ID3D11RenderTargetView*			_CurRenderTarget;
 
 		VideoBuffer<float, VideoBufferType::Constant>  _VertexConstantBuffer;
 

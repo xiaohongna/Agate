@@ -2,6 +2,7 @@
 #include "Brush.h"
 #include "Drawable.h"
 #include "Renderer.h"
+#include "AssetManager.h"
 
 namespace agate
 {
@@ -14,7 +15,14 @@ namespace agate
 
 		void SetClip(const Vector4& clip);
 
-		void BeginDraw(bool clear, Color clearColor);
+		void BeginDraw();
+		/// <summary>
+		///  设置渲染目标，nullptr时渲染到窗口
+		/// </summary>
+		/// <param name="image"></param>
+		void SetTarget(const std::shared_ptr<ImageAsset>& image);
+
+		void Clean(Color clearColor);
 
 		void Draw(Drawable& drawing);
 
@@ -34,9 +42,7 @@ namespace agate
 		FixedBuffer<DrawIndex>	_IndexBuffer;
 
 		BatchDrawData		    _CurrentBatch;
-
-		uint32_t	_ViewWidth;
-		uint32_t	_ViewHeight;
+		std::shared_ptr<ImageAsset>  _CurrentTarget;
 		uint32_t	_ClipX;
 		uint32_t	_ClipY;
 		uint32_t	_ClipWidth;

@@ -24,7 +24,11 @@ namespace agate
     private:
         void BeginDraw() override;
 
-        void SetRenderTarget() override;
+        void GetViewSize(uint32_t& width, uint32_t& height) override;
+
+        void SetViewSize(uint32_t& width, uint32_t& height) override;
+
+        void SetRenderTarget(TextureHandle handle) override;
 
         void Clear(Color color) override;
 

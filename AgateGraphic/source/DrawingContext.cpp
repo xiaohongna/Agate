@@ -8,12 +8,8 @@ namespace agate
 	constexpr  uint32_t Max_VertexBuffer_Count = 1024 * 10;
 
 	DrawingContext::DrawingContext(IRenderer* delegate) :
-		_ViewWidth{ 1024 },
-		_ViewHeight{ 768 },
 		_ClipX{ 0 },
 		_ClipY{ 0 },
-		_ClipWidth{ 1024 },
-		_ClipHeight{ 768 },
 		_Renderer(delegate),
 		_CurrentBatch{},
 		_ClipChanged{ true }
@@ -22,6 +18,7 @@ namespace agate
 		_IndexBuffer.Alloc<DrawIndex>(Max_IndexBuffer_Count);
 		_CurrentBatch.vertexData = _VertextBuffer.buffer;
 		_CurrentBatch.indexData = _IndexBuffer.buffer;
+		_Renderer->GetViewSize(_ClipWidth, _ClipHeight);
 	}
 
 	void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
@@ -30,7 +27,7 @@ namespace agate
 		_ClipY = 0;
 		_ClipWidth = width;
 		_ClipHeight = height;
-		_Renderer->SetViewPort(width, height);
+		_Renderer->SetViewSize(width, height);
 	}
 
 	void DrawingContext::SetClip(const Vector4& clip)
@@ -42,14 +39,37 @@ namespace agate
 		_ClipChanged = true;
 	}
 
-	void DrawingContext::BeginDraw(bool clear, Color clearColor)
+	void DrawingContext::BeginDraw()
 	{
 		_Renderer->BeginDraw();
-		_Renderer->SetRenderTarget();
-		if (clear)
+	}
+
+	void DrawingContext::SetTarget(const std::shared_ptr<ImageAsset>& image)
+	{
+		if (_CurrentTarget != image)
 		{
-			_Renderer->Clear(clearColor);
+			Flush();
+			_CurrentTarget = image;
+			_ClipX = 0;
+			_ClipY = 0;
+			_ClipChanged = true;
+			if (image == nullptr)
+			{
+				_Renderer->SetRenderTarget(nullptr);
+				_Renderer->GetViewSize(_ClipWidth, _ClipHeight);
+			}
+			else
+			{
+				_ClipWidth = image->GetWidth();
+				_ClipHeight = image->GetHeight();
+				_Renderer->SetRenderTarget(image->GetTexture());
+			}
 		}
+	}
+
+	void DrawingContext::Clean(Color clearColor)
+	{
+		_Renderer->Clear(clearColor);
 	}
 
 	void DrawingContext::Draw(Drawable& drawing)
@@ -64,6 +84,7 @@ namespace agate
 
 	void DrawingContext::EndDraw(uint32_t sync)
 	{
+		assert(_CurrentTarget == nullptr);
 		Flush();
 		_Renderer->EndDraw(sync);
 	}
