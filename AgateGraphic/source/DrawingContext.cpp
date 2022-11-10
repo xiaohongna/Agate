@@ -7,7 +7,7 @@ namespace agate
 
 	constexpr  uint32_t Max_VertexBuffer_Count = 1024 * 10;
 
-	DrawingContext::DrawingContext(std::unique_ptr<IRenderer>&& delegate) :
+	DrawingContext::DrawingContext(std::unique_ptr<IRendererDelegate>&& delegate) :
 		_ClipX{ 0 },
 		_ClipY{ 0 },
 		_CurrentBatch{},

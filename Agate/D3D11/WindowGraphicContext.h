@@ -14,7 +14,7 @@
 #include "D3DDevice.h"
 namespace agate
 {
-	class WindowGraphicContext: public IRenderer
+	class WindowGraphicContext: public IRendererDelegate
 	{
     public:
         WindowGraphicContext(D3DDevice& device, HWND hwnd);

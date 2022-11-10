@@ -9,7 +9,7 @@ namespace agate
 	class DrawingContext
 	{
 	public:
-		DrawingContext(std::unique_ptr<IRenderer>&& delegate);
+		DrawingContext(std::unique_ptr<IRendererDelegate>&& delegate);
 
 		void SetViewSize(uint32_t width, uint32_t height);
 
@@ -37,7 +37,7 @@ namespace agate
 		void PushCommnd(const RasterizeData& data);
 
 	private:
-		std::unique_ptr<IRenderer> _Renderer;
+		std::unique_ptr<IRendererDelegate> _Renderer;
 		FixedBuffer<unsigned char>		_VertextBuffer;
 		FixedBuffer<DrawIndex>	_IndexBuffer;
 

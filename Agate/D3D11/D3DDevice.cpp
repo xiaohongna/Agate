@@ -29,12 +29,17 @@ namespace agate
             D3D_FEATURE_LEVEL featureLevel;
             const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
             auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, swapChain, &_Device, &featureLevel, &_DeviceContext);
+            assert(SUCCEEDED(hr));
             if (SUCCEEDED(hr))
             {
-                CreateOther();
-                CreateBlendState();
-                CreateSamplerState();
+                hr = CreateOther();
+                assert(SUCCEEDED(hr));
+                hr = CreateBlendState();
+                assert(SUCCEEDED(hr));
+                hr = CreateSamplerState();
+                assert(SUCCEEDED(hr));
             }
+            return hr;
         }
         else
         {
@@ -50,6 +55,7 @@ namespace agate
         {
            hr = _Device->CreateRenderTargetView(backBuffer, NULL, rootView);
         }
+        assert(SUCCEEDED(hr));
         return hr;
     }
 
@@ -175,17 +181,18 @@ namespace agate
             resourceView->Release();
         }
 	}
-    void D3DDevice::CreateOther()
+    HRESULT D3DDevice::CreateOther()
     {
+        HRESULT hr = E_FAIL;
         {
             D3D11_RASTERIZER_DESC desc{};
             desc.FillMode = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME;//
             desc.CullMode = D3D11_CULL_NONE;
             desc.ScissorEnable = true;
             desc.DepthClipEnable = true;
-            _Device->CreateRasterizerState(&desc, &_RasterizerState);
+            hr = _Device->CreateRasterizerState(&desc, &_RasterizerState);
         }
-
+        assert(SUCCEEDED(hr));
         {
             D3D11_DEPTH_STENCIL_DESC desc;
             ZeroMemory(&desc, sizeof(desc));
@@ -196,10 +203,11 @@ namespace agate
             desc.FrontFace.StencilFailOp = desc.FrontFace.StencilDepthFailOp = desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
             desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
             desc.BackFace = desc.FrontFace;
-            _Device->CreateDepthStencilState(&desc, &_DepthStencilState);
+            hr = _Device->CreateDepthStencilState(&desc, &_DepthStencilState);
         }
-        _VertexConstantBuffer.Init(_Device, 16);
-
+        assert(SUCCEEDED(hr));
+        hr = _VertexConstantBuffer.Init(_Device, 16);
+        assert(SUCCEEDED(hr));
         auto colorPPL = std::make_unique<ColorPipline>();
         if (colorPPL->Load(_Device))
         {
@@ -207,6 +215,7 @@ namespace agate
         }
         else
         {
+            hr = E_FAIL;
             assert(false);
         }
 
@@ -217,10 +226,12 @@ namespace agate
         }
         else
         {
+            hr = E_FAIL;
             assert(false);
         }
+        return hr;
     }
-    void D3DDevice::CreateBlendState()
+    HRESULT D3DDevice::CreateBlendState()
     {
         D3D11_BLEND_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
@@ -233,31 +244,33 @@ namespace agate
         desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
         desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-        _Device->CreateBlendState(&desc, &_BlendStates[0]);  //Blend
-
+        auto hr = _Device->CreateBlendState(&desc, &_BlendStates[0]);  //Blend
+        assert(SUCCEEDED(hr));
         desc.RenderTarget[0].BlendEnable = false;
         desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
         desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
         desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        _Device->CreateBlendState(&desc, &_BlendStates[1]);  //Blend
-
+        hr = _Device->CreateBlendState(&desc, &_BlendStates[1]);  //Blend
+        assert(SUCCEEDED(hr));
         desc.RenderTarget[0].BlendEnable = true;
         desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
         desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
         desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        _Device->CreateBlendState(&desc, &_BlendStates[2]);  //Additive
-
+        hr = _Device->CreateBlendState(&desc, &_BlendStates[2]);  //Additive
+        assert(SUCCEEDED(hr));
         desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
         desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
         desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
-        _Device->CreateBlendState(&desc, &_BlendStates[3]);  //Additive
-
+        hr = _Device->CreateBlendState(&desc, &_BlendStates[3]);  //Additive
+        assert(SUCCEEDED(hr));
         desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC_COLOR;
         desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
         desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        _Device->CreateBlendState(&desc, &_BlendStates[4]);  //Multiply
+        hr =_Device->CreateBlendState(&desc, &_BlendStates[4]);  //Multiply
+        assert(SUCCEEDED(hr));
+        return hr;
     }
-    void D3DDevice::CreateSamplerState()
+    HRESULT D3DDevice::CreateSamplerState()
     {
         D3D11_SAMPLER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
@@ -269,6 +282,6 @@ namespace agate
         desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
         desc.MinLOD = 0.f;
         desc.MaxLOD = 0.f;
-        _Device->CreateSamplerState(&desc, &_Sampler);
+        return _Device->CreateSamplerState(&desc, &_Sampler);
     }
 }

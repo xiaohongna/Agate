@@ -22,10 +22,10 @@ namespace agate
         {
         }
 
-        void Init(ID3D11Device* device, UINT32 capacity = 5000)
+        HRESULT Init(ID3D11Device* device, UINT32 capacity = 5000)
         {
             _Device = device;
-            setCapacity(capacity);
+            return setCapacity(capacity);
         }
 
         uint32_t getCapacity()
@@ -33,7 +33,7 @@ namespace agate
             return _Capacity;
         }
 
-        void setCapacity(UINT32 count)
+        HRESULT setCapacity(UINT32 count)
         {
             if (count != _Capacity)
             {
@@ -59,7 +59,7 @@ namespace agate
             default:
                 break;
             }
-            auto hr = _Device->CreateBuffer(&desc, NULL, &_Buffer);
+            return _Device->CreateBuffer(&desc, NULL, &_Buffer);
         }
 
         T* Map(ID3D11DeviceContext* context)

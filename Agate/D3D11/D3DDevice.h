@@ -50,9 +50,9 @@ namespace agate
 		void ReleaseTexture(TextureHandle handle) override; 
 #pragma endregion
 	private:
-		void CreateOther();
-		void CreateBlendState();
-		void CreateSamplerState();
+		HRESULT CreateOther();
+		HRESULT CreateBlendState();
+		HRESULT CreateSamplerState();
 	private:
 		CComPtr<IDXGIFactory>           _Factory;
 		CComPtr<ID3D11Device>           _Device;
