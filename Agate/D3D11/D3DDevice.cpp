@@ -31,7 +31,9 @@ namespace agate
             auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, swapChain, &_Device, &featureLevel, &_DeviceContext);
             if (SUCCEEDED(hr))
             {
-
+                CreateOther();
+                CreateBlendState();
+                CreateSamplerState();
             }
         }
         else
@@ -43,10 +45,12 @@ namespace agate
     HRESULT D3DDevice::CreateRenderTarget(IDXGISwapChain* swapChain, ID3D11RenderTargetView** rootView)
     {
         CComPtr<ID3D11Texture2D> backBuffer;
+        HRESULT hr = E_FAIL;
         if (SUCCEEDED(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
         {
-            _Device->CreateRenderTargetView(backBuffer, NULL, rootView);
+           hr = _Device->CreateRenderTargetView(backBuffer, NULL, rootView);
         }
+        return hr;
     }
 
     void D3DDevice::ResetState()
@@ -94,12 +98,45 @@ namespace agate
         float fColor[4]{ color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f };
         _DeviceContext->ClearRenderTargetView(_CurRenderTarget, fColor);
     }
+
+    void D3DDevice::Draw(const BatchDrawData& data)
+    {
+        if (_CurrentPipline == nullptr || _CurrentPipline->GetType() != data.pipline)
+        {
+            _CurrentPipline = _Piplines[(int)data.pipline].get();
+            _CurrentPipline->Active(_DeviceContext);
+        }
+        _CurrentPipline->UpdateVertex(_DeviceContext, data.vertexData, data.vertexCount);
+        _CurrentPipline->UpdateIndex(_DeviceContext, data.indexData, data.indexCount);
+        for (auto const& cmd : data.commands)
+        {
+            if (cmd.blend != _CurrentBlend)
+            {
+                SetBlend(cmd.blend);
+            }
+            if (cmd.texture)
+            {
+                _DeviceContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView**)&cmd.texture);
+            }
+            if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
+            {
+                const D3D11_RECT r = { cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipHeight };
+                _DeviceContext->RSSetScissorRects(1, &r);
+            }
+            _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
+        }
+    }
 	
     const AssetManagerConfig& D3DDevice::GetConfig()
 	{
         static AssetManagerConfig g_Config{ 1024 * 1024 * 300, false }; 
         return  g_Config;
 	}
+
+    TextureHandle D3DDevice::CreateRenderTarget(uint32_t width, uint32_t height)
+    {
+        return TextureHandle();
+    }
 
 	TextureHandle D3DDevice::CreateTexture(uint32_t width, uint32_t height, void* sysMem)
 	{
@@ -233,8 +270,5 @@ namespace agate
         desc.MinLOD = 0.f;
         desc.MaxLOD = 0.f;
         _Device->CreateSamplerState(&desc, &_Sampler);
-    }
-    void D3DDevice::SetupRenderState()
-    {
     }
 }

@@ -7,13 +7,13 @@ namespace agate
 
 	constexpr  uint32_t Max_VertexBuffer_Count = 1024 * 10;
 
-	DrawingContext::DrawingContext(IRenderer* delegate) :
+	DrawingContext::DrawingContext(std::unique_ptr<IRenderer>&& delegate) :
 		_ClipX{ 0 },
 		_ClipY{ 0 },
-		_Renderer(delegate),
 		_CurrentBatch{},
 		_ClipChanged{ true }
 	{
+		_Renderer = std::move(delegate);
 		_VertextBuffer.Alloc<char>(Max_VertexBuffer_Count * sizeof(VertexXYUVColor));
 		_IndexBuffer.Alloc<DrawIndex>(Max_IndexBuffer_Count);
 		_CurrentBatch.vertexData = _VertextBuffer.buffer;
@@ -23,6 +23,10 @@ namespace agate
 
 	void DrawingContext::SetViewSize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0)
+		{
+			return;
+		}
 		_ClipX = 0;
 		_ClipY = 0;
 		_ClipWidth = width;

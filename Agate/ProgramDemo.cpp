@@ -18,10 +18,9 @@ int64_t GetNowTick()
 
 ProgramDemo::ProgramDemo()
 {
-	auto bk = agate::Texture::CreateFromFile(GetModulePath() + L"bk.jpg");
-	auto& imgbk = bk->GetImageData();
+	auto bk = agate::AssetManager::SharedInstance().CreateImage(GetModulePath() + L"bk.jpg");
 	_Background.SetTexture(bk);
-	agate::Vector4 bounds{ .0f, .0f, (float)imgbk.width, (float)imgbk.height };
+	agate::Vector4 bounds{ .0f, .0f, (float)bk->GetWidth(), (float)bk->GetHeight()};
 	_Background.SetClip(bounds);
 	_Background.SetBounds(bounds);
 
@@ -39,7 +38,8 @@ void ProgramDemo::Render(agate::DrawingContext& canvs)
 	auto now = std::chrono::steady_clock::now();
 	//auto nowTick = std::chrono::duration_cast<std::chrono::milliseconds>(now - _BeginTime).count();
 	begin += 16;
-	canvs.BeginDraw(true, 0xFF000000);
+	canvs.BeginDraw();
+	canvs.Clean(0xFF000000);
 	//canvs.Draw(_Background);
 	//_Program.Update(nowTick);
 	//_Program.Draw(canvs);

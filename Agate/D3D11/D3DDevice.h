@@ -15,18 +15,15 @@
 
 namespace agate
 {
-	class RenderTarget
-	{
-
-	};
-
 	class  D3DDevice: public IAssetManagerDelegate 
 	{
 	public:
-		static D3DDevice& ShareInstance()
+		D3DDevice() :
+			_CurRenderTarget{},
+			_CurrentPipline{},
+			_CurrentBlend{ BlendMode::Blend }
 		{
-			static D3DDevice g_Device;
-			return g_Device;
+
 		}
 
 		HRESULT CreateSwapChain(HWND hwnd, IDXGISwapChain** swapChain);
@@ -41,6 +38,8 @@ namespace agate
 
 		void Clear(Color color);
 
+		void Draw(const BatchDrawData& data);
+
 #pragma region IAssetManagerDelegate
 		const AssetManagerConfig& GetConfig() override;
 
@@ -51,15 +50,9 @@ namespace agate
 		void ReleaseTexture(TextureHandle handle) override; 
 #pragma endregion
 	private:
-		D3DDevice() :_CurRenderTarget{}
-		{
-
-		}
-
 		void CreateOther();
 		void CreateBlendState();
 		void CreateSamplerState();
-		void SetupRenderState();
 	private:
 		CComPtr<IDXGIFactory>           _Factory;
 		CComPtr<ID3D11Device>           _Device;

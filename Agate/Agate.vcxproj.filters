@@ -36,9 +36,6 @@
     <ClInclude Include="RenderDemo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11\GraphicContext.h">
-      <Filter>D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="D3D11\VideoBuffer.h">
       <Filter>D3D11</Filter>
     </ClInclude>
@@ -54,6 +51,9 @@
     <ClInclude Include="D3D11\WindowGraphicContext.h">
       <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11\Direct3D11Graphic.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agate.cpp">
@@ -61,9 +61,6 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D11\GraphicContext.cpp">
-      <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="D3D11\Pipeline.cpp">
       <Filter>D3D11</Filter>
@@ -78,6 +75,9 @@
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="D3D11\WindowGraphicContext.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11\Direct3D11Graphic.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>

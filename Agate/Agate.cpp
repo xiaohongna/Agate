@@ -7,13 +7,12 @@
 #include <iostream>
 #include <vector>
 #include <future>
-#include "D3D11/GraphicContext.h"
 #include "DrawingContext.h"
 #include "RenderDemo.h"
 #include "ProgramDemo.h"
 #include <crtdbg.h> 
-
-
+#include "D3D11/Direct3D11Graphic.h"
+#include <atlbase.h>
 
 #define MAX_LOADSTRING 100
 
@@ -29,7 +28,6 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void CleanUp();
 
-std::unique_ptr<agate::GraphicContext> D3D11Context;
 std::unique_ptr<agate::DrawingContext> Canvas;
 std::unique_ptr<RenderDemo> Demo;
 std::unique_ptr<ProgramDemo> Program;
@@ -88,7 +86,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 void CleanUp()
 {
-    D3D11Context.reset();
     Canvas.reset();
     Demo.reset();
     Program.reset();
@@ -145,9 +142,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   D3D11Context = std::make_unique<agate::GraphicContext>();
-   D3D11Context->CreateDeviceD3D(hWnd);
-   Canvas = std::make_unique<agate::DrawingContext>(D3D11Context.get());
+   Canvas.reset(agate::CreateDrawContext(hWnd));
    Demo = std::make_unique<RenderDemo>();
    Program = std::make_unique<ProgramDemo>();
    RECT rt{};

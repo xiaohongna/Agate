@@ -22,7 +22,7 @@ private:
 	float _Rotation;
 	agate::Vector2 _Scale;
 	agate::Color   _SpiritColor;
-	std::shared_ptr<agate::Texture> _Texture;
+	std::shared_ptr<agate::ImageAsset> _Texture;
 	agate::Image	_Spirit;
 	agate::Image	_Background;
 };

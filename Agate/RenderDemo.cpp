@@ -55,30 +55,27 @@ _SpiritColor(0xFF0000FF)
 	
 	_Ellipse.AddFigure(agate::Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
-
-	_Texture = agate::Texture::CreateFromFile(path + L"Splash01.png");
+	_Texture = agate::AssetManager::SharedInstance().CreateImage(path + L"Splash01.png");
 	_Spirit.SetTexture(_Texture);
-	auto& img = _Texture->GetImageData();
 	agate::Vector4 bounds{};
 	bounds.pos = { 200.f, 100.f };
-	bounds.size = { (float)img.width, (float)img.height };
-	_Spirit.SetClip(agate::Vector4(0.f, 0.f, img.width, img.height));
+	bounds.size = { (float)_Texture->GetWidth(), (float)_Texture->GetHeight()};
+	_Spirit.SetClip(agate::Vector4(0.f, 0.f, bounds.size.x, bounds.size.y));
 	_Spirit.SetBounds(bounds);
 	_Spirit.SetColor(_SpiritColor);
 	_Spirit.SetBlendMode(agate::BlendMode::Subtract);
 
-	auto bk = agate::Texture::CreateFromFile(path + L"bk.jpg");
-	auto& imgbk = bk->GetImageData();
+	auto bk = agate::AssetManager::SharedInstance().CreateImage(path + L"bk.jpg");
 	_Background.SetTexture(bk);
 	bounds.pos = { 0.f, 0.f };
-	bounds.size = { (float)imgbk.width, (float)imgbk.height };
+	bounds.size = { (float)bk->GetWidth(), (float)bk->GetHeight()};
 	_Background.SetClip(bounds);
 	_Background.SetBounds(bounds);
 }
 
 void RenderDemo::Render(agate::DrawingContext& canvs)
 {
-	canvs.BeginDraw(false, 0xFFFFFFFF);
+	canvs.BeginDraw();
 	canvs.Draw(_Background);
 	RenderGeomegry(canvs);
 	//RenderSpirit(canvs);

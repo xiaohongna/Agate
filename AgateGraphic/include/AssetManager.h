@@ -90,13 +90,14 @@ namespace agate
 		{
 			assert(_Delegate == nullptr);
 			_Delegate = delegate;
+			return true;
 		}
 		/// <summary>
 		/// 无效化所有资源，在D3D设备丢失时调用
 		/// </summary>
 		void Invalidate();
 
-		std::shared_ptr<ImageAsset> LoadImage(std::wstring filePath);
+		std::shared_ptr<ImageAsset> CreateImage(std::wstring filePath);
 
 		std::shared_ptr<ImageAsset> CreateImage(uint32_t width, uint32_t height);
 

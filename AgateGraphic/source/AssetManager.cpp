@@ -38,7 +38,7 @@ namespace agate
         }
     }
 
-    std::shared_ptr<ImageAsset> AssetManager::LoadImage(std::wstring filePath)
+    std::shared_ptr<ImageAsset> AssetManager::CreateImage(std::wstring filePath)
     {
         auto found = _ImageStorage.find(filePath);
         if (found != _ImageStorage.end())

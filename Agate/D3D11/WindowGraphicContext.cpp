@@ -3,15 +3,14 @@
 #include "D3DDevice.h"
 namespace agate
 {
-	WindowGraphicContext::WindowGraphicContext(HWND hwnd)
+	WindowGraphicContext::WindowGraphicContext(D3DDevice& device, HWND hwnd) :_Device(device), _Width{}, _Height{}
 	{
-		D3DDevice::ShareInstance().CreateSwapChain(hwnd, &_SwapChain);
+		_Device.CreateSwapChain(hwnd, &_SwapChain);
 		if (_SwapChain)
 		{
 			DXGI_SWAP_CHAIN_DESC desc{};
 			_SwapChain->GetDesc(&desc);
-			_Width = desc.BufferDesc.Width;
-			_Height = desc.BufferDesc.Height;
+			OnResize(desc.BufferDesc.Width, desc.BufferDesc.Height);
 		}
 	}
 	void WindowGraphicContext::OnResize(uint32_t width, uint32_t height)
@@ -24,14 +23,13 @@ namespace agate
 		_Height = height;
 		_MainRenderTargetView.Release();
 		_SwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-		D3DDevice::ShareInstance().CreateRenderTarget(_SwapChain, &_MainRenderTargetView);
+		_Device.CreateRenderTarget(_SwapChain, &_MainRenderTargetView);
 	}
 
 	void WindowGraphicContext::BeginDraw()
 	{
-		auto& device = D3DDevice::ShareInstance();
-		device.ResetState();
-		device.SetRenderTarget(_MainRenderTargetView, _Width, _Height);
+		_Device.ResetState();
+		_Device.SetRenderTarget(_MainRenderTargetView, _Width, _Height);
 	}
 
 	void WindowGraphicContext::GetViewSize(uint32_t& width, uint32_t& height)
@@ -50,14 +48,14 @@ namespace agate
 		_Height = height;
 		_MainRenderTargetView.Release();
 		_SwapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-		D3DDevice::ShareInstance().CreateRenderTarget(_SwapChain, &_MainRenderTargetView);
+		_Device.CreateRenderTarget(_SwapChain, &_MainRenderTargetView);
 	}
 
 	void WindowGraphicContext::SetRenderTarget(TextureHandle handle)
 	{
 		if (handle == nullptr)
 		{
-			D3DDevice::ShareInstance().SetRenderTarget(_MainRenderTargetView, _Width, _Height);
+			_Device.SetRenderTarget(_MainRenderTargetView, _Width, _Height);
 		}
 		else
 		{
@@ -67,12 +65,12 @@ namespace agate
 
 	void WindowGraphicContext::Clear(Color color)
 	{
-		D3DDevice::ShareInstance().Clear(color);
+		_Device.Clear(color);
 	}
 
 	void WindowGraphicContext::Draw(const BatchDrawData& data)
 	{
-
+		_Device.Draw(data);
 	}
 
 	void WindowGraphicContext::EndDraw(uint32_t sync)

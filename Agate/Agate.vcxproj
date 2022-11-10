@@ -158,7 +158,7 @@
   <ItemGroup>
     <ClInclude Include="Agate.h" />
     <ClInclude Include="D3D11\D3DDevice.h" />
-    <ClInclude Include="D3D11\GraphicContext.h" />
+    <ClInclude Include="D3D11\Direct3D11Graphic.h" />
     <ClInclude Include="D3D11\Pipeline.h" />
     <ClInclude Include="D3D11\VideoBuffer.h" />
     <ClInclude Include="D3D11\WindowGraphicContext.h" />
@@ -172,7 +172,7 @@
   <ItemGroup>
     <ClCompile Include="Agate.cpp" />
     <ClCompile Include="D3D11\D3DDevice.cpp" />
-    <ClCompile Include="D3D11\GraphicContext.cpp" />
+    <ClCompile Include="D3D11\Direct3D11Graphic.cpp" />
     <ClCompile Include="D3D11\Pipeline.cpp" />
     <ClCompile Include="D3D11\WindowGraphicContext.cpp" />
     <ClCompile Include="pch.cpp">

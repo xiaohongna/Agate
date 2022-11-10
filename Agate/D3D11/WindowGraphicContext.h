@@ -11,17 +11,17 @@
 #include "VideoBuffer.h"
 #include "Pipeline.h"
 #include "Brush.h"
-
+#include "D3DDevice.h"
 namespace agate
 {
-	class WindowGraphicContext: private IRenderer
+	class WindowGraphicContext: public IRenderer
 	{
     public:
-        WindowGraphicContext(HWND hwnd);
+        WindowGraphicContext(D3DDevice& device, HWND hwnd);
 
         void OnResize(uint32_t width, uint32_t height);
 #pragma region IRenderer
-    private:
+    
         void BeginDraw() override;
 
         void GetViewSize(uint32_t& width, uint32_t& height) override;
@@ -41,6 +41,7 @@ namespace agate
         CComPtr<ID3D11RenderTargetView> _MainRenderTargetView;
         uint32_t        _Width;
         uint32_t        _Height;
+        D3DDevice& _Device;
 	};
 }
 
