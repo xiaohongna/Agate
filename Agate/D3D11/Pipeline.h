@@ -21,6 +21,13 @@ namespace agate
 		{
 			return _PiplineType;
 		}
+		virtual void Dispose()
+		{
+			_IndexBuffer.Dispose();
+			_VertexShader.Release();
+			_InputLayout.Release();
+			_PixelShader.Release();
+		}
 	protected:
 		virtual HRESULT CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength) = 0;
 		bool LoadVertexShader(ID3D11Device* device, const std::wstring& csofile);
@@ -58,6 +65,11 @@ namespace agate
 
 		}
 		bool Load(ID3D11Device* device);
+		void Dispose() override
+		{
+			PipelineBase::Dispose();
+			_VertexBuffer.Dispose();
+		}
 	protected:
 		HRESULT CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength) override;
 		VideoBuffer<VertexXYUVColor, VideoBufferType::Vertex> _VertexBuffer;

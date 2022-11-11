@@ -89,6 +89,7 @@ void CleanUp()
     Canvas.reset();
     Demo.reset();
     Program.reset();
+    agate::ClearResource();
     _CrtDumpMemoryLeaks();
 }
 

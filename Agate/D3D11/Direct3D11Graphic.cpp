@@ -17,6 +17,7 @@ namespace agate
 
 	void ClearResource()
 	{
-
+		AssetManager::SharedInstance().Invalidate();
+		g_Device.Dispose();
 	}
 }

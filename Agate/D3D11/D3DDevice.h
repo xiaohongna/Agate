@@ -15,6 +15,7 @@
 
 namespace agate
 {
+
 	class  D3DDevice: public IAssetManagerDelegate 
 	{
 	public:
@@ -40,6 +41,7 @@ namespace agate
 
 		void Draw(const BatchDrawData& data);
 
+		void Dispose();
 #pragma region IAssetManagerDelegate
 		const AssetManagerConfig& GetConfig() override;
 

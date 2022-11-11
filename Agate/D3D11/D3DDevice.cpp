@@ -3,6 +3,15 @@
 #include <DirectXMath.h>
 namespace agate
 {
+    struct D3DTexture
+    {
+        uint32_t    width;
+        uint32_t    height;
+        CComPtr<ID3D11Texture2D> resource;
+        CComPtr<ID3D11ShaderResourceView> resourceView;
+        CComPtr<ID3D11RenderTargetView> renderTargetView;
+    };
+
 	HRESULT D3DDevice::CreateSwapChain(HWND hwnd, IDXGISwapChain** swapChain)
 	{
         if (_Device == NULL)
@@ -122,7 +131,9 @@ namespace agate
             }
             if (cmd.texture)
             {
-                _DeviceContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView**)&cmd.texture);
+                auto texture = static_cast<D3DTexture*>(cmd.texture);
+                assert(texture->resourceView != nullptr);
+                _DeviceContext->PSSetShaderResources(0, 1, &texture->resourceView.p);
             }
             if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
             {
@@ -131,6 +142,26 @@ namespace agate
             }
             _DeviceContext->DrawIndexed(cmd.indexCount, cmd.startIndexLocation, 0);
         }
+    }
+
+    void D3DDevice::Dispose()
+    {
+        
+        CComPtr<ID3D11Debug> debug;
+        _Device->QueryInterface(&debug);
+        _Factory.Release();
+        _Device.Release();
+        _DeviceContext.Release();
+        _VertexConstantBuffer.Dispose();
+        _RasterizerState.Release();
+        _DepthStencilState.Release();
+        for (size_t i = 0; i < 5; i++)
+        {
+            _BlendStates[i].Release();
+        }
+        _Sampler.Release();
+        _Piplines[0]->Dispose();
+        _Piplines[1]->Dispose();
     }
 	
     const AssetManagerConfig& D3DDevice::GetConfig()
@@ -146,6 +177,9 @@ namespace agate
 
 	TextureHandle D3DDevice::CreateTexture(uint32_t width, uint32_t height, void* sysMem)
 	{
+        auto result = new D3DTexture();
+        result->width = width;
+        result->height = height;
         D3D11_TEXTURE2D_DESC desc{};
         desc.Width = width;
         desc.Height = height;
@@ -157,28 +191,26 @@ namespace agate
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         desc.CPUAccessFlags = 0;
 
-        CComPtr<ID3D11Texture2D> pTexture;
         D3D11_SUBRESOURCE_DATA subResource { sysMem, desc.Width * 4, 0 };
-        auto hr = _Device->CreateTexture2D(&desc, &subResource, &pTexture);
+        auto hr = _Device->CreateTexture2D(&desc, &subResource, &result->resource);
         assert(SUCCEEDED(hr));
 
-        ID3D11ShaderResourceView* resourceView;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
         srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = desc.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
-        hr = _Device->CreateShaderResourceView(pTexture, &srvDesc, &resourceView);
+        hr = _Device->CreateShaderResourceView(result->resource, &srvDesc, &result->resourceView);
         assert(SUCCEEDED(hr));
-        return resourceView;
+        return result;
 	}
 
 	void D3DDevice::ReleaseTexture(TextureHandle handle)
 	{
         if (handle)
         {
-            auto resourceView = reinterpret_cast<ID3D11ShaderResourceView*>(handle);
-            resourceView->Release();
+            auto texture = reinterpret_cast<D3DTexture*>(handle);
+            delete texture;
         }
 	}
     HRESULT D3DDevice::CreateOther()

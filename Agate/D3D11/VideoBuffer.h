@@ -111,6 +111,10 @@ namespace agate
             _Size = size;
         }
 
+        void Dispose()
+        {
+            _Buffer.Release();
+        }
     private:
         CComPtr<ID3D11Buffer> _Buffer;
         uint32_t  _Capacity;
