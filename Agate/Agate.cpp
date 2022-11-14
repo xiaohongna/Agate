@@ -56,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGATE));
-
+    MessageBox(0, L"开始", L"1234", MB_OK);
     MSG msg;
     // 主消息循环:
     while (true)
@@ -76,8 +76,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            Program->Render(*Canvas);
-            //Demo->Render(*Canvas);
+            //Program->Render(*Canvas);
+            Demo->Render(*Canvas);
         }
     }
     CleanUp();

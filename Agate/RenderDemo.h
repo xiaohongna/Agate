@@ -13,6 +13,7 @@ private:
 	void RenderGeomegry(agate::DrawingContext& canvs);
 	void RenderSpirit(agate::DrawingContext& canvs);
 	void RenderSpiritColor(agate::DrawingContext& canvs);
+	void OffScreen(agate::DrawingContext& canvas);
 private:
 	agate::Geometry  _Line;
 	agate::Geometry  _Bezier;
@@ -25,6 +26,8 @@ private:
 	std::shared_ptr<agate::ImageAsset> _Texture;
 	agate::Image	_Spirit;
 	agate::Image	_Background;
+	std::shared_ptr<agate::ImageAsset> _OffScreen;
+	agate::Image	_OffScreenImage;
 };
 
 

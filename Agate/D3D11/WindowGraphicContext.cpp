@@ -59,7 +59,8 @@ namespace agate
 		}
 		else
 		{
-			assert(false);
+			auto texture = static_cast<D3DTexture*>(handle);
+			_Device.SetRenderTarget(texture->renderTargetView, texture->width, texture->height);
 		}
 	}
 

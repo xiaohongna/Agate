@@ -16,6 +16,15 @@
 namespace agate
 {
 
+	struct D3DTexture
+	{
+		uint32_t    width;
+		uint32_t    height;
+		CComPtr<ID3D11Texture2D> resource;
+		CComPtr<ID3D11ShaderResourceView> resourceView;
+		CComPtr<ID3D11RenderTargetView> renderTargetView;
+	};
+
 	class  D3DDevice: public IAssetManagerDelegate 
 	{
 	public:

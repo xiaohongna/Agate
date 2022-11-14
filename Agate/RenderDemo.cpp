@@ -71,15 +71,21 @@ _SpiritColor(0xFF0000FF)
 	bounds.size = { (float)bk->GetWidth(), (float)bk->GetHeight()};
 	_Background.SetClip(bounds);
 	_Background.SetBounds(bounds);
+
+	_OffScreenImage.SetClip({ 0.0f, 0.0f, 800.0f, 600.0f });
+	_OffScreenImage.SetBounds({ 0.0f, 0.0f, 800.0f, 600.0f });
+	_OffScreenImage.SetBlendMode(agate::BlendMode::Blend);
 }
 
 void RenderDemo::Render(agate::DrawingContext& canvs)
 {
 	canvs.BeginDraw();
-	canvs.Draw(_Background);
-	RenderGeomegry(canvs);
+	canvs.Clean({0xFF000000});
+	//canvs.Draw(_Background);
+	//RenderGeomegry(canvs);
 	//RenderSpirit(canvs);
-	RenderSpiritColor(canvs);
+	//RenderSpiritColor(canvs);
+	OffScreen(canvs);
 	canvs.EndDraw(1);
 }
 
@@ -138,4 +144,24 @@ void RenderDemo::RenderSpiritColor(agate::DrawingContext& canvs)
 	_SpiritColor.color = RandLCG(2456);
 	_Spirit.SetColor(_SpiritColor);
 	canvs.Draw(_Spirit);
+}
+
+static uint32_t t = 0;
+
+void RenderDemo::OffScreen(agate::DrawingContext& canvas)
+{
+	if (_OffScreen == nullptr)
+	{
+		_OffScreen = agate::AssetManager::SharedInstance().CreateImage(800, 600);
+
+		canvas.SetTarget(_OffScreen);
+		canvas.Clean({ 0xFFFF0000 });
+		RenderGeomegry(canvas);
+		//RenderSpirit(canvs);
+		//RenderSpiritColor(canvas);
+		canvas.SetTarget(nullptr);
+		_OffScreenImage.SetTexture(_OffScreen);
+		
+	}
+	canvas.Draw(_OffScreenImage);
 }

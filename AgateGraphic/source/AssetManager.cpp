@@ -10,17 +10,19 @@ namespace agate
         {
             return _Texture;
         }
-        if (_SysMemory == nullptr)
-        {
-            assert(false);
-            return _Texture;
-        }
         auto& mgr = AssetManager::SharedInstance();
-        _Texture = mgr._Delegate->CreateTexture(_Width, _Height, _SysMemory);
-        if (_Texture != nullptr && mgr._Delegate->GetConfig().holdMemory == false)
+        if (_SysMemory)
         {
-            delete _SysMemory;
-            _SysMemory = nullptr;
+            _Texture = mgr._Delegate->CreateTexture(_Width, _Height, _SysMemory);
+            if (_Texture != nullptr && mgr._Delegate->GetConfig().holdMemory == false)
+            {
+                delete _SysMemory;
+                _SysMemory = nullptr;
+            }
+        }
+        else
+        {
+            _Texture = mgr._Delegate->CreateRenderTarget(_Width, _Height);
         }
         return _Texture;
     }

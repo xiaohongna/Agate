@@ -3,14 +3,6 @@
 #include <DirectXMath.h>
 namespace agate
 {
-    struct D3DTexture
-    {
-        uint32_t    width;
-        uint32_t    height;
-        CComPtr<ID3D11Texture2D> resource;
-        CComPtr<ID3D11ShaderResourceView> resourceView;
-        CComPtr<ID3D11RenderTargetView> renderTargetView;
-    };
 
 	HRESULT D3DDevice::CreateSwapChain(HWND hwnd, IDXGISwapChain** swapChain)
 	{
@@ -162,6 +154,10 @@ namespace agate
         _Sampler.Release();
         _Piplines[0]->Dispose();
         _Piplines[1]->Dispose();
+        if (debug)
+        {
+            debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+        }
     }
 	
     const AssetManagerConfig& D3DDevice::GetConfig()
@@ -172,7 +168,34 @@ namespace agate
 
     TextureHandle D3DDevice::CreateRenderTarget(uint32_t width, uint32_t height)
     {
-        return TextureHandle();
+        auto result = new D3DTexture();
+        result->width = width;
+        result->height = height;
+        D3D11_TEXTURE2D_DESC desc{};
+        desc.Width = width;
+        desc.Height = height;
+        desc.MipLevels = 1;
+        desc.ArraySize = 1;
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        desc.CPUAccessFlags = 0;
+
+        //D3D11_SUBRESOURCE_DATA subResource{ nullptr, desc.Width * 4, 0 };
+        auto hr = _Device->CreateTexture2D(&desc, nullptr, &result->resource);
+        assert(SUCCEEDED(hr));
+        hr = _Device->CreateRenderTargetView(result->resource, NULL, &result->renderTargetView);
+        assert(SUCCEEDED(hr));
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = desc.MipLevels;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        hr = _Device->CreateShaderResourceView(result->resource, &srvDesc, &result->resourceView);
+        assert(SUCCEEDED(hr));
+        return result;
     }
 
 	TextureHandle D3DDevice::CreateTexture(uint32_t width, uint32_t height, void* sysMem)
