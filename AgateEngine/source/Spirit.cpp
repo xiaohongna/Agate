@@ -36,7 +36,7 @@ namespace agate
 		_Image.SetBlendMode(param.blend);
 		_Image.SetAntialiasing(param.antialiasing);
 		auto texture = agate::AssetManager::SharedInstance().CreateImage(param.filePath);
-		_Image.SetTexture(texture);
+		_Image.SetTexture(0, texture);
 		if (param.size.x < 0.0001 || param.size.y < 0.0001)
 		{
 			_Info.scaleCenter = { (float)texture->GetWidth(), (float)texture->GetHeight()};

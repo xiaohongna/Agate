@@ -56,7 +56,7 @@ _SpiritColor(0xFF0000FF)
 	_Ellipse.AddFigure(agate::Figure::InitAsEllipse(150, 400, 100, 20));
 	_Ellipse.SetFillBrush(pureColor);
 	_Texture = agate::AssetManager::SharedInstance().CreateImage(path + L"Splash01.png");
-	_Spirit.SetTexture(_Texture);
+	_Spirit.SetTexture(0, _Texture);
 	agate::Vector4 bounds{};
 	bounds.pos = { 200.f, 100.f };
 	bounds.size = { (float)_Texture->GetWidth(), (float)_Texture->GetHeight()};
@@ -66,7 +66,7 @@ _SpiritColor(0xFF0000FF)
 	_Spirit.SetBlendMode(agate::BlendMode::Subtract);
 
 	auto bk = agate::AssetManager::SharedInstance().CreateImage(path + L"bk.jpg");
-	_Background.SetTexture(bk);
+	_Background.SetTexture(0, bk);
 	bounds.pos = { 0.f, 0.f };
 	bounds.size = { (float)bk->GetWidth(), (float)bk->GetHeight()};
 	_Background.SetClip(bounds);
@@ -160,18 +160,16 @@ void RenderDemo::OffScreen(agate::DrawingContext& canvas)
 		//RenderSpirit(canvs);
 		//RenderSpiritColor(canvas);
 		canvas.SetTarget(nullptr);
-		_OffScreenImage.SetTexture(_OffScreen);
-
-
-		canvas.Draw(_OffScreenImage);
+		_OffScreenImage.SetTexture(0, _OffScreen);
 	}
-	t++;
-	DrawRect(canvas, t);
+
+	canvas.Draw(_OffScreenImage);
+
 }
 
 void RenderDemo::DrawRect(agate::DrawingContext& canvas, int count)
 {
-	if (count > 5)
+	if (count > 10)
 	{
 		return;
 	}

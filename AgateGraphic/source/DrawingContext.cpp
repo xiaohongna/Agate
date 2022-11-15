@@ -175,7 +175,10 @@ namespace agate
 				cmd.clipHeight = _ClipHeight;
 				_ClipChanged = false;
 			}
-			cmd.texture = data.texture;
+			for (uint32_t i = 0; i < MaxTextureCount; i++)
+			{
+				cmd.texture[i] = data.texture[i];
+			}
 			_CurrentBatch.commands.emplace_back(cmd);
 		}
 		else
@@ -194,7 +197,10 @@ namespace agate
 				}
 				cmd.indexCount = data.index.count;
 				cmd.startIndexLocation = _CurrentBatch.indexCount;
-				cmd.texture = data.texture;
+				for (uint32_t i = 0; i < MaxTextureCount; i++)
+				{
+					cmd.texture[i] = data.texture[i];
+				}
 				_ClipChanged = false;
 				_CurrentBatch.commands.emplace_back(cmd);
 			}

@@ -107,5 +107,8 @@
     <FxCompile Include="D3D11\TextureColor_PS.hlsl">
       <Filter>D3D11</Filter>
     </FxCompile>
+    <FxCompile Include="Distort_PS.hlsl">
+      <Filter>D3D11</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

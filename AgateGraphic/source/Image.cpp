@@ -21,6 +21,11 @@ namespace agate
         RemoveFlag(Spirit_Flag_Rasterize);
     }
 
+    void Image::SetEffect(PipelineType effect)
+    {
+        _RasterData.pipline = effect;
+    }
+
     void Image::SetBounds(const Vector4& bounds)
     {
         if (_Bounds != bounds)
@@ -30,11 +35,16 @@ namespace agate
         }
     }
 
-    void Image::SetTexture(const std::shared_ptr<ImageAsset>& img)
+    void Image::SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img)
     {
-        if (_Image != img)
+        if (index >= MaxTextureCount)
         {
-            _Image = img;
+            assert(false);
+            return;
+        }
+        if (_Images[index] != img)
+        {
+            _Images[index] = img;
             AddFlag(Spirit_Flag_ImageChanged);
         }
     }
@@ -69,7 +79,14 @@ namespace agate
 
     uint32_t Image::Rasterize(DrawingContext& context)
     {
-        _RasterData.texture = _Image->GetTexture();
+        for (uint32_t i = 0; i < MaxTextureCount; i++)
+        {
+            if (_Images[i] != nullptr)
+            {
+                _RasterData.texture[i] = _Images[i]->GetTexture();
+            }
+        }
+        
         if (HaveFlag(Spirit_Flag_Rasterize) == false)
         {
             Rasterize();
@@ -218,10 +235,10 @@ namespace agate
     {
         if (!_NormalUV)
         {
-            _Clip.x = _Clip.x / _Image->GetWidth();
-            _Clip.y = _Clip.y / _Image->GetHeight();
-            _Clip.right = _Clip.right / _Image->GetWidth();
-            _Clip.bottom = _Clip.bottom / _Image->GetHeight();
+            _Clip.x = _Clip.x / _Images[0]->GetWidth();
+            _Clip.y = _Clip.y / _Images[0]->GetHeight();
+            _Clip.right = _Clip.right / _Images[0]->GetWidth();
+            _Clip.bottom = _Clip.bottom / _Images[0]->GetHeight();
             _NormalUV = true;
         }
         Vector2 minUV(_Clip.x, _Clip.y);

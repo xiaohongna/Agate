@@ -19,7 +19,7 @@ int64_t GetNowTick()
 ProgramDemo::ProgramDemo()
 {
 	auto bk = agate::AssetManager::SharedInstance().CreateImage(GetModulePath() + L"bk.jpg");
-	_Background.SetTexture(bk);
+	_Background.SetTexture(0, bk);
 	agate::Vector4 bounds{ .0f, .0f, (float)bk->GetWidth(), (float)bk->GetHeight()};
 	_Background.SetClip(bounds);
 	_Background.SetBounds(bounds);

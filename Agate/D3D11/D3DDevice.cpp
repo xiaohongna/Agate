@@ -121,12 +121,17 @@ namespace agate
             {
                 SetBlend(cmd.blend);
             }
-            if (cmd.texture)
+            ID3D11ShaderResourceView* textures[MaxTextureCount]{};
+            uint32_t textureCount = 0;
+            for (uint32_t i = 0; i < MaxTextureCount; i++)
             {
-                auto texture = static_cast<D3DTexture*>(cmd.texture);
-                assert(texture->resourceView != nullptr);
-                _DeviceContext->PSSetShaderResources(0, 1, &texture->resourceView.p);
+                if (cmd.texture[i] != nullptr)
+                {
+                    textures[i] = static_cast<D3DTexture*>(cmd.texture[i])->resourceView;
+                    textureCount++;
+                }
             }
+            _DeviceContext->PSSetShaderResources(0, textureCount, textures);
             if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
             {
                 const D3D11_RECT r = { cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipHeight };

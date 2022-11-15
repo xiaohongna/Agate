@@ -4,11 +4,12 @@
 #include "Brush.h"
 namespace agate
 {
-
+	constexpr uint32_t MaxTextureCount = 2;
 	enum class PipelineType
 	{
 		Color,
 		TextureColor,
+		DistortTextureColor,
 	};
 
 	enum class BlendMode
@@ -48,7 +49,7 @@ namespace agate
 		BlendMode blend;
 		uint32_t indexCount;
 		uint32_t startIndexLocation;
-		TextureHandle texture;
+		TextureHandle texture[MaxTextureCount];
 		TextureAddressMode addressMode;
 
 		uint32_t clipX;

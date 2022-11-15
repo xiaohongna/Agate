@@ -22,9 +22,11 @@ namespace agate
 
 		void SetAntialiasing(bool enable);
 
+		void SetEffect(PipelineType effect);
+
 		void SetBounds(const Vector4& bounds);
 
-		void SetTexture(const std::shared_ptr<ImageAsset>& img);
+		void SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img);
 
 		void SetClip(const Vector4& clip, bool normal = false);
 
@@ -65,7 +67,7 @@ namespace agate
 		void UpdateColor();
 
 	private:
-		std::shared_ptr<ImageAsset>	_Image;
+		std::shared_ptr<ImageAsset>	_Images[MaxTextureCount];
 		Vector4 _Bounds;
 		Vector4 _Clip;
 		bool _NormalUV;
