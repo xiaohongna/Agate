@@ -14,6 +14,7 @@ private:
 	void RenderSpirit(agate::DrawingContext& canvs);
 	void RenderSpiritColor(agate::DrawingContext& canvs);
 	void OffScreen(agate::DrawingContext& canvas);
+	void DrawRect(agate::DrawingContext& canvas, int count);
 private:
 	agate::Geometry  _Line;
 	agate::Geometry  _Bezier;

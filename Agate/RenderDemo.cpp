@@ -161,7 +161,28 @@ void RenderDemo::OffScreen(agate::DrawingContext& canvas)
 		//RenderSpiritColor(canvas);
 		canvas.SetTarget(nullptr);
 		_OffScreenImage.SetTexture(_OffScreen);
-		
+
+
+		canvas.Draw(_OffScreenImage);
 	}
-	canvas.Draw(_OffScreenImage);
+	t++;
+	DrawRect(canvas, t);
+}
+
+void RenderDemo::DrawRect(agate::DrawingContext& canvas, int count)
+{
+	if (count > 5)
+	{
+		return;
+	}
+	agate::Brush pureColor;
+	pureColor.SetColor(0xFF00FFFF);
+	while(count > 0)
+	{ 
+		agate::Geometry  rect;
+		rect.AddFigure(agate::Figure::InitAsRectangle(agate::Vector4(50, 200 + count * 14,  60, 200 + count * 14 + 10)));
+		rect.SetFillBrush(pureColor);
+		canvas.Draw(rect);
+		count--;
+	}
 }
