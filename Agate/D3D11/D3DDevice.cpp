@@ -69,7 +69,6 @@ namespace agate
         _DeviceContext->DSSetShader(NULL, NULL, 0);
         _DeviceContext->CSSetShader(NULL, NULL, 0);
         _DeviceContext->OMSetDepthStencilState(_DepthStencilState, 0);
-        _DeviceContext->PSSetSamplers(0, 1, (ID3D11SamplerState**)&_Sampler.p);
         _DeviceContext->RSSetState(_RasterizerState);
         SetBlend(BlendMode::Blend);
     }
@@ -122,16 +121,19 @@ namespace agate
                 SetBlend(cmd.blend);
             }
             ID3D11ShaderResourceView* textures[MaxTextureCount]{};
+            ID3D11SamplerState* samplers[MaxTextureCount]{};
             uint32_t textureCount = 0;
             for (uint32_t i = 0; i < MaxTextureCount; i++)
             {
                 if (cmd.texture[i] != nullptr)
                 {
                     textures[i] = static_cast<D3DTexture*>(cmd.texture[i])->resourceView;
+                    samplers[i] = _Samplers[(UINT32)cmd.samplers[i]];
                     textureCount++;
                 }
             }
             _DeviceContext->PSSetShaderResources(0, textureCount, textures);
+            _DeviceContext->PSSetSamplers(0, textureCount, samplers);
             if (cmd.clipHeight != 0 && cmd.clipWidth != 0)
             {
                 const D3D11_RECT r = { cmd.clipX, cmd.clipY, cmd.clipX + cmd.clipWidth, cmd.clipY + cmd.clipHeight };
@@ -156,7 +158,10 @@ namespace agate
         {
             _BlendStates[i].Release();
         }
-        _Sampler.Release();
+        for (int i = 0; i < MaxTextureCount; i++)
+        {
+            _Samplers[i].Release();
+        }
         _Piplines[0]->Dispose();
         _Piplines[1]->Dispose();
         if (debug)
@@ -334,14 +339,56 @@ namespace agate
     {
         D3D11_SAMPLER_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
-        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
         desc.MipLODBias = 0.f;
         desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
         desc.MinLOD = 0.f;
         desc.MaxLOD = 0.f;
-        return _Device->CreateSamplerState(&desc, &_Sampler);
+        //SamplerMode::PointClamp
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        auto hr = _Device->CreateSamplerState(&desc, &_Samplers[0]);
+        assert(SUCCEEDED(hr));
+        //SamplerMode::PointWarp
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        hr = _Device->CreateSamplerState(&desc, &_Samplers[1]);
+        assert(SUCCEEDED(hr));
+
+        //SamplerMode::LinearClamp
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        hr = _Device->CreateSamplerState(&desc, &_Samplers[2]);
+        assert(SUCCEEDED(hr));
+
+        //SamplerMode::LinearWarp
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        hr = _Device->CreateSamplerState(&desc, &_Samplers[3]);
+        assert(SUCCEEDED(hr));
+
+        //SamplerMode::AnisotropicClamp
+        desc.Filter = D3D11_FILTER_ANISOTROPIC;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        hr = _Device->CreateSamplerState(&desc, &_Samplers[4]);
+        assert(SUCCEEDED(hr));
+
+        //SamplerMode::AnisotropicWarp
+        desc.Filter = D3D11_FILTER_ANISOTROPIC;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        hr = _Device->CreateSamplerState(&desc, &_Samplers[5]);
+        assert(SUCCEEDED(hr));
+        return hr;
     }
 }

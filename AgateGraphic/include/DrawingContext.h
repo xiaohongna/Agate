@@ -36,6 +36,7 @@ namespace agate
 
 		void PushCommnd(const RasterizeData& data);
 
+		bool CanMergeCommand(const DrawCommand& cmd, const RasterizeData& data) const;
 	private:
 		std::unique_ptr<IRendererDelegate> _Renderer;
 		FixedBuffer<unsigned char>		_VertextBuffer;

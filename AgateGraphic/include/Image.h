@@ -9,16 +9,7 @@ namespace agate
 	class Image : public Drawable
 	{
 	public:
-		Image() :_Matrix{},
-			_Flags{ 0 },
-			_Color{ 0xFFFFFFFF },
-			_NormalUV{true},
-			_Clip{0.0f, 0.0f, 1.0f, 1.0f}
-		{
-			_Matrix._11 = 1.0f;
-			_Matrix._22 = 1.0f;
-			_RasterData.pipline = PipelineType::TextureColor;
-		}
+		Image();
 
 		void SetAntialiasing(bool enable);
 
@@ -26,7 +17,7 @@ namespace agate
 
 		void SetBounds(const Vector4& bounds);
 
-		void SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img);
+		void SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img, SamplerMode sampler = SamplerMode::PointClamp);
 
 		void SetClip(const Vector4& clip, bool normal = false);
 
@@ -68,6 +59,7 @@ namespace agate
 
 	private:
 		std::shared_ptr<ImageAsset>	_Images[MaxTextureCount];
+		SamplerMode	_ImageSampler[MaxTextureCount];
 		Vector4 _Bounds;
 		Vector4 _Clip;
 		bool _NormalUV;

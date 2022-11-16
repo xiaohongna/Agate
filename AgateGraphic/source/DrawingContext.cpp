@@ -178,13 +178,18 @@ namespace agate
 			for (uint32_t i = 0; i < MaxTextureCount; i++)
 			{
 				cmd.texture[i] = data.texture[i];
+				cmd.samplers[i] = data.samplers[i];
 			}
 			_CurrentBatch.commands.emplace_back(cmd);
 		}
 		else
 		{
 			auto& back = _CurrentBatch.commands.back();
-			if (back.blend != data.blend || _ClipChanged || back.texture != data.texture)
+			if (CanMergeCommand(back, data))
+			{
+				back.indexCount += data.index.count;
+			}
+			else
 			{
 				DrawCommand cmd{};
 				cmd.blend = data.blend;
@@ -200,15 +205,30 @@ namespace agate
 				for (uint32_t i = 0; i < MaxTextureCount; i++)
 				{
 					cmd.texture[i] = data.texture[i];
+					cmd.samplers[i] = data.samplers[i];
 				}
 				_ClipChanged = false;
 				_CurrentBatch.commands.emplace_back(cmd);
 			}
-			else
+		}
+	}
+	bool DrawingContext::CanMergeCommand(const DrawCommand& cmd, const RasterizeData& data) const
+	{
+		if (_ClipChanged)
+		{
+			return false;
+		}
+		if (cmd.blend != data.blend)
+		{
+			return false;
+		}
+		for (uint32_t i = 0; i < MaxTextureCount; i++)
+		{
+			if (cmd.texture[i] != data.texture[i] || cmd.samplers[i] != data.samplers[i])
 			{
-				back.indexCount += data.index.count;
+				return false;
 			}
 		}
-
+		return true;
 	}
 }

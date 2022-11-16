@@ -8,6 +8,20 @@ namespace agate
     constexpr uint32_t Spirit_Flag_ColorChanged = 1 << 2;
     constexpr uint32_t Spirit_Flag_Antialiasing = 1 << 3;
 
+    Image::Image() :
+            _Matrix{},
+            _Flags{ 0 },
+            _Color{ 0xFFFFFFFF },
+            _NormalUV{ true },
+            _Clip{ 0.0f, 0.0f, 1.0f, 1.0f },
+            _ImageSampler{}
+    {
+            _Matrix._11 = 1.0f;
+            _Matrix._22 = 1.0f;
+            _RasterData.pipline = PipelineType::TextureColor;
+            _RasterData.samplers[0] = SamplerMode::PointClamp;
+    }
+
     void Image::SetAntialiasing(bool enable)
     {
         if (enable)
@@ -35,7 +49,7 @@ namespace agate
         }
     }
 
-    void Image::SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img)
+    void Image::SetTexture(uint32_t index, const std::shared_ptr<ImageAsset>& img, SamplerMode sampler)
     {
         if (index >= MaxTextureCount)
         {
@@ -45,6 +59,7 @@ namespace agate
         if (_Images[index] != img)
         {
             _Images[index] = img;
+            _ImageSampler[index] = sampler;
             AddFlag(Spirit_Flag_ImageChanged);
         }
     }
@@ -84,6 +99,7 @@ namespace agate
             if (_Images[i] != nullptr)
             {
                 _RasterData.texture[i] = _Images[i]->GetTexture();
+                _RasterData.samplers[i] = _ImageSampler[i];
             }
         }
         

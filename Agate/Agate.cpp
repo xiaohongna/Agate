@@ -54,7 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }
-    MessageBox(0, L"开始", L"Demo", MB_OK);
+    //MessageBox(0, L"开始", L"Demo", MB_OK);
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGATE));
     Canvas->BeginDraw();
     Canvas->Clean({ 0xFFFFFFFF });

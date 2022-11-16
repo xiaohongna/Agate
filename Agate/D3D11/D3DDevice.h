@@ -76,7 +76,7 @@ namespace agate
 		CComPtr<ID3D11DepthStencilState>  _DepthStencilState;
 
 		CComPtr<ID3D11BlendState>       _BlendStates[5];
-		CComPtr<ID3D11SamplerState>     _Sampler;
+		CComPtr<ID3D11SamplerState>     _Samplers[(ULONG)SamplerMode::SamplerModeCount];
 		std::unique_ptr<PipelineBase>    _Piplines[2];
 
 		PipelineBase* _CurrentPipline;

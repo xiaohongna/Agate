@@ -37,6 +37,17 @@ namespace agate
 
 	};
 
+	enum class SamplerMode
+	{
+		PointClamp,
+		PointWarp,
+		LinearClamp,
+		LinearWarp, 
+		AnisotropicClamp,
+		AnisotropicWarp, 
+		SamplerModeCount
+	};
+
 	enum class TextureAddressMode
 	{
 		Clamp,
@@ -50,6 +61,7 @@ namespace agate
 		uint32_t indexCount;
 		uint32_t startIndexLocation;
 		TextureHandle texture[MaxTextureCount];
+		SamplerMode samplers[MaxTextureCount];
 		TextureAddressMode addressMode;
 
 		uint32_t clipX;

@@ -63,9 +63,12 @@ namespace agate
 		FixedBuffer<char> vertex;
 		FixedBuffer<DrawIndex> index;
 		TextureHandle	texture[MaxTextureCount];
-		RasterizeData() :pipline{ PipelineType::Color },
+		SamplerMode		samplers[MaxTextureCount];
+		RasterizeData() :
+			pipline{ PipelineType::Color },
 			blend{ BlendMode::Blend },
-			texture{}
+			texture{},
+			samplers{}
 		{
 
 		}
