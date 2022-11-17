@@ -74,4 +74,24 @@ namespace agate
 		HRESULT CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength) override;
 		VideoBuffer<VertexXYUVColor, VideoBufferType::Vertex> _VertexBuffer;
 	};
+
+	class DisplacementPipline : public PipelineBase
+	{
+	public:
+		void Active(ID3D11DeviceContext* context) override;
+		void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count) override;
+		DisplacementPipline() : PipelineBase(PipelineType::TextureColor)
+		{
+
+		}
+		bool Load(ID3D11Device* device);
+		void Dispose() override
+		{
+			PipelineBase::Dispose();
+			_VertexBuffer.Dispose();
+		}
+	protected:
+		HRESULT CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength) override;
+		VideoBuffer<VertexXYUVColor, VideoBufferType::Vertex> _VertexBuffer;
+	};
 }
