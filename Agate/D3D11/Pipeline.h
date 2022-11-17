@@ -78,12 +78,12 @@ namespace agate
 	class DisplacementPipline : public PipelineBase
 	{
 	public:
-		void Active(ID3D11DeviceContext* context) override;
-		void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count) override;
-		DisplacementPipline() : PipelineBase(PipelineType::TextureColor)
+		DisplacementPipline() : PipelineBase(PipelineType::DistortTextureColor)
 		{
 
 		}
+		void Active(ID3D11DeviceContext* context) override;
+		void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count) override;
 		bool Load(ID3D11Device* device);
 		void Dispose() override
 		{

@@ -294,6 +294,17 @@ namespace agate
             hr = E_FAIL;
             assert(false);
         }
+
+        auto DisplacementPPL = std::make_unique<DisplacementPipline>();
+        if (DisplacementPPL->Load(_Device))
+        {
+            _Piplines[2] = std::move(DisplacementPPL);
+        }
+        else
+        {
+            hr = E_FAIL;
+            assert(false);
+        }
         return hr;
     }
     HRESULT D3DDevice::CreateBlendState()

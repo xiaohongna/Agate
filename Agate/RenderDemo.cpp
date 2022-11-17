@@ -1,25 +1,20 @@
 #include "pch.h"
 #include "RenderDemo.h"
 
-int32_t RandLCG(int32_t seed)
-{
-	const int64_t a = 1103515245;
-	const int64_t c = 12345;
-	const int64_t m = 2147483647;
-
-	seed = (seed * a + c) & m;
-	return seed % 0x7fff;
-}
-
-RenderDemo::RenderDemo():_Scale{1.0f, 1.0f},
-_SpiritColor(0xFF0000FF)
+const std::wstring GetResPath()
 {
 	wchar_t pathBuffer[256];
 	GetModuleFileName(0, pathBuffer, 256);
 	std::wstring path(pathBuffer);
 	auto pos = path.rfind(LR"(\)");
 	path = path.substr(0, pos + 1);
+	return path;
+}
 
+RenderDemo::RenderDemo():_Scale{1.0f, 1.0f},
+_SpiritColor(0xFF0000FF)
+{
+	auto path = GetResPath();
 
 	_Rotation = 0.0;
 	
@@ -81,11 +76,12 @@ void RenderDemo::Render(agate::DrawingContext& canvs)
 {
 	canvs.BeginDraw();
 	canvs.Clean({0xFF000000});
-	//canvs.Draw(_Background);
+	canvs.Draw(_Background);
 	//RenderGeomegry(canvs);
 	//RenderSpirit(canvs);
 	//RenderSpiritColor(canvs);
-	OffScreen(canvs);
+	//OffScreen(canvs);
+	DisplacementRender(canvs);
 	canvs.EndDraw(1);
 }
 
@@ -131,19 +127,7 @@ void RenderDemo::RenderSpirit(agate::DrawingContext& canvs)
 
 void RenderDemo::RenderSpiritColor(agate::DrawingContext& canvs)
 {
-	/*
-	if (_SpiritColor.alpha > 1)
-	{
-		_SpiritColor.alpha -= 1;
-	}
-	else
-	{
-		_SpiritColor.alpha = 255;
-	}
-	*/
-	_SpiritColor.color = RandLCG(2456);
-	_Spirit.SetColor(_SpiritColor);
-	canvs.Draw(_Spirit);
+
 }
 
 static uint32_t t = 0;
@@ -183,4 +167,26 @@ void RenderDemo::DrawRect(agate::DrawingContext& canvas, int count)
 		canvas.Draw(rect);
 		count--;
 	}
+}
+
+void RenderDemo::DisplacementRender(agate::DrawingContext& canvas)
+{
+	if (_DisplacementImage == nullptr)
+	{
+		auto path = GetResPath();
+		_DisplacementImage = std::make_unique<agate::Image>();
+		auto bk = agate::AssetManager::SharedInstance().CreateImage(path + L"r.jpg");
+		_DisplacementImage->SetTexture(0, bk, agate::SamplerMode::LinearWarp);
+		auto displace = agate::AssetManager::SharedInstance().CreateImage(path + L"Dispalce.jpg");
+		_DisplacementImage->SetTexture(1, displace);
+		agate::Vector4 clip{ 0.0f, 0.0f, (float)bk->GetWidth() , (float)bk->GetHeight() };
+		_DisplacementImage->SetClip(clip);
+
+		agate::Vector4 bounds;
+		bounds.pos = { 200.f, 100.f };
+		bounds.size = { (float)bk->GetWidth() / 2.0f, (float)bk->GetHeight() / 2.0f };
+		_DisplacementImage->SetBounds(bounds);
+		_DisplacementImage->SetEffect(agate::PipelineType::DistortTextureColor);
+	}
+	canvas.Draw(*_DisplacementImage);
 }

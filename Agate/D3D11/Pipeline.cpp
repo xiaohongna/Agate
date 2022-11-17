@@ -113,4 +113,38 @@ namespace agate
         };
         return device->CreateInputLayout(local_layout, 3, pShaderBytecodeWithInputSignature, BytecodeLength, &_InputLayout);
     }
+
+    void DisplacementPipline::Active(ID3D11DeviceContext* context)
+    {
+        PipelineBase::Active(context);
+        _VertexBuffer.Bind(context);
+    }
+
+    void DisplacementPipline::UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count)
+    {
+        _VertexBuffer.Update(context, (VertexXYUVColor*)data, count);
+    }
+
+    bool DisplacementPipline::Load(ID3D11Device* device)
+    {
+        _VertexBuffer.Init(device, 5000 * sizeof(VertexXYUVColor));
+        _IndexBuffer.Init(device, 6000);
+        wchar_t pathBuffer[512];
+        GetModuleFileName(0, pathBuffer, 512);
+        std::wstring path(pathBuffer);
+        auto pos = path.rfind(LR"(\)");
+        path = path.substr(0, pos + 1);
+        return LoadVertexShader(device, path + LR"(TextureColor_VS.cso)") && LoadPixelShader(device, path + LR"(Displacement_PS.cso)");
+    }
+    HRESULT DisplacementPipline::CreateInputLayout(ID3D11Device* device, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength)
+    {
+        D3D11_INPUT_ELEMENT_DESC local_layout[] =
+        {
+
+            { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,   0, (UINT)offsetof(VertexXYUVColor, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,  0, (UINT)offsetof(VertexXYUVColor, uv),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "COLOR",   0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (UINT)offsetof(VertexXYUVColor, col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        };
+        return device->CreateInputLayout(local_layout, 3, pShaderBytecodeWithInputSignature, BytecodeLength, &_InputLayout);
+    }
 }

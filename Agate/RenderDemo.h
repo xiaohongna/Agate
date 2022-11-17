@@ -2,6 +2,7 @@
 #include "DrawingContext.h"
 #include "Image.h"
 #include "Geometry.h"
+#include <memory>
 
 class RenderDemo
 {
@@ -15,6 +16,7 @@ private:
 	void RenderSpiritColor(agate::DrawingContext& canvs);
 	void OffScreen(agate::DrawingContext& canvas);
 	void DrawRect(agate::DrawingContext& canvas, int count);
+	void DisplacementRender(agate::DrawingContext& canvas);
 private:
 	agate::Geometry  _Line;
 	agate::Geometry  _Bezier;
@@ -29,6 +31,7 @@ private:
 	agate::Image	_Background;
 	std::shared_ptr<agate::ImageAsset> _OffScreen;
 	agate::Image	_OffScreenImage;
+	std::unique_ptr<agate::Image>	_DisplacementImage;
 };
 
 

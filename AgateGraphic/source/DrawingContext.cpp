@@ -128,6 +128,10 @@ namespace agate
 
 	bool DrawingContext::NeedFlush(const RasterizeData& data)
 	{
+		if (_CurrentBatch.commands.empty())
+		{
+			return false;
+		}
 		if (_CurrentBatch.pipline != data.pipline)
 		{
 			//渲染管线不同
