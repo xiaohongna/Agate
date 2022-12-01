@@ -360,16 +360,30 @@ HRESULT CreateBitmapFromFile(PCWSTR uri,ID2D1Bitmap** ppBitmap)
 }
 
 CComPtr<ID2D1Bitmap> bitmap;
+CComPtr<ID2D1Effect> cropEffect;
+CComPtr<ID2D1Effect> gaussianBlurEffect;
 
 void Draw()
 {
 	if (bitmap == nullptr)
 	{
 		CreateBitmapFromFile(LR"(D:\UGit\Agate\Resource\bk.jpg)", &bitmap);
+
+		m_d2dContext->CreateEffect(CLSID_D2D1Crop, &cropEffect);
+
+		cropEffect->SetInput(0, bitmap);
+		cropEffect->SetValue(D2D1_CROP_PROP_RECT, D2D1::RectF(0.0f, 0.0f, 256.0f, 192.0f));
+		cropEffect->SetValue(D2D1_CROP_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
+
+		
+		m_d2dContext->CreateEffect(CLSID_D2D1GaussianBlur, &gaussianBlurEffect);
+
+		gaussianBlurEffect->SetInput(0, bitmap);
+		gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 2.0f);
 	}
     m_d2dContext->BeginDraw();
     m_d2dContext->Clear(D2D1::ColorF(0xFF00FFFF));
-	m_d2dContext->DrawBitmap(bitmap);
+	m_d2dContext->DrawImage(gaussianBlurEffect);
     m_d2dContext->EndDraw();
     m_swapChain->Present(1, 0);
 }
