@@ -14,9 +14,10 @@ Texture2D texture1 : register(t1);
             
 float4 main(PS_INPUT input) : SV_Target
 {
-    float2 disp = texture1.Sample(sampler1, input.uv).rg * 0.05;
-    //disp = ((disp * 2) - 1) * 1.2f;
-
-    float4 out_col = input.col * texture0.Sample(sampler0, input.uv + disp);
+    const float extend = 0.05;
+    float2 disp = texture1.Sample(sampler1, input.uv).rg;
+    disp = ((disp * 2) - 1) * 0.05f;
+    float2 uv = input.uv * (1.0 + extend * 2) - extend;
+    float4 out_col = input.col * texture0.Sample(sampler0, uv + disp);
     return out_col;
 }
