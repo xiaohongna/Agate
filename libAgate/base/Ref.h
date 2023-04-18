@@ -16,7 +16,7 @@ namespace agate
     class Reference
     {
     private:
-        Reference(Ref* obj) :_weakReference{1}
+        Reference(Ref* obj)
         {
             _obj = obj;
         }
@@ -29,7 +29,7 @@ namespace agate
         void release()
         {
             auto count = _weakReference--;
-            if (count == 1 && _reference == 0)
+            if (count == 1)
             {
                 delete this;
             }
@@ -37,14 +37,13 @@ namespace agate
 
         ~Reference()
         {
-            assert(_reference == 0);
             assert(_weakReference == 0);
         }
     private:
         friend class Ref;
         friend class BasePtr;
-        std::atomic_uint _reference;
-        std::atomic_uint _weakReference;
+        std::atomic_uint _reference{0};
+        std::atomic_uint _weakReference{1};
         Ref* _obj;
     };
 
@@ -81,14 +80,14 @@ namespace agate
 	};
 
     template <class T>
-    class RefPtr 
+    class Share_Ptr
     {
     public:
-        RefPtr() :_p{}
+        Share_Ptr() :_p{}
         {
         }
 
-        RefPtr(T* lp): _p{lp}
+        Share_Ptr(T* lp): _p{lp}
         {
             if (_p)
             {
@@ -96,7 +95,7 @@ namespace agate
             }
         }
 
-        RefPtr(RefPtr<T>& lp)
+        Share_Ptr(Share_Ptr<T>& lp)
         {
             _p = lp->_p;
             if (_p)
@@ -105,7 +104,7 @@ namespace agate
             }
         }
 
-        RefPtr(RefPtr<T>&& lp)
+        Share_Ptr(Share_Ptr<T>&& lp)
         {
             _p = lp._p;
             lp._p = nullptr;
@@ -157,7 +156,7 @@ namespace agate
             return *this;
         }
 
-        T* operator=(RefPtr<T>&& lp)
+        T* operator=(Share_Ptr<T>&& lp)
         {
             if (_p != lp._p)
             {
@@ -173,9 +172,16 @@ namespace agate
                 lp._p->release();
                 lp._p = nullptr;
             }
+            return lp._p;
         }
 
-        T* operator=(RefPtr<T>& lp)
+        T** operator&() throw()
+        {
+            assert(_p == nullptr);
+            return &_p;
+        }
+
+        T* operator=(Share_Ptr<T>& lp)
         {
             if (_p != lp._p)
             {
@@ -189,32 +195,56 @@ namespace agate
                     _p->retain();
                 }
             }
+            return lp._p;
         }
         
-        ~RefPtr()
+        void reset() 
+        {
+            if (_p)
+            {
+                _p->release();
+                _p = nullptr;
+            }
+        }
+
+        ~Share_Ptr()
         {
             if (_p)
             {
                 _p->release();
             }
         }
-    private:
+
         T* _p;
     };
     
-    class BasePtr
+    class BasePtr 
     {
+    public:
+        ~BasePtr()
+        {
+            reset();
+        }
+        
+        void reset()
+        {
+            if (_ref)
+            {
+                _ref->release();
+                _ref = nullptr;
+            }
+        }
     protected:
         BasePtr() :_ref{}
         {
 
         }
 
-        BasePtr(Ref* ref) 
+        BasePtr(Ref* obj) 
         {
-            if (ref)
+            if (obj)
             {
-                _ref = ref->_ref;
+                _ref = obj->_ref;
                 _ref->retain();
             }
             else
@@ -232,44 +262,65 @@ namespace agate
             }
         }
 
-        BasePtr(BasePtr&& ptr)
+        BasePtr(BasePtr&& ptr) noexcept
         {
             _ref = ptr._ref;
             ptr._ref = nullptr;
         }
 
-
-        void release()
+        void assign(Ref* obj)
         {
-            if (_ref)
+            if (obj)
             {
-                _ref->release();
+                if (obj->_ref != _ref)
+                {
+                    reset();
+                    _ref = obj->_ref;
+                    _ref->retain();
+                }
+            }
+            else
+            {
+                reset();
             }
         }
-    
+
+        Ref* _lock()
+        {
+            auto count = _ref->_reference++;
+            if (count > 0)
+            {
+                return _ref->_obj;
+            }
+            else
+            {
+                _ref->_reference--;
+                return nullptr;
+            }
+        }
     protected:
         Reference* _ref;
     };
 
     template<class T>
-    class WeakRefPtr: public BasePtr
+    class Weak_Ptr: public BasePtr
     {
     public:
-        WeakRefPtr() :BasePtr()
+        Weak_Ptr() :BasePtr()
         {
         }
 
-        WeakRefPtr(T* lp): BasePtr(lp)
+        Weak_Ptr(T* lp): BasePtr(lp)
         {
 
         }
 
-        WeakRefPtr(WeakRefPtr<T>& lp)
+        Weak_Ptr(WeakRefPtr<T>& lp)
         {
             _ref = lp._ref;
         }
 
-        WeakRefPtr(WeakRefPtr<T>&& lp)
+        Weak_Ptr(WeakRefPtr<T>&& lp)
         {
             _ref = lp._ref;
             lp._ref = nullptr;
@@ -277,41 +328,15 @@ namespace agate
 
         T* operator=(T* lp)
         {
-            if (lp == nullptr)
-            {
-                release();
-                _ref = nullptr;
-            }
-            else if (_ref != lp->_ref)
-            {
-                release();
-                _ref = lp->_ref;
-                _ref->_weakReference++;
-            }
+            assign(lp);
             return lp;
         }
 
-        RefPtr<T> lock()
+        Share_Ptr<T> lock()
         {
-            RefPtr<T> obj;
-            if (_ref)
-            {
-                _ref->_reference++;
-                if (_ref->_obj)
-                {
-                    obj.attach(_ref->_obj);
-                }
-                else
-                {
-                    _ref->_reference--;
-                }
-            }
-            return std::move(obj);
-        }
-
-        ~WeakRefPtr()
-        {
-            release();
+            Share_Ptr<T> ptr;
+            ptr.attach(static_cast<T*>(_lock()));
+            return ptr;
         }
     };
 
