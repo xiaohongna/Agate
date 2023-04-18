@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <future>
+#include <assert.h>
 
 namespace agate
 {
@@ -15,16 +16,30 @@ namespace agate
     class Reference
     {
     private:
-        Reference(Ref* obj)
+        Reference(Ref* obj) :_weakReference{1}
         {
             _obj = obj;
         }
 
+        void retain()
+        {
+            _weakReference++;
+        }
+
+        void release()
+        {
+            auto count = _weakReference--;
+            if (count == 1 && _reference == 0)
+            {
+                delete this;
+            }
+        }
+
         ~Reference()
         {
-
+            assert(_reference == 0);
+            assert(_weakReference == 0);
         }
-        
     private:
         friend class Ref;
         friend class BasePtr;
@@ -57,13 +72,13 @@ namespace agate
         {
             _ref = new Reference(this);
         }
+        
         virtual ~Ref();
 
 	private:
         friend class BasePtr;
         Reference* _ref;
 	};
-
 
     template <class T>
     class RefPtr 
@@ -194,21 +209,44 @@ namespace agate
         {
 
         }
-        BasePtr(Reference* ref) :_ref{ ref }
+
+        BasePtr(Ref* ref) 
         {
+            if (ref)
+            {
+                _ref = ref->_ref;
+                _ref->retain();
+            }
+            else
+            {
+                _ref = nullptr;
+            }
         }
+
+        BasePtr(BasePtr& ptr)
+        {
+            _ref = ptr._ref;
+            if (_ref)
+            {
+                _ref->retain();
+            }
+        }
+
+        BasePtr(BasePtr&& ptr)
+        {
+            _ref = ptr._ref;
+            ptr._ref = nullptr;
+        }
+
 
         void release()
         {
             if (_ref)
             {
-                auto count = _ref->_weakReference--;
-                if (count == 1 && _ref->_obj == nullptr)
-                {
-                    delete this;
-                }
+                _ref->release();
             }
         }
+    
     protected:
         Reference* _ref;
     };
@@ -221,13 +259,9 @@ namespace agate
         {
         }
 
-        WeakRefPtr(T* lp)
+        WeakRefPtr(T* lp): BasePtr(lp)
         {
-            if (lp != nullptr)
-            {
-                BasePtr(lp->_ref);
-                _ref->_weakReference++;
-            }
+
         }
 
         WeakRefPtr(WeakRefPtr<T>& lp)
