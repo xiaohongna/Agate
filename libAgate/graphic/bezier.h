@@ -51,7 +51,41 @@
 
 // First conversion from original 28.4 to 18.14 format
 
-#include <Windows.h>
+#include <math.h>
+#include <algorithm>
+
+#define VOID void
+
+typedef char CHAR;
+typedef short SHORT;
+typedef long LONG;
+typedef int  INT;
+typedef int  BOOL;
+typedef __int64 LONGLONG;
+typedef unsigned __int64 ULONGLONG;
+
+#ifndef FALSE
+#define FALSE               0
+#endif
+
+#ifndef TRUE
+#define TRUE                1
+#endif
+
+typedef struct
+{
+    LONG  x;
+    LONG  y;
+} POINT, * PPOINT;
+
+typedef struct tagRECT
+{
+    LONG    left;
+    LONG    top;
+    LONG    right;
+    LONG    bottom;
+} RECT, * PRECT; 
+typedef int                 INT;
 
 #define DBG 1
 
@@ -85,12 +119,12 @@ private:
 public:
     MIL_FORCEINLINE LONG lParentErrorDividedBy4() 
     { 
-        return(max(abs(e3), abs(e2 + e2 - e3))); 
+        return(std::max(abs(e3), abs(e2 + e2 - e3))); 
     }
 
     MIL_FORCEINLINE LONG lError()                 
     { 
-        return(max(abs(e2), abs(e3))); 
+        return(std::max(abs(e2), abs(e3))); 
     }
 
     MIL_FORCEINLINE INT fxValue() const

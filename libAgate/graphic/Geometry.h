@@ -2,10 +2,11 @@
 #include "Ref.h"
 #include "Vector.h"
 #include "Matrix.h"
+#include "Visual.h"
 
 namespace agate
 {
-    class Geometry :
+    class AgateAPI Geometry :
         public Ref
     {
     public:
@@ -32,17 +33,24 @@ namespace agate
         {
             _close = true;
         }
-    private:
-        enum class PointType
+
+        void setTransform(const Matrix3X2& transition)
         {
-            Line,
-            Bezier
-        };
+            _transition = transition;
+        }
+
+    private:
         void reserve(int32_t pointCount, int32_t typeCount);
     private:
         std::vector<Vector2> _points;
-        std::vector<PointType> _pointTypes;
-        bool _close{ false };
+        std::vector<LineType> _pointTypes;
+        Matrix3X2 _transition;
+        bool _closed{ false };
+        Color _strokeColor;
+        Color _fillColor;
+        float _strokeWidth{ 1.0f };
+
+        Share_Ptr<Visual>  _visual;
     };
 }
 

@@ -133,7 +133,7 @@ namespace agate
             dest.y = source.x * _12 + source.y * _22 + _32;
         }
 
-        void TransformPoint(Vector2* dest, const Vector2* source, const uint32_t count) const
+        void transformPoint(Vector2* dest, const Vector2* source, const uint32_t count) const
         {
             for (uint32_t i = 0; i < count; i++)
             {

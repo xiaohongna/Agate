@@ -515,12 +515,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="base\Color.h" />
     <ClInclude Include="base\Matrix.h" />
     <ClInclude Include="base\Ref.h" />
     <ClInclude Include="base\Vector.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="graphic\bezier.h" />
     <ClInclude Include="graphic\Geometry.h" />
+    <ClInclude Include="graphic\Visual.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -528,6 +530,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="graphic\bezier.cpp" />
     <ClCompile Include="graphic\Geometry.cpp" />
+    <ClCompile Include="graphic\Visual.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

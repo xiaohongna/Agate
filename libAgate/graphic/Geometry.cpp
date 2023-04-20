@@ -15,7 +15,7 @@ namespace agate
 	void Geometry::lineTo(float x, float y)
 	{
 		_points.emplace_back(x, y);
-		_pointTypes.emplace_back(PointType::Line);
+		_pointTypes.emplace_back(LineType::Line);
 	}
 
 	void Geometry::lineTo(const Vector2* pts, uint32_t count)
@@ -24,7 +24,7 @@ namespace agate
 		for (size_t i = 0; i < count; i++)
 		{
 			_points.emplace_back(pts[i]);
-			_pointTypes.emplace_back(PointType::Line);
+			_pointTypes.emplace_back(LineType::Line);
 		}
 	}
 
@@ -34,7 +34,7 @@ namespace agate
 		_points.emplace_back(ctr1);
 		_points.emplace_back(ctr2);
 		_points.emplace_back(endPt);
-		_pointTypes.emplace_back(PointType::Bezier);
+		_pointTypes.emplace_back(LineType::Bezier);
 	}
 
 	void Geometry::bezierTo(const Vector2* pts, uint32_t count)
@@ -47,7 +47,7 @@ namespace agate
 			_points.emplace_back(pts[0]);
 			_points.emplace_back(pts[1]);
 			_points.emplace_back(pts[2]);
-			_pointTypes.emplace_back(PointType::Bezier);
+			_pointTypes.emplace_back(LineType::Bezier);
 			pts += 3;
 		}
 	}
