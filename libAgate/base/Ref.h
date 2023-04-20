@@ -83,74 +83,74 @@ namespace agate
     class Share_Ptr
     {
     public:
-        Share_Ptr() :_p{}
+        Share_Ptr() :p{}
         {
         }
 
-        Share_Ptr(T* lp): _p{lp}
+        Share_Ptr(T* lp): p{lp}
         {
-            if (_p)
+            if (p)
             {
-                _p->retain();
+                p->retain();
             }
         }
 
         Share_Ptr(Share_Ptr<T>& lp)
         {
-            _p = lp->_p;
-            if (_p)
+            p = lp->_p;
+            if (p)
             {
-                _p->retain();
+                p->retain();
             }
         }
 
         Share_Ptr(Share_Ptr<T>&& lp)
         {
-            _p = lp._p;
-            lp._p = nullptr;
+            p = lp.p;
+            lp.p = nullptr;
         }
 
         void attach(T* lp)
         {
-            if (_p)
+            if (p)
             {
-                _p->release();
+                p->release();
             }
-            _p = lp;
+            p = lp;
         }
 
         operator T* () const
         {
-            return _p;
+            return p;
         }
 
         T* operator->() const
         {
-            return _p;
+            return p;
         }
 
         T& operator*() const
         {
-            return *_p;
+            return *p;
         }
 
         bool operator==(T* pT)
         {
-            return _p == pT;
+            return p == pT;
         }
 
         T* operator=(T* lp)
         {
-            if (_p != lp)
+            if (p != lp)
             {
-                if (_p)
+                if (p)
                 {
-                    _p->release();
+                    p->release();
                 }
-                _p = lp;
-                if (_p)
+                p = lp;
+                if (p)
                 {
-                    _p->retain();
+                    p->retain();
                 }
             }
             return *this;
@@ -158,64 +158,64 @@ namespace agate
 
         T* operator=(Share_Ptr<T>&& lp)
         {
-            if (_p != lp._p)
+            if (p != lp.p)
             {
-                if (_p)
+                if (p)
                 {
-                    _p->release();
+                    p->release();
                 }
-                _p = lp._p;
-                lp._p = nullptr;
+                p = lp.p;
+                lp.p = nullptr;
             }
-            else if(_p)
+            else if(p)
             {
-                lp._p->release();
-                lp._p = nullptr;
+                lp.p->release();
+                lp.p = nullptr;
             }
-            return lp._p;
+            return lp.p;
         }
 
         T** operator&() throw()
         {
-            assert(_p == nullptr);
-            return &_p;
+            assert(p == nullptr);
+            return &p;
         }
 
         T* operator=(Share_Ptr<T>& lp)
         {
-            if (_p != lp._p)
+            if (p != lp.p)
             {
-                if (_p)
+                if (p)
                 {
-                    _p->release();
+                    p->release();
                 }
-                _p = lp._p;
-                if (_p)
+                p = lp.p;
+                if (p)
                 {
-                    _p->retain();
+                    p->retain();
                 }
             }
-            return lp._p;
+            return lp.p;
         }
         
         void reset() 
         {
-            if (_p)
+            if (p)
             {
-                _p->release();
-                _p = nullptr;
+                p->release();
+                p = nullptr;
             }
         }
 
         ~Share_Ptr()
         {
-            if (_p)
+            if (p)
             {
-                _p->release();
+                p->release();
             }
         }
 
-        T* _p;
+        T* p;
     };
     
     class BasePtr 
@@ -315,12 +315,12 @@ namespace agate
 
         }
 
-        Weak_Ptr(WeakRefPtr<T>& lp)
+        Weak_Ptr(Weak_Ptr<T>& lp)
         {
             _ref = lp._ref;
         }
 
-        Weak_Ptr(WeakRefPtr<T>&& lp)
+        Weak_Ptr(Weak_Ptr<T>&& lp)
         {
             _ref = lp._ref;
             lp._ref = nullptr;
