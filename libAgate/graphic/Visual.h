@@ -60,7 +60,7 @@ namespace agate
         std::vector<Vector2> _points;
         std::vector<LineType> _lineTypes;
         bool _closed { false };
-        Matrix3X2 _transition;
+        Matrix3X2 _transition{};
         Color _strokeColor;
         Color _fillColor;
         float _strokeWidth{ 1.0f };

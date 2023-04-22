@@ -241,7 +241,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)base;$(ProjectDir)graphic;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)base;$(ProjectDir)graphic;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -522,6 +522,8 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="graphic\bezier.h" />
     <ClInclude Include="graphic\Geometry.h" />
+    <ClInclude Include="graphic\Renderer.h" />
+    <ClInclude Include="graphic\Vertex.h" />
     <ClInclude Include="graphic\Visual.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

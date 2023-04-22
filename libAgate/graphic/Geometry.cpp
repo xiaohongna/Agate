@@ -3,6 +3,18 @@
 
 namespace agate
 {
+    void ArcToBezier(
+        float xStart,     // X coordinate of the last point
+        float yStart,     // Y coordinate of the last point
+        float xRadius,    // The ellipse's X radius
+        float yRadius,    // The ellipse's Y radius
+        float rRotation,  // Rotation angle of the ellipse's x axis
+        bool fLargeArc,  // Choose the larger of the 2 possible arcs if TRUE
+        bool fSweepUp,   // Sweep the arc while increasing the angle if TRUE
+        float xEnd,       // X coordinate of the last point
+        float yEnd,       // Y coordinate of the last point
+        Vector2* pPt,       // An array of size 12 receiving the Bezier points
+        int& cPieces);   // The number of output Bezier curves
 	void Geometry::startAt(float x, float y)
 	{
 		if (!_points.empty())
@@ -42,7 +54,7 @@ namespace agate
 		assert(count % 3 == 0);
 		auto bCount = count / 3;
 		reserve(count, bCount);
-		for (int i = 0; i < bCount; i++)
+		for (uint32_t i = 0; i < bCount; i++)
 		{
 			_points.emplace_back(pts[0]);
 			_points.emplace_back(pts[1]);
@@ -231,6 +243,11 @@ namespace agate
         rSinArcAngle = sinf(rAngle);
     }
 
+    constexpr float FUZZ = 1.e-6f;           // Relative 0
+    constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
+    constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
+    constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
+
     float GetBezierDistance(  // Return the distance as a fraction of the radius
         float rDot,    // In: The dot product of the two radius vectors
         float rRadius = 1.0f) // In: The radius of the arc's circle (optional=1)
@@ -278,11 +295,6 @@ namespace agate
         return rDist;
     }
 
-
-    constexpr float FUZZ = 1.e-6f;           // Relative 0
-    constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
-    constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
-    constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
 
     void ArcToBezier(
         float xStart,     // X coordinate of the last point

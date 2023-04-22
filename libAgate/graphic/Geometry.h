@@ -31,7 +31,7 @@ namespace agate
 
         void close()
         {
-            _close = true;
+            _closed = true;
         }
 
         void setTransform(const Matrix3X2& transition)

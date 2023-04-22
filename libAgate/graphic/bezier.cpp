@@ -18,7 +18,7 @@
 //  $ENDTAG
 //
 //------------------------------------------------------------------------------
-
+#include "pch.h"
 //#include "precomp.hpp"
 #include "bezier.h"
 // BEZIER_FLATTEN_GDI_COMPATIBLE:
@@ -159,10 +159,10 @@ inline VOID vBoundBox(
 
     for (i = 1; i < 4; i++)
     {
-        left = min(left, aptfx[i].x);
-        top = min(top, aptfx[i].y);
-        right = max(right, aptfx[i].x);
-        bottom = max(bottom, aptfx[i].y);
+        left = std::min(left, aptfx[i].x);
+        top = std::min(top, aptfx[i].y);
+        right = std::max(right, aptfx[i].x);
+        bottom = std::max(bottom, aptfx[i].y);
     }
 
     // We make the bounds one pixel loose for the nominal width 
@@ -290,7 +290,7 @@ INT Bezier32::cFlatten(
     
     // Okay, we have to step:
     
-        if (max(x.lError(), y.lError()) > HFD32_TEST_MAGNITUDE)
+        if (std::max(x.lError(), y.lError()) > HFD32_TEST_MAGNITUDE)
         {
             x.vHalveStepSize();
             y.vHalveStepSize();
@@ -302,7 +302,7 @@ INT Bezier32::cFlatten(
         // |2e2-e3| < max(|e2|,|e3|) << 2 and vHalveStepSize is guaranteed to reduce 
         // max(|e2|,|e3|) by >> 2, no more than one subdivision should be required to 
         // bring the new max(|e2|,|e3|) back to within HFD32_TEST_MAGNITUDE, so:
-        Assert(max(x.lError(), y.lError()) <= HFD32_TEST_MAGNITUDE);
+        Assert(std::max(x.lError(), y.lError()) <= HFD32_TEST_MAGNITUDE);
     
         while (!(cSteps & 1) &&
                x.lParentErrorDividedBy4() <= (HFD32_TEST_MAGNITUDE >> 2) &&
@@ -356,12 +356,12 @@ INT Bezier32::cFlatten(
 
 inline VOID HfdBasis64::vParentError(__out_ecount(1) LONGLONG* peq) const
 {
-    *peq = max(llabs(e3 << 2), llabs((e2 << 3) - (e3 << 2)));
+    *peq = std::max(llabs(e3 << 2), llabs((e2 << 3) - (e3 << 2)));
 }
 
 inline VOID HfdBasis64::vError(__out_ecount(1) LONGLONG* peq) const
 {
-    *peq = max(llabs(e2), llabs(e3));
+    *peq = std::max(llabs(e2), llabs(e3));
 }
 
 inline INT HfdBasis64::fxValue() const

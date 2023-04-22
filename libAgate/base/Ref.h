@@ -97,7 +97,7 @@ namespace agate
 
         Share_Ptr(Share_Ptr<T>& lp)
         {
-            p = lp->_p;
+            p = lp.p;
             if (p)
             {
                 p->retain();

@@ -4,11 +4,27 @@
 
 namespace agate
 {
+#ifdef ENABLE_SSE
+#include <immintrin.h>
+    static inline float  ImRsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
+#else
+    static inline float  ImRsqrt(float x) { return 1.0f / sqrtf(x); }
+#endif
+
+#define IM_NORMALIZE2F_OVER_ZERO(VX,VY)     { float d2 = VX*VX + VY*VY; if (d2 > 0.0f) { float inv_len = ImRsqrt(d2); VX *= inv_len; VY *= inv_len; } } (void)0
+#define IM_FIXNORMAL2F_MAX_INVLEN2          100.0f 
+#define IM_FIXNORMAL2F(VX,VY)               { float d2 = VX*VX + VY*VY; if (d2 > 0.000001f) { float inv_len2 = 1.0f / d2; if (inv_len2 > IM_FIXNORMAL2F_MAX_INVLEN2) inv_len2 = IM_FIXNORMAL2F_MAX_INVLEN2; VX *= inv_len2; VY *= inv_len2; } } (void)0
+
+
+    constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
+    
+    constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
+
 	void Visual::flatten(std::vector<Vector2>& flattenLines)
 	{
         Vector2* tranPpt = (Vector2*)_malloca(_points.size() * sizeof(Vector2));
         auto ppt = _points.data();
-        _transition.transformPoint(tranPpt, ppt, _points.size());
+        _transition.transformPoint(tranPpt, ppt, (uint32_t)_points.size());
         ppt = tranPpt;
         flattenLines.push_back(*ppt);
         for (auto ptt : _lineTypes)
@@ -48,6 +64,7 @@ namespace agate
     }
     void Visual::rasterizeStroke(uint32_t color, std::vector<Vector2>& flattenLines)
     {
+        /*
         constexpr float FringeScale = 1.0f;
         auto points_count = flattenLines.size();
         if (points_count < 2)
@@ -62,7 +79,7 @@ namespace agate
         const float AA_SIZE = FringeScale;
         const uint32_t col_trans = col & 0xFFFFFF; // ~IM_COL32_A_MASK;
         //宽度至少一个像素
-        auto thickness = max(_StrokeWidth, 1.0f);
+        auto thickness = std::max(_StrokeWidth, 1.0f);
 
         const int integer_thickness = (int)thickness;
         const float fractional_thickness = thickness - integer_thickness;
@@ -213,7 +230,7 @@ namespace agate
         _freea(temp_normals);
         _StrokeData.pipline = PipelineType::Color;
         _StrokeData.blend = BlendMode::Blend;
-        AddFlag(Geometry_Flag_Stroke_RS);
+        */
     }
     void Visual::rasterizeFill(uint32_t color, std::vector<Vector2>& flattenLines)
     {

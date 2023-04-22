@@ -42,10 +42,16 @@
     <ClInclude Include="graphic\bezier.h">
       <Filter>graphic</Filter>
     </ClInclude>
-    <ClInclude Include="base\Color.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="graphic\Visual.h">
+      <Filter>graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\Renderer.h">
+      <Filter>graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="base\Color.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\Vertex.h">
       <Filter>graphic</Filter>
     </ClInclude>
   </ItemGroup>
