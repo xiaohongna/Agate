@@ -515,21 +515,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Agate2D.h" />
     <ClInclude Include="base\Color.h" />
     <ClInclude Include="base\Matrix.h" />
     <ClInclude Include="base\Ref.h" />
     <ClInclude Include="base\Vector.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="graphic\AssetManager.h" />
     <ClInclude Include="graphic\bezier.h" />
     <ClInclude Include="graphic\Geometry.h" />
     <ClInclude Include="graphic\Renderer.h" />
     <ClInclude Include="graphic\Vertex.h" />
     <ClInclude Include="graphic\Visual.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="thirdPart\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Ref.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="graphic\AssetManager.cpp" />
     <ClCompile Include="graphic\bezier.cpp" />
     <ClCompile Include="graphic\Geometry.cpp" />
     <ClCompile Include="graphic\Visual.cpp" />

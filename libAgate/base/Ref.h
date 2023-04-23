@@ -51,6 +51,11 @@ namespace agate
 	{
 	public:
 
+        virtual bool init()
+        {
+            return true;
+        }
+
         void retain()
         {
             _ref->_reference++;
@@ -340,4 +345,16 @@ namespace agate
         }
     };
 
+    template<class T> 
+    Share_Ptr<T> CreateObject() 
+    {
+        Share_Ptr<T> result;
+        T* obj = new (std::nothrow)T();
+        if (obj->init())
+        {
+            result.attach(obj);
+        }
+        return result;
+
+    }
 };

@@ -10,7 +10,7 @@ namespace agate
 
 	constexpr uint32_t MaxTextureCount = 2;
 
-	enum class PipelineType
+	enum class EffectType
 	{
 		Color,
 		TextureColor,

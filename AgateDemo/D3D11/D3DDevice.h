@@ -6,13 +6,9 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "Drawable.h"
-#include "Renderer.h"
-#include "VideoBuffer.h"
 #include "Pipeline.h"
-#include "Brush.h"
-#include "AssetManager.h"
-
+#include "Agate2D.h"
+#include <atlbase.h>
 namespace agate
 {
 	struct D3DTexture

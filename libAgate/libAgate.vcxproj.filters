@@ -19,6 +19,12 @@
     <Filter Include="graphic">
       <UniqueIdentifier>{bc464dce-4899-440f-9956-d75ed27a1bf8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="thirdPart">
+      <UniqueIdentifier>{3ef7b455-eb86-4560-a0d4-a5b51ecb9d22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdPart\stb">
+      <UniqueIdentifier>{200cb893-51b0-4f06-865a-4483044525d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -54,6 +60,15 @@
     <ClInclude Include="graphic\Vertex.h">
       <Filter>graphic</Filter>
     </ClInclude>
+    <ClInclude Include="Agate2D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\AssetManager.h">
+      <Filter>graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPart\stb\stb_image.h">
+      <Filter>thirdPart\stb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -72,6 +87,9 @@
       <Filter>graphic</Filter>
     </ClCompile>
     <ClCompile Include="graphic\Visual.cpp">
+      <Filter>graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\AssetManager.cpp">
       <Filter>graphic</Filter>
     </ClCompile>
   </ItemGroup>
