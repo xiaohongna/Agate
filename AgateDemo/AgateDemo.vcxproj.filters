@@ -36,9 +36,6 @@
     <ClInclude Include="D3D11\Direct3D11Graphic.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11\GraphicContext.h">
-      <Filter>D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="D3D11\Pipeline.h">
       <Filter>D3D11</Filter>
     </ClInclude>
@@ -57,9 +54,6 @@
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="D3D11\Direct3D11Graphic.cpp">
-      <Filter>D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D11\GraphicContext.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="D3D11\Pipeline.cpp">

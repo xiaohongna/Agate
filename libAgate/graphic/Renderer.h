@@ -3,7 +3,8 @@
 #include <stdint.h>
 #include <vector>
 #include "Vertex.h"
-#include "Color.h"
+#include "base/Color.h"
+#include "base/Ref.h"
 namespace agate
 {
 	typedef void* TextureHandle;
@@ -75,9 +76,81 @@ namespace agate
 		uint32_t clipHeight;
 	};
 
+	template<typename T>
+	struct FixedBuffer
+	{
+		T* buffer;
+		uint32_t count;   //元素数量
+		uint32_t preSize;  //单元素大小
+		uint32_t size;    //buffer内存大小
+		FixedBuffer() :buffer{}, count{}, size{}, preSize{ 1 }
+		{
+
+		}
+
+		template<typename T1>
+		T1* Alloc(uint32_t count)
+		{
+			assert(count > 0);
+			this->count = count;
+			preSize = sizeof(T1);
+			auto sz = count * sizeof(T1);
+			if (sz != size)
+			{
+				size = (uint32_t)sz;
+				if (buffer)
+					delete buffer;
+				buffer = (T*)malloc(size);
+			}
+			return (T1*)buffer;
+		}
+
+		void Reset()
+		{
+			if (buffer)
+			{
+				delete buffer;
+				buffer = nullptr;
+				count = 0;
+				size = 0;
+			}
+		}
+
+		template<typename T1>
+		T1* As() const
+		{
+			assert(size == count * sizeof(T1));
+			return (T1*)buffer;
+		}
+
+		~FixedBuffer()
+		{
+			Reset();
+		}
+	};
+
+	struct RasterizeData
+	{
+		EffectType pipline;
+		BlendMode   blend;
+		FixedBuffer<char> vertex;
+		FixedBuffer<DrawIndex> index;
+		TextureHandle	texture[MaxTextureCount];
+		SamplerMode		samplers[MaxTextureCount];
+		RasterizeData() :
+			pipline{ EffectType::Color },
+			blend{ BlendMode::Blend },
+			texture{},
+			samplers{}
+		{
+
+		}
+	};
+
+
 	struct BatchDrawData
 	{
-		PipelineType pipline;
+		EffectType pipline;
 		unsigned char* vertexData;
 		uint32_t vertexCount;
 		DrawIndex* indexData;
@@ -85,7 +158,7 @@ namespace agate
 		std::vector<DrawCommand> commands;
 	};
 
-	class IRendererDelegate
+	class AgateAPI IRendererDelegate: public Ref
 	{
 	public:
 		virtual void GetViewSize(uint32_t& width, uint32_t& height) = 0;

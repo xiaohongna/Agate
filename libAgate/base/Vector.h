@@ -3,7 +3,7 @@
 
 namespace agate
 {
-    struct Vector2
+    struct AgateAPI Vector2
     {
         float   x, y;
         
@@ -50,7 +50,7 @@ namespace agate
 
     };
 
-    struct Vector4
+    struct AgateAPI Vector4
     {
         union
         {

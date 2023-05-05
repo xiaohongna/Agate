@@ -6,11 +6,8 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "Drawable.h"
-#include "Renderer.h"
 #include "VideoBuffer.h"
 #include "Pipeline.h"
-#include "Brush.h"
 #include "D3DDevice.h"
 namespace agate
 {

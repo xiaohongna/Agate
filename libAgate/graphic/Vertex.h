@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <vector>
-#include "Vector.h"
+#include "base/Vector.h"
 
 namespace agate
 {

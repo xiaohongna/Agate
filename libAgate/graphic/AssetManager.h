@@ -4,19 +4,19 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "Ref.h"
+#include "base/Ref.h"
 
 namespace agate
 {
 	typedef void* TextureHandle;
 
-	struct AssetManagerConfig
+	struct AgateAPI AssetManagerConfig
 	{
 		uint64_t maxVideoMemory;  //最大资产显存占用
 		bool holdMemory;
 	};
 
-	class IAssetManagerDelegate
+	class AgateAPI IAssetManagerDelegate
 	{
 	public:
 		virtual const AssetManagerConfig& GetConfig() = 0;
@@ -36,7 +36,7 @@ namespace agate
 
 	class AssetManager;
 
-	class ImageAsset: public Ref
+	class AgateAPI ImageAsset: public Ref
 	{
 	public:
 		ImageAsset() :
@@ -78,7 +78,7 @@ namespace agate
 		TextureHandle	_Texture;
 	};
 
-	class AssetManager
+	class AgateAPI AssetManager
 	{
 	public:
 		static AssetManager& SharedInstance()

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Renderer.h"
+#include "Agate2D.h"
 #include "VideoBuffer.h"
 
 namespace agate
@@ -9,7 +9,7 @@ namespace agate
 	class PipelineBase
 	{
 	public:
-		PipelineBase(PipelineType plt) :_PiplineType{ plt }
+		PipelineBase(EffectType plt) :_PiplineType{ plt }
 		{
 
 		}
@@ -17,7 +17,7 @@ namespace agate
 		virtual void Active(ID3D11DeviceContext* context);
 		virtual void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count) = 0;
 		void UpdateIndex(ID3D11DeviceContext* context, DrawIndex* data, uint32_t count);
-		PipelineType GetType()
+		EffectType GetType()
 		{
 			return _PiplineType;
 		}
@@ -37,13 +37,13 @@ namespace agate
 		CComPtr<ID3D11VertexShader> _VertexShader;
 		CComPtr<ID3D11InputLayout> _InputLayout;
 		CComPtr<ID3D11PixelShader> _PixelShader;
-		PipelineType		_PiplineType;
+		EffectType		_PiplineType;
 	};
 
 	class ColorPipline : public PipelineBase
 	{
 	public:
-		ColorPipline() : PipelineBase(PipelineType::Color)
+		ColorPipline() : PipelineBase(EffectType::Color)
 		{
 
 		}
@@ -60,7 +60,7 @@ namespace agate
 	public:
 		void Active(ID3D11DeviceContext* context) override;
 		void UpdateVertex(ID3D11DeviceContext* context, byte* data, uint32_t count) override;
-		TextureColorPipline() : PipelineBase(PipelineType::TextureColor)
+		TextureColorPipline() : PipelineBase(EffectType::TextureColor)
 		{
 
 		}
@@ -78,7 +78,7 @@ namespace agate
 	class DisplacementPipline : public PipelineBase
 	{
 	public:
-		DisplacementPipline() : PipelineBase(PipelineType::DistortTextureColor)
+		DisplacementPipline() : PipelineBase(EffectType::DistortTextureColor)
 		{
 
 		}

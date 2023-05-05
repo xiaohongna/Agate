@@ -69,6 +69,9 @@
     <ClInclude Include="thirdPart\stb\stb_image.h">
       <Filter>thirdPart\stb</Filter>
     </ClInclude>
+    <ClInclude Include="graphic\DrawingContext.h">
+      <Filter>graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -90,6 +93,9 @@
       <Filter>graphic</Filter>
     </ClCompile>
     <ClCompile Include="graphic\AssetManager.cpp">
+      <Filter>graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\DrawingContext.cpp">
       <Filter>graphic</Filter>
     </ClCompile>
   </ItemGroup>

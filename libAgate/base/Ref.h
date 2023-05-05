@@ -258,7 +258,7 @@ namespace agate
             }
         }
 
-        BasePtr(BasePtr& ptr)
+        BasePtr(const BasePtr& ptr)
         {
             _ref = ptr._ref;
             if (_ref)
@@ -320,9 +320,9 @@ namespace agate
 
         }
 
-        Weak_Ptr(Weak_Ptr<T>& lp)
+        Weak_Ptr(const Weak_Ptr<T>& lp):BasePtr(lp)
         {
-            _ref = lp._ref;
+           
         }
 
         Weak_Ptr(Weak_Ptr<T>&& lp)

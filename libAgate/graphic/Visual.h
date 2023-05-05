@@ -1,18 +1,18 @@
 #pragma once
-#include "Ref.h"
-#include "Vector.h"
-#include "Color.h"
-#include "Matrix.h"
+#include "base/Ref.h"
+#include "base/Vector.h"
+#include "base/Color.h"
+#include "base/Matrix.h"
 
 namespace agate
 {
-    enum class LineType
+    enum class AgateAPI LineType
     {
         Line,
         Bezier
     };
 
-    class Visual :
+    class AgateAPI Visual :
         public Ref
     {
     public:

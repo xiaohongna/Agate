@@ -3,7 +3,7 @@
 #include <atlbase.h>
 #include <stdint.h>
 #include <d3d11.h>
-
+#include <assert.h>
 namespace agate
 {
 

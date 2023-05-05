@@ -105,10 +105,12 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)libAgate;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D3DCompiler.lib;D3D11.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,7 +133,6 @@
     <ClInclude Include="AgateDemo.h" />
     <ClInclude Include="D3D11\D3DDevice.h" />
     <ClInclude Include="D3D11\Direct3D11Graphic.h" />
-    <ClInclude Include="D3D11\GraphicContext.h" />
     <ClInclude Include="D3D11\Pipeline.h" />
     <ClInclude Include="D3D11\VideoBuffer.h" />
     <ClInclude Include="D3D11\WindowGraphicContext.h" />
@@ -143,7 +144,6 @@
     <ClCompile Include="AgateDemo.cpp" />
     <ClCompile Include="D3D11\D3DDevice.cpp" />
     <ClCompile Include="D3D11\Direct3D11Graphic.cpp" />
-    <ClCompile Include="D3D11\GraphicContext.cpp" />
     <ClCompile Include="D3D11\Pipeline.cpp" />
     <ClCompile Include="D3D11\WindowGraphicContext.cpp" />
   </ItemGroup>

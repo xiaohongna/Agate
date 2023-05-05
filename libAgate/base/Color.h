@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
-
+#include "Ref.h"
 namespace agate
 {
-	union Color
+	union AgateAPI Color
 	{
 		struct
 		{

@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "DrawingContext.h"
+#include "graphic/DrawingContext.h"
 
 namespace agate
 {

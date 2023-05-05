@@ -8,9 +8,10 @@ namespace agate
 
 	DrawingContext* CreateDrawContext(HWND hwnd)
 	{
-		auto windowRender = std::make_unique<WindowGraphicContext>(g_Device, hwnd);
+		auto windowRender = new WindowGraphicContext(g_Device, hwnd);
 		AssetManager::SharedInstance().Initialize(&g_Device);
-		DrawingContext* context = new DrawingContext(std::move(windowRender));
+		DrawingContext* context = new DrawingContext();
+		context->setRendererDelegate(windowRender);
 		return context;
 	}
 

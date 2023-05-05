@@ -1,8 +1,8 @@
 #pragma once
-#include "Ref.h"
-#include "Vector.h"
-#include "Matrix.h"
-#include "Visual.h"
+#include "base/Ref.h"
+#include "base/Vector.h"
+#include "base/Matrix.h"
+#include "graphic/Visual.h"
 
 namespace agate
 {

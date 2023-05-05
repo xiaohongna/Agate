@@ -7,3 +7,4 @@
 
 #include "graphic/Geometry.h"
 #include "graphic/Renderer.h"
+#include "graphic/AssetManager.h"
