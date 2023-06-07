@@ -16,6 +16,9 @@
     <Filter Include="D3D11">
       <UniqueIdentifier>{6c633349-6890-496f-84ea-96affbcfd25b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{8ca65fc4-30c9-403d-9e74-54b280b77a8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -45,6 +48,9 @@
     <ClInclude Include="D3D11\WindowGraphicContext.h">
       <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AgateDemo.cpp">
@@ -61,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="D3D11\WindowGraphicContext.cpp">
       <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

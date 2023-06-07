@@ -25,6 +25,9 @@
     <Filter Include="thirdPart\stb">
       <UniqueIdentifier>{200cb893-51b0-4f06-865a-4483044525d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{a958e737-3179-4884-85ef-e7707aa8e163}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -72,6 +75,9 @@
     <ClInclude Include="graphic\DrawingContext.h">
       <Filter>graphic</Filter>
     </ClInclude>
+    <ClInclude Include="ui\Component.h">
+      <Filter>ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -97,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="graphic\DrawingContext.cpp">
       <Filter>graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\Component.cpp">
+      <Filter>ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
