@@ -132,7 +132,7 @@ namespace agate
 	struct RasterizeData
 	{
 		EffectType pipline;
-		BlendMode   blend;
+		BlendMode  blend;
 		FixedBuffer<char> vertex;
 		FixedBuffer<DrawIndex> index;
 		TextureHandle	texture[MaxTextureCount];

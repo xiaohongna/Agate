@@ -3,6 +3,7 @@
 #include "base/Vector.h"
 #include "base/Matrix.h"
 #include "graphic/Visual.h"
+#include "Canvas.h"
 
 namespace agate
 {
@@ -38,6 +39,8 @@ namespace agate
         {
             _transition = transition;
         }
+
+        void paint(Canvas* canvas);
 
     private:
         void reserve(int32_t pointCount, int32_t typeCount);

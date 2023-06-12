@@ -78,6 +78,12 @@
     <ClInclude Include="ui\Component.h">
       <Filter>ui</Filter>
     </ClInclude>
+    <ClInclude Include="ui\Frame.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\Canvas.h">
+      <Filter>graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -106,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="ui\Component.cpp">
       <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\Frame.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\Canvas.cpp">
+      <Filter>graphic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

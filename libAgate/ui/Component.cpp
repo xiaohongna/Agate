@@ -36,10 +36,18 @@ namespace agate
 		std::hash<std::string> h;
 		_hashOfName = h(name);
 	}
-	void Component::draw()
+
+	void Component::draw(Canvas* canvas)
+	{
+		selfDraw(canvas);
+		for (auto& item : _children)
+		{
+			item->selfDraw(canvas);
+		}
+	}
+
+	void Component::selfDraw(Canvas* canvas)
 	{
 	}
-	void Component::selfDraw()
-	{
-	}
+
 }

@@ -31,7 +31,7 @@ namespace agate
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(_handle, &ps);
-			Paint();
+			paint();
 			EndPaint(_handle, &ps);
 			break;
 		}
@@ -47,12 +47,20 @@ namespace agate
 		return 0;
 	}
 
-	void Window::Paint()
+	void Window::paint()
 	{
+		if (_canvas) 
+		{
+			_canvas->beginPaint(_width, _height);
+			draw(_canvas);
+			_canvas->endPaint();
+		}
 	}
 
 	void Window::OnResize(UINT width, UINT height)
 	{
+		_width = width;
+		_height = height;
 	}
 
 	LRESULT Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -97,6 +105,8 @@ namespace agate
 			_handle = hWnd;
 			::SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 		}
+		_canvas = new Canvas();
+		_canvas->bindContext(this);
 	}
 
 }

@@ -8,14 +8,15 @@
 // 全局变量:
 HINSTANCE hInst;                                // 当前实例
 
-agate::Window window;
+ agate::Share_Ptr<agate::Window> window;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-    window.Show(SW_SHOW);
+    window = new agate::Window();
+    window->Show(SW_SHOW);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGATEDEMO));
     MSG msg;
@@ -27,6 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             if (msg.message == WM_QUIT)
             {
+                window = nullptr;
                 return 0;
             }
             TranslateMessage(&msg);

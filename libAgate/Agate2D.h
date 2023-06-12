@@ -8,3 +8,7 @@
 #include "graphic/Geometry.h"
 #include "graphic/Renderer.h"
 #include "graphic/AssetManager.h"
+#include "graphic/Canvas.h"
+
+#include "ui/Frame.h"
+#include "ui/Component.h"

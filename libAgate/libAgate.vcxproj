@@ -524,6 +524,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="graphic\AssetManager.h" />
     <ClInclude Include="graphic\bezier.h" />
+    <ClInclude Include="graphic\Canvas.h" />
     <ClInclude Include="graphic\DrawingContext.h" />
     <ClInclude Include="graphic\Geometry.h" />
     <ClInclude Include="graphic\Renderer.h" />
@@ -532,12 +533,14 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="thirdPart\stb\stb_image.h" />
     <ClInclude Include="ui\Component.h" />
+    <ClInclude Include="ui\Frame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base\Ref.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="graphic\AssetManager.cpp" />
     <ClCompile Include="graphic\bezier.cpp" />
+    <ClCompile Include="graphic\Canvas.cpp" />
     <ClCompile Include="graphic\DrawingContext.cpp" />
     <ClCompile Include="graphic\Geometry.cpp" />
     <ClCompile Include="graphic\Visual.cpp" />
@@ -548,6 +551,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ui\Component.cpp" />
+    <ClCompile Include="ui\Frame.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -123,7 +123,17 @@ namespace agate
 		}
 	}
 
-	void Geometry::reserve(int32_t pointCount, int32_t typeCount)
+    void Geometry::paint(Canvas* canvas)
+    {
+        if (_visual == nullptr)
+        {
+            _visual = new Visual();
+            _visual->setGeometry(_points, _pointTypes, _closed);
+        }
+        canvas->paint(_visual);
+    }
+
+    void Geometry::reserve(int32_t pointCount, int32_t typeCount)
 	{
 		_points.reserve(_points.size() + pointCount);
 		_pointTypes.reserve(_pointTypes.size() + typeCount);
