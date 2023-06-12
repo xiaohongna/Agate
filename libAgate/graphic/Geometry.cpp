@@ -133,6 +133,33 @@ namespace agate
         canvas->paint(_visual);
     }
 
+    Geometry* Geometry::initAsRectangle(const Vector4& rect)
+    {
+        Geometry* geometry = new Geometry();
+        geometry->reserve(4, 3);
+        geometry->_points[0].x = rect.left;
+        geometry->_points[0].y = rect.top;
+        geometry->_points[1].x = rect.right;
+        geometry->_points[1].y = rect.top;
+        geometry->_points[2].x = rect.right;
+        geometry->_points[2].y = rect.bottom;
+        geometry->_points[3].x = rect.left;
+        geometry->_points[3].y = rect.bottom;
+        geometry->_pointTypes[0] = geometry->_pointTypes[1] = geometry->_pointTypes[2] = LineType::Line;
+        geometry->close();
+        return geometry;
+    }
+
+    Geometry* Geometry::initAsRoundedRectangle(const Vector4& rect, float rRadiusX, float rRadiusY)
+    {
+        return nullptr;
+    }
+
+    Geometry* Geometry::initAsEllipse(float rCenterX, float rCenterY, float rRadiusX, float rRadiusY)
+    {
+        return nullptr;
+    }
+
     void Geometry::reserve(int32_t pointCount, int32_t typeCount)
 	{
 		_points.reserve(_points.size() + pointCount);

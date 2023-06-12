@@ -42,6 +42,13 @@ namespace agate
 
         void paint(Canvas* canvas);
 
+
+        static Geometry* initAsRectangle(const Vector4& rect);
+
+        static Geometry* initAsRoundedRectangle(const Vector4& rect, float rRadiusX, float rRadiusY);
+
+        static Geometry* initAsEllipse(float rCenterX, float rCenterY, float rRadiusX, float rRadiusY);
+
     private:
         void reserve(int32_t pointCount, int32_t typeCount);
     private:
