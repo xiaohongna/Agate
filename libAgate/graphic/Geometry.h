@@ -40,10 +40,13 @@ namespace agate
             _transition = transition;
         }
 
-        void paint(Canvas* canvas);
+        void draw(Canvas* canvas);
 
+        void setFillColor(const Color& clr);
 
-        static Geometry* initAsRectangle(const Vector4& rect);
+        void setRect(const Rect& rect);
+
+        static Geometry* initAsRectangle(const Rect& rect);
 
         static Geometry* initAsRoundedRectangle(const Vector4& rect, float rRadiusX, float rRadiusY);
 

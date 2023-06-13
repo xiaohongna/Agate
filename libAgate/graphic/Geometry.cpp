@@ -123,7 +123,7 @@ namespace agate
 		}
 	}
 
-    void Geometry::paint(Canvas* canvas)
+    void Geometry::draw(Canvas* canvas)
     {
         if (_visual == nullptr)
         {
@@ -133,26 +133,93 @@ namespace agate
         canvas->paint(_visual);
     }
 
-    Geometry* Geometry::initAsRectangle(const Vector4& rect)
+    void Geometry::setFillColor(const Color& clr)
+    {
+        _fillColor = clr;
+    }
+
+    void Geometry::setRect(const Rect& rect)
+    {
+        reserve(4, 3);
+        _points[0] = rect.pos;
+        _points[1].x = rect.right();
+        _points[1].y = rect.top();
+        _points[2].x = rect.right();
+        _points[2].y = rect.bottom();
+        _points[3].x = rect.left();
+        _points[3].y = rect.bottom();
+        _pointTypes[0] = _pointTypes[1] = _pointTypes[2] = LineType::Line;
+        _closed = true;
+    }
+
+    Geometry* Geometry::initAsRectangle(const Rect& rect)
     {
         Geometry* geometry = new Geometry();
-        geometry->reserve(4, 3);
-        geometry->_points[0].x = rect.left;
-        geometry->_points[0].y = rect.top;
-        geometry->_points[1].x = rect.right;
-        geometry->_points[1].y = rect.top;
-        geometry->_points[2].x = rect.right;
-        geometry->_points[2].y = rect.bottom;
-        geometry->_points[3].x = rect.left;
-        geometry->_points[3].y = rect.bottom;
-        geometry->_pointTypes[0] = geometry->_pointTypes[1] = geometry->_pointTypes[2] = LineType::Line;
-        geometry->close();
+        geometry->setRect(rect);
         return geometry;
+    }
+
+    inline void ClampRoundedRectangleRadius(
+        float rDimension,                // The dimension, width or height
+        float& rRadius)// The corresponding radius, clamped here
+    {
+        float r = rDimension / 2;
+        if (rRadius > r)
+        {
+            rRadius = r;
+        }
+    }
+
+    constexpr float FUZZ = 1.e-6f;           // Relative 0
+    constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
+    constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
+    constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
+
+    void InitBufferWithRoundedRectanglePoints(
+        Vector2* pts,
+        // The point buffer
+        const Vector4& rect,
+        // The rectangle
+        float rRadiusX,
+        // The X-radius of the corner (elliptical arc)
+        float rRadiusY
+        // The Y-radius of the corner (elliptical arc)
+    )
+    {
+        ClampRoundedRectangleRadius(rect.right - rect.left, rRadiusX);
+        ClampRoundedRectangleRadius(rect.bottom - rect.top, rRadiusY);
+
+        // Note "1 - ARC_AS_BEZIER" - because we measure from the edge of the rectangle,
+        // not the center of the arc.
+
+        float rBezierX = (1.0f - ARC_AS_BEZIER) * rRadiusX;
+        float rBezierY = (1.0f - ARC_AS_BEZIER) * rRadiusY;
+
+        pts[1].x = pts[0].x = pts[15].x = pts[14].x = rect.left;
+        pts[2].x = pts[13].x = rect.left + rBezierX;
+        pts[3].x = pts[12].x = rect.left + rRadiusX;
+        pts[4].x = pts[11].x = rect.right - rRadiusX;
+        pts[5].x = pts[10].x = rect.right - rBezierX;
+        pts[6].x = pts[7].x = pts[8].x = pts[9].x = rect.right;
+
+        pts[2].y = pts[3].y = pts[4].y = pts[5].y = rect.top;
+        pts[1].y = pts[6].y = rect.top + rBezierY;
+        pts[0].y = pts[7].y = rect.top + rRadiusY;
+        pts[15].y = pts[8].y = rect.bottom - rRadiusY;
+        pts[14].y = pts[9].y = rect.bottom - rBezierY;
+        pts[13].y = pts[12].y = pts[11].y = pts[10].y = rect.bottom;
     }
 
     Geometry* Geometry::initAsRoundedRectangle(const Vector4& rect, float rRadiusX, float rRadiusY)
     {
-        return nullptr;
+        Geometry* geometry = new Geometry();
+        geometry->reserve(16, 7);
+        auto pPoints = geometry->_points.data();
+        auto pTypes = geometry->_pointTypes.data();
+        InitBufferWithRoundedRectanglePoints(pPoints, rect, rRadiusX, rRadiusY);
+        pTypes[0] = pTypes[2] = pTypes[4] = pTypes[6] = LineType::Bezier;
+        pTypes[1] = pTypes[3] = pTypes[5] = LineType::Line;
+        return geometry;
     }
 
     Geometry* Geometry::initAsEllipse(float rCenterX, float rCenterY, float rRadiusX, float rRadiusY)
@@ -279,11 +346,6 @@ namespace agate
         rCosArcAngle = cosf(rAngle);
         rSinArcAngle = sinf(rAngle);
     }
-
-    constexpr float FUZZ = 1.e-6f;           // Relative 0
-    constexpr float PI_OVER_180 = 0.0174532925199432957692f;  // PI/180
-    constexpr float FOUR_THIRDS = 1.33333333333333333f; // = 4/3
-    constexpr float ARC_AS_BEZIER = 0.5522847498307933984f; // =(\/2 - 1)*4/3
 
     float GetBezierDistance(  // Return the distance as a fraction of the radius
         float rDot,    // In: The dot product of the two radius vectors

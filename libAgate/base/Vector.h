@@ -62,11 +62,6 @@ namespace agate
             {
                 float left, top, right, bottom;
             };
-            struct
-            {
-                Vector2 pos;
-                Vector2 size;
-            };
         };
 
         Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
@@ -89,6 +84,42 @@ namespace agate
         bool operator == (const Vector4 v4) const
         {
             return x == v4.x && y == v4.y && z == v4.z && w == v4.w;
+        }
+    };
+
+    struct Rect
+    {
+        Vector2 pos;
+        Vector2 size;
+
+        Rect() :pos{}, size{}
+        {
+
+        }
+
+        Rect(float left, float top, float width, float height):
+            pos(left, top), size(width, height)
+        {
+
+        }
+
+        float left() const
+        {
+            return pos.x;
+        }
+
+        float top() const
+        {
+            return pos.y;
+        }
+
+        float right() const
+        {
+            return pos.x + size.x;
+        }
+        float bottom() const
+        {
+            return pos.y + size.y;
         }
     };
 }
